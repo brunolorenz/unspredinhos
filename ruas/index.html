@@ -413,7 +413,7 @@ function renderResults() {
       </div>
       <div class="uf-filter">
         <button class="uf-btn${!currentUF ? ' active' : ''}" onclick="setUF(null)">Todos</button>
-        ${ufs.map(uf => `<button class="uf-btn${currentUF === uf ? ' active' : ''}" onclick="setUF('${uf}')">${uf} <span style="opacity:.5;font-weight:400">${byUF[uf].length}</span></button>`).join('')}
+        ${ufs.map(uf => { const isHL = HIGHLIGHT_UF.has(uf); const hlStyle = isHL ? ' style="border-color:#E07B3A;color:#E07B3A"' : ''; return `<button class="uf-btn${currentUF === uf ? ' active' : ''}"${hlStyle} onclick="setUF('${uf}')">${uf} <span style="opacity:.5;font-weight:400">${byUF[uf].length}</span></button>`; }).join('')}
       </div>
     </div>`;
 
