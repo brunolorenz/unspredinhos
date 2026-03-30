@@ -420,9 +420,12 @@ function renderResults() {
   const groups   = currentUF ? {[currentUF]: byUF[currentUF]} : byUF;
   const showUFs  = currentUF ? [currentUF] : ufs;
 
+  const HIGHLIGHT_UF = new Set(['AP','PI','RR','DF']);
+
   showUFs.forEach(uf => {
+    const ufStyle = HIGHLIGHT_UF.has(uf) ? ' style="color:#E07B3A"' : '';
     html += `<div class="street-group">
-      <div class="uf-header">${uf}</div>`;
+      <div class="uf-header"${ufStyle}>${uf}</div>`;
     groups[uf].forEach(e => {
       const q = encodeURIComponent(e.l + ', ' + e.c + ', ' + e.u + ', Brasil');
       html += `<div class="street-item">
