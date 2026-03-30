@@ -94,14 +94,14 @@ body {
 
 <div class="controls">
   <label>Dia</label>
-  <input type="number" id="inputDay" min="1" max="31" value="7">
+  <input type="number" id="inputDay" min="1" max="31">
   <label>Mês</label>
   <select id="inputMonth">
     <option value="1">Janeiro</option><option value="2">Fevereiro</option>
     <option value="3">Março</option><option value="4">Abril</option>
     <option value="5">Maio</option><option value="6">Junho</option>
     <option value="7">Julho</option><option value="8">Agosto</option>
-    <option value="9" selected>Setembro</option><option value="10">Outubro</option>
+    <option value="9">Setembro</option><option value="10">Outubro</option>
     <option value="11">Novembro</option><option value="12">Dezembro</option>
   </select>
   <button onclick="updateCard()" style="background:#fff;border:1px solid #444;color:#111;padding:8px 20px;border-radius:8px;font-size:14px;font-family:Inter,sans-serif;cursor:pointer;font-weight:500;">Gerar</button>
@@ -214,6 +214,12 @@ function scaleCard() {
 }
 window.addEventListener('resize', scaleCard);
 scaleCard();
+
+// Inicializa com o dia e mês de hoje
+const _hoje = new Date();
+document.getElementById('inputDay').value  = _hoje.getDate();
+document.getElementById('inputMonth').value = _hoje.getMonth() + 1;
+
 updateCard();
 </script>
 </body>
