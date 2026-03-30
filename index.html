@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predinho do Dia · @unspredinhos 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a18;padding:12px}
+@media(prefers-color-scheme:dark){body{background:#1a1a18;color:#e8e6df}}
+#app{max-width:960px;margin:0 auto}
+
+#status-bar{font-size:12px;color:#888780;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:8px;background:#f1efe8;transition:background 0.3s}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#888780;flex-shrink:0}
+.status-dot.ok{background:#5DCAA5}
+.status-dot.err{background:#E24B4A}
+.status-dot.loading{background:#EF9F27;animation:pulse 0.8s infinite}
+#status-bar.loading-state{background:#FFF8EC;color:#854F0B}
+#status-bar.ok-state{background:#F0FBF6;color:#0F6E56}
+#status-bar.err-state{background:#FEF2F2;color:#A32D2D}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status-spinner{width:14px;height:14px;border:2px solid #FAC775;border-top-color:#854F0B;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;display:none}
+#status-bar.loading-state .status-spinner{display:block}
+#status-bar.loading-state .status-dot{display:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#reload-btn{font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid #b4b2a9;background:transparent;color:#888780;cursor:pointer;margin-left:auto}
+#reload-btn:hover{background:#f1efe8}
+
+#controls{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.btn-filter{font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid transparent;cursor:pointer;transition:all 0.15s}
+.btn-filter[data-region="all"]{background:#e8e6e1;color:#444441}
+.btn-filter[data-region="Sul"]{background:#E1F5EE;color:#0F6E56;border-color:#9FE1CB}
+.btn-filter[data-region="Sudeste"]{background:#E6F1FB;color:#185FA5;border-color:#B5D4F4}
+.btn-filter[data-region="Nordeste"]{background:#FAECE7;color:#993C1D;border-color:#F5C4B3}
+.btn-filter[data-region="Centro Oeste"]{background:#FAEEDA;color:#854F0B;border-color:#FAC775}
+.btn-filter[data-region="Norte"]{background:#EEEDFE;color:#534AB7;border-color:#CECBF6}
+.btn-filter.active{color:#fff;border-color:transparent}
+.btn-filter[data-region="all"].active{background:#444441}
+.btn-filter[data-region="Sul"].active{background:#1D9E75}
+.btn-filter[data-region="Sudeste"].active{background:#185FA5}
+.btn-filter[data-region="Nordeste"].active{background:#993C1D}
+.btn-filter[data-region="Centro Oeste"].active{background:#854F0B}
+.btn-filter[data-region="Norte"].active{background:#534AB7}
+
+
+/* Desktop: mapa | calendário lado a lado */
+#layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+
+/* Mobile: calendário primeiro, mapa depois (mais natural no celular) */
+@media(max-width:640px){
+  body{padding:8px}
+  #layout{grid-template-columns:1fr;gap:12px}
+  #map-col{order:2}
+  #cal-col{order:1}
+  #controls{gap:4px}
+  .btn-filter{font-size:10px;padding:2px 8px}
+}
+
+#map-wrap{position:relative}
+#map svg{width:100%;display:block;border-radius:8px}
+
+#map-tooltip{display:none;position:absolute;background:#fff;border:0.5px solid #b4b2a9;border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:10;max-width:180px;line-height:1.5}
+@media(prefers-color-scheme:dark){#map-tooltip{background:#2c2c2a}}
+#map-tooltip strong{font-weight:500;display:block}
+#map-tooltip .meta{color:#888780;font-size:10px}
+
+#month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+#month-label{font-size:14px;font-weight:500}
+.nav-btn{background:transparent;border:0.5px solid #b4b2a9;border-radius:8px;padding:4px 12px;font-size:15px;cursor:pointer;color:#1a1a18;transition:background 0.15s;line-height:1}
+.nav-btn:hover{background:#f1efe8}
+@media(prefers-color-scheme:dark){.nav-btn{color:#e8e6df}}
+
+#cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dow{font-size:10px;color:#b4b2a9;text-align:center;padding:2px 0;font-weight:500}
+.cal-day{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid transparent;transition:background 0.12s,border-color 0.12s,transform 0.12s;position:relative;cursor:default;user-select:none}
+.cal-day.has-predinho{cursor:pointer}
+.cal-day.hovered,.cal-day.selected{transform:scale(1.08)}
+.cal-day .day-num{font-size:11px;font-weight:500;line-height:1;pointer-events:none}
+.cal-day .day-dot{width:5px;height:5px;border-radius:50%;margin-top:3px;pointer-events:none}
+.cal-day.no-predinho .day-num{color:#b4b2a9;font-size:11px}
+
+/* Painel de detalhe */
+#detail{margin-top:12px;padding:12px 14px;background:#f1efe8;border-radius:8px;min-height:60px;font-size:13px;display:flex;align-items:center;justify-content:center;color:#888780}
+@media(prefers-color-scheme:dark){#detail{background:#2c2c2a}}
+#detail.filled{display:block;color:#1a1a18}
+@media(prefers-color-scheme:dark){#detail.filled{color:#e8e6df}}
+.detail-city{font-weight:500;font-size:14px;margin-bottom:3px}
+.detail-sub{font-size:11px;color:#888780;line-height:1.6}
+.detail-region{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-top:6px;font-weight:500}
+
+/* Imagem 996x1280 → proporção ~0.778 → aspect-ratio 39/50 */
+.detail-img-wrap{
+  margin-top:10px;
+  width:100%;
+  border-radius:8px;
+  overflow:hidden;
+  background:#f1efe8;
+  border:0.5px solid #d3d1c7;
+  aspect-ratio:996/1280;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+@media(prefers-color-scheme:dark){.detail-img-wrap{background:#2c2c2a;border-color:#5f5e5a}}
+.detail-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.detail-img-wrap.placeholder{font-size:11px;color:#b4b2a9;font-style:italic}
+
+/* No mobile, limita a altura da imagem para não ocupar a tela toda */
+@media(max-width:640px){
+  .detail-img-wrap{aspect-ratio:996/1280}
+}
+
+#stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+@media(max-width:640px){#stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:#f1efe8;border-radius:8px;padding:8px;text-align:center}
+@media(prefers-color-scheme:dark){.stat{background:#2c2c2a}}
+.stat-n{font-size:18px;font-weight:500}
+.stat-l{font-size:10px;color:#888780;margin-top:1px}
+
+/* Cabeçalho */
+#header{text-align:center;padding:24px 12px 20px;border-bottom:0.5px solid #d3d1c7;margin-bottom:16px}
+@media(prefers-color-scheme:dark){#header{border-color:#3d3d3a}}
+#header .tag{font-size:11px;letter-spacing:0.08em;color:#888780;text-transform:uppercase;margin-bottom:8px}
+#header h1{font-size:26px;font-weight:500;line-height:1.2;color:#1a1a18;margin-bottom:6px}
+@media(prefers-color-scheme:dark){#header h1{color:#e8e6df}}
+#header .sub{font-size:13px;color:#888780;line-height:1.5}
+@media(max-width:640px){#header{padding:16px 8px 14px}#header h1{font-size:20px}}
+/* Rodapé */
+#footer{margin-top:32px;padding:20px 12px 24px;border-top:0.5px solid #d3d1c7;text-align:center}
+@media(prefers-color-scheme:dark){#footer{border-color:#3d3d3a}}
+#footer .desc{font-size:12px;color:#888780;line-height:1.7;max-width:520px;margin:0 auto 16px}
+#footer .links{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+#footer a{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:7px 16px;border-radius:20px;text-decoration:none;transition:opacity 0.15s}
+#footer a:hover{opacity:0.8}
+#footer .btn-ig{background:#1a1a18;color:#fff}
+@media(prefers-color-scheme:dark){#footer .btn-ig{background:#e8e6df;color:#1a1a18}}
+#footer .btn-wa{background:#25D366;color:#fff}
+#footer .credit{margin-top:16px;font-size:10px;color:#b4b2a9}
+
+.ins-section{margin:32px 0}
+.ins-title{font-size:12px;font-weight:500;color:#888780;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:.5px solid #d3d1c7}
+.ins-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0}
+@media(max-width:640px){.ins-cards{grid-template-columns:repeat(2,1fr)}}
+.ins-card{background:#f1efe8;border-radius:10px;padding:14px 12px;text-align:center}
+.ins-card-n{font-size:24px;font-weight:500;line-height:1;margin-bottom:4px}
+.ins-card-l{font-size:11px;color:#888780;line-height:1.4}
+.ins-prog-wrap{background:#f1efe8;border-radius:10px;padding:16px;margin-bottom:0}
+.ins-prog-track{height:10px;background:#d3d1c7;border-radius:5px;overflow:hidden;margin:8px 0 5px}
+.ins-prog-fill{height:100%;border-radius:5px;background:#1D9E75;transition:width 1.2s ease}
+.ins-prog-labels{display:flex;justify-content:space-between;font-size:11px;color:#888780}
+.ins-two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:640px){.ins-two{grid-template-columns:1fr}}
+.ins-bar-list{display:flex;flex-direction:column;gap:7px}
+.ins-bar-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.ins-bar-label{min-width:96px;color:#1a1a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.ins-bar-track{flex:1;height:7px;background:#d3d1c7;border-radius:4px;overflow:hidden}
+.ins-bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.ins-bar-count{min-width:24px;text-align:right;color:#888780;font-size:11px}
+.ins-icard{background:#f1efe8;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;font-size:12px}
+.ins-icard.warn{background:#FFF8EC}
+.ins-icard.good{background:#F0FBF6}
+.ins-icard.fun{background:#EEEDFE}
+.ins-icard-title{font-weight:500;margin-bottom:2px;font-size:12px}
+.ins-icard-body{color:#888780;line-height:1.6;font-size:11px}
+.ins-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.ins-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ins-pill{font-size:10px;padding:3px 9px;border-radius:10px;background:#FAECE7;color:#993C1D}
+.ins-rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:640px){.ins-rec-grid{grid-template-columns:repeat(2,1fr)}}
+.ins-rec-card{background:#f1efe8;border-radius:10px;padding:12px;text-align:center}
+.ins-rec-val{font-size:15px;font-weight:500;margin-bottom:3px;word-break:break-word;line-height:1.2}
+.ins-rec-label{font-size:10px;color:#888780}
+.ins-divider{border:none;border-top:.5px solid #d3d1c7;margin:32px 0}
+</style>
+</head>
+<body>
+<div id="app">
+<header id="header">
+  <div class="tag">Projeto 365 · 2026</div>
+  <h1>Predinho do Dia</h1>
+  <div class="sub">365 predinhos em 2026 — um por dia, em ruas com o nome da data de hoje, espalhados por todo o Brasil. Por <a href="https://instagram.com/unspredinhos" target="_blank" rel="noopener" style="color:#888780;text-decoration:underline">@unspredinhos</a></div>
+</header>
+
+
+<!-- =====================================================
+  CONFIGURAÇÃO — cole aqui a URL CSV da sua planilha
+
+  Como obter:
+  1. Abra a planilha no Google Sheets
+  2. Arquivo → Compartilhar → Publicar na web
+  3. Selecione aba "Predinhos 2026" e formato "CSV"
+  4. Clique em Publicar e copie o link gerado
+  5. Substitua o valor de SHEET_CSV_URL abaixo
+====================================================== -->
+<script>
+const SHEET_CSV_URL = 'https://script.google.com/macros/s/AKfycbzTnhTf2CH2Q6nVnla3YgJC-1mx7I804AsKIhASMYsCZrgWZwfyjAnZS-oIKu4xQnbXSg/exec';
+// Exemplo:
+// const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/SEU_ID_AQUI/pub?gid=0&single=true&output=csv';
+</script>
+
+  <div id="status-bar">
+    <span class="status-spinner" id="status-spinner"></span><span class="status-dot loading" id="status-dot"></span>
+    <span id="status-text">Carregando...</span>
+    <button id="reload-btn" onclick="loadData()">↺ Atualizar</button>
+  </div>
+  <div id="controls">
+    <button class="btn-filter active" data-region="all">Todos</button>
+    <button class="btn-filter" data-region="Sul">Sul</button>
+    <button class="btn-filter" data-region="Sudeste">Sudeste</button>
+    <button class="btn-filter" data-region="Nordeste">Nordeste</button>
+    <button class="btn-filter" data-region="Centro Oeste">Centro-Oeste</button>
+    <button class="btn-filter" data-region="Norte">Norte</button>
+  </div>
+  <div id="layout">
+    <div id="map-col">
+      <div id="map-wrap"><div id="map"></div><div id="map-tooltip"></div></div>
+      <div id="stats">
+        <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">predinhos</div></div>
+        <div class="stat"><div class="stat-n" id="s-estados">—</div><div class="stat-l">estados</div></div>
+        <div class="stat"><div class="stat-n" id="s-cidades">—</div><div class="stat-l">cidades</div></div>
+        <div class="stat"><div class="stat-n" id="s-regioes">—</div><div class="stat-l">regiões</div></div>
+      </div>
+    </div>
+    <div id="cal-col">
+      <div id="month-nav">
+        <button class="nav-btn" id="prev-month">‹</button>
+        <span id="month-label"></span>
+        <button class="nav-btn" id="next-month">›</button>
+      </div>
+      <div id="cal-grid"></div>
+      <div id="detail">Selecione um dia para ver o predinho</div>
+    </div>
+  </div>
+
+<hr class="ins-divider">
+
+<div class="ins-section">
+  <div class="ins-title">Progresso do ano</div>
+  <div class="ins-cards" style="margin-bottom:14px">
+    <div class="ins-card"><div class="ins-card-n" id="i-total">—</div><div class="ins-card-l">predinhos desenhados</div></div>
+    <div class="ins-card"><div class="ins-card-n" id="i-restam">—</div><div class="ins-card-l">ainda por desenhar</div></div>
+    <div class="ins-card"><div class="ins-card-n" id="i-pct">—</div><div class="ins-card-l">do ano concluído</div></div>
+    <div class="ins-card"><div class="ins-card-n" id="i-km">—</div><div class="ins-card-l">km percorridos virtualmente</div></div>
+  </div>
+  <div class="ins-prog-wrap">
+    <div style="font-size:11px;color:#888780">Jornada de 365 predinhos</div>
+    <div class="ins-prog-track"><div class="ins-prog-fill" id="i-prog" style="width:0%"></div></div>
+    <div class="ins-prog-labels"><span id="i-prog-l">0 feitos</span><span>365 no total</span></div>
+  </div>
+</div>
+
+<div class="ins-section">
+  <div class="ins-title">Recordes e curiosidades</div>
+  <div class="ins-rec-grid" id="i-records"></div>
+  <div id="i-fun" style="margin-top:12px"></div>
+</div>
+
+<div class="ins-section">
+  <div class="ins-title">Distribuição por região</div>
+  <div class="ins-two">
+    <div style="position:relative;height:200px"><canvas id="i-chart-reg"></canvas></div>
+    <div class="ins-bar-list" id="i-bar-reg"></div>
+  </div>
+  <div id="i-ins-reg" style="margin-top:12px"></div>
+</div>
+
+<div class="ins-section">
+  <div class="ins-title">Estados mais visitados</div>
+  <div class="ins-bar-list" id="i-bar-est" style="margin-bottom:14px"></div>
+  <div style="font-size:11px;color:#888780;margin-bottom:6px">Estados ainda não visitados</div>
+  <div class="ins-pills" id="i-missing"></div>
+</div>
+
+<div class="ins-section">
+  <div class="ins-title">Predinhos por mês</div>
+  <div style="position:relative;height:160px"><canvas id="i-chart-mes"></canvas></div>
+  <div id="i-ins-mes" style="margin-top:12px"></div>
+</div>
+
+<div class="ins-section">
+  <div class="ins-title">Próximos passos</div>
+  <div id="i-proximos"></div>
+</div>
+
+<footer id="footer">
+  <div class="desc">
+    Um projeto de Bruno Lorenz: 365 desenhos em aquarela, um por dia, de casas e edificações localizadas em ruas que levam o nome da data do desenho. Uma crônica afetiva da arquitetura popular brasileira.
+  </div>
+  <div class="links">
+    <a class="btn-ig" href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      @unspredinhos
+    </a>
+    <a class="btn-wa" href="https://wa.me/5551993115340" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Fale comigo
+    </a>
+  </div>
+  <div class="credit">Aquarelas e desenhos: Bruno Lorenz · @unspredinhos · 2026</div>
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+const RC={'Sul':'#5DCAA5','Sudeste':'#85B7EB','Nordeste':'#F0997B','Centro Oeste':'#EF9F27','Norte':'#AFA9EC'};
+const SR={'Rio Grande do Sul':'Sul','Santa Catarina':'Sul','Paraná':'Sul','São Paulo':'Sudeste','Rio de Janeiro':'Sudeste','Minas Gerais':'Sudeste','Espírito Santo':'Sudeste','Bahia':'Nordeste','Pernambuco':'Nordeste','Ceará':'Nordeste','Maranhão':'Nordeste','Rio Grande do Norte':'Nordeste','Paraíba':'Nordeste','Alagoas':'Nordeste','Sergipe':'Nordeste','Piauí':'Nordeste','Mato Grosso do Sul':'Centro Oeste','Mato Grosso':'Centro Oeste','Goiás':'Centro Oeste','Distrito Federal':'Centro Oeste','Pará':'Norte','Amazonas':'Norte','Acre':'Norte','Rondônia':'Norte','Roraima':'Norte','Amapá':'Norte','Tocantins':'Norte'};
+const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DOWS=['D','S','T','Q','Q','S','S'];
+
+let predinhos=[], byKey={};
+let activeRegion='all', curMonth=new Date().getMonth()+1, selectedKey=null, hoveredKey=null;
+let allDots, svgReady=false;
+const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+
+function setStatus(state,text){
+  const bar=document.getElementById('status-bar');
+  const dot=document.getElementById('status-dot');
+  dot.className='status-dot '+state;
+  bar.className=state+'-state';
+  document.getElementById('status-text').textContent=text;
+}
+
+function parseCSV(text){
+  const lines=text.trim().split('\n');
+  if(!lines.length) return [];
+  const raw=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase());
+  const idx={};
+  raw.forEach((h,i)=>{ idx[h]=i; });
+  const get=(row,names)=>{
+    for(const n of names){ if(idx[n]!==undefined) return (row[idx[n]]||'').replace(/^"|"$/g,'').trim(); }
+    return '';
+  };
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const cols=lines[i].match(/("(?:[^"]|"")*"|[^,]*)/g)||[];
+    const d=parseInt(get(cols,['dia','d']));
+    const m=parseInt(get(cols,['mês','mes','m']));
+    const lat=parseFloat(String(get(cols,['latitude','lat'])).replace(',','.'));
+    const lng=parseFloat(String(get(cols,['longitude','lng'])).replace(',','.'));
+    if(!d||!m||isNaN(lat)||isNaN(lng)) continue;
+    const mm=String(m).padStart(2,'0'), dd=String(d).padStart(2,'0');
+    rows.push({
+      d, m,
+      dia: get(cols,['data (dd/mm)','data'])||`${dd}/${mm}`,
+      rua: get(cols,['rua']),
+      cidade: get(cols,['cidade']),
+      uf: get(cols,['uf']),
+      regiao: get(cols,['região','regiao']),
+      lat, lng,
+      img: get(cols,['url imagem','url_imagem','imagem','img']),
+    });
+  }
+  return rows;
+}
+
+function parseJSON(rows){
+  const out=[];
+  for(const r of rows){
+    const get=(...names)=>{ for(const n of names){ const k=Object.keys(r).find(k=>k.toLowerCase().trim()===n); if(k!==undefined&&r[k]!=='') return String(r[k]).trim(); } return ''; };
+    const d=parseInt(get('dia','d'));
+    const m=parseInt(get('mês','mes','m'));
+    const lat=parseFloat(String(get('latitude','lat')).replace(',','.'));
+    const lng=parseFloat(String(get('longitude','lng')).replace(',','.'));
+    if(!d||!m||isNaN(lat)||isNaN(lng)) continue;
+    const mm=String(m).padStart(2,'0'), dd=String(d).padStart(2,'0');
+    out.push({
+      d, m,
+      dia: get('data (dd/mm)','data')||`${dd}/${mm}`,
+      rua: get('rua'),
+      cidade: get('cidade'),
+      uf: get('uf'),
+      regiao: get('região','regiao'),
+      lat, lng,
+      img: get('url imagem','url_imagem','imagem','img'),
+    });
+  }
+  return out;
+}
+
+async function loadData(){
+  setStatus('loading','Buscando os predinhos na planilha, um momento...');
+  if(!SHEET_CSV_URL){
+    setStatus('err','URL não configurada — usando dados locais');
+    boot(FALLBACK); return;
+  }
+  try{
+    const res=await fetch(SHEET_CSV_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    if(!json.length) throw new Error('Sem dados');
+    const data=parseJSON(json);
+    if(!data.length) throw new Error('Nenhuma linha válida');
+    const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    setStatus('ok',`${data.length} predinhos · atualizado às ${now}`);
+    boot(data);
+  } catch(e){
+    setStatus('err','Erro: '+e.message+' — usando dados locais');
+    boot(FALLBACK);
+  }
+}
+
+function boot(data){
+  predinhos=data;
+  byKey={};
+  predinhos.forEach(p=>{ byKey[`${p.d}-${p.m}`]=p; });
+  curMonth=predinhos[predinhos.length-1]?.m||1;
+  if(svgReady) renderDots();
+  buildCalendar();
+  updateStats();
+  clearDetail();
+}
+
+function daysInMonth(m){return m===2?29:[4,6,9,11].includes(m)?30:31;}
+function firstDow(m){return new Date(2026,m-1,1).getDay();}
+function getActiveDia(){return selectedKey?byKey[selectedKey]?.dia:hoveredKey?byKey[hoveredKey]?.dia:null;}
+
+function updateDots(){
+  if(!allDots) return;
+  const ad=getActiveDia();
+  allDots.each(function(d){
+    const el=d3.select(this), inF=activeRegion==='all'||d.regiao===activeRegion, act=d.dia===ad, c=RC[d.regiao]||'#888';
+    act ? el.attr('r',10).attr('fill',c).attr('stroke','#fff').attr('stroke-width',2.5).attr('opacity',1).style('filter',`drop-shadow(0 0 6px ${c})`)
+        : el.attr('r',5).attr('fill',c).attr('stroke','rgba(255,255,255,0.7)').attr('stroke-width',1).attr('opacity',inF?0.75:0.06).style('filter','none');
+  });
+}
+
+function styledCalDay(el,p,key){
+  const inF=activeRegion==='all'||p.regiao===activeRegion;
+  if(!inF){
+    el.className='cal-day no-predinho';
+    el.style.cssText='background:#F1EFE8;border-color:transparent';
+    el.innerHTML=`<div class="day-num">${p.d}</div>`; return;
+  }
+  const sel=selectedKey===key, hov=hoveredKey===key, act=sel||hov, c=RC[p.regiao];
+  el.className='cal-day has-predinho'+(sel?' selected':'')+(hov&&!sel?' hovered':'');
+  el.style.cssText=`background:${c}${act?'38':'14'};border-color:${act?c:'transparent'};border-width:${act?'1.5px':'0.5px'}`;
+  el.innerHTML=`<div class="day-num" style="color:${c};filter:brightness(0.65)">${p.d}</div><div class="day-dot" style="background:${c}"></div>`;
+}
+
+function buildCalendar(){
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  DOWS.forEach(d=>{const e=document.createElement('div');e.className='cal-dow';e.textContent=d;grid.appendChild(e);});
+  const start=firstDow(curMonth), days=daysInMonth(curMonth);
+  for(let i=0;i<start;i++){const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);}
+  for(let d=1;d<=days;d++){
+    const key=`${d}-${curMonth}`, p=byKey[key], el=document.createElement('div');
+    if(p){
+      styledCalDay(el,p,key);
+      el.dataset.key=key;
+      el.addEventListener('mouseenter',()=>{hoveredKey=key;patchCalDay(key);updateDots();});
+      el.addEventListener('mouseleave',()=>{hoveredKey=null;patchCalDay(key);updateDots();});
+      el.addEventListener('click',()=>{
+        const was=selectedKey===key;
+        selectedKey=was?null:key; hoveredKey=null;
+        patchCalDay(key); updateDots();
+        was?clearDetail():updateDetail(p);
+      });
+    } else {
+      el.className='cal-day no-predinho';
+      el.innerHTML=`<div class="day-num">${d}</div>`;
+    }
+    grid.appendChild(el);
+  }
+  document.getElementById('month-label').textContent=`${MONTHS[curMonth-1]} 2026`;
+}
+
+function patchCalDay(key){
+  const el=document.querySelector(`.cal-day[data-key="${key}"]`), p=byKey[key];
+  if(el&&p) styledCalDay(el,p,key);
+}
+
+function updateDetail(p){
+  const el=document.getElementById('detail'), c=RC[p.regiao];
+  el.className='filled';
+  const imgHtml=p.img
+    ?`<div class="detail-img-wrap"><img src="${p.img}" alt="Predinho de ${p.cidade}" onerror="this.parentElement.className='detail-img-wrap placeholder';this.parentElement.textContent='Imagem indisponível'"></div>`
+    :`<div class="detail-img-wrap placeholder">imagem em breve</div>`;
+  el.innerHTML=`<div class="detail-city">${p.cidade} · ${p.uf}</div><div class="detail-sub">${p.dia}/2026<br>${p.rua}</div><span class="detail-region" style="background:${c}22;color:${c};filter:brightness(0.75)">${p.regiao}</span>${imgHtml}`;
+}
+
+function clearDetail(){
+  const el=document.getElementById('detail');
+  el.className=''; el.textContent='Selecione um dia para ver o predinho';
+}
+
+function updateStats(){
+  const list=predinhos.filter(p=>activeRegion==='all'||p.regiao===activeRegion);
+  document.getElementById('s-total').textContent=list.length;
+  document.getElementById('s-estados').textContent=new Set(list.map(p=>p.uf)).size;
+  document.getElementById('s-cidades').textContent=new Set(list.map(p=>p.cidade)).size;
+  document.getElementById('s-regioes').textContent=new Set(list.map(p=>p.regiao)).size;
+}
+
+function renderDots(){
+  if(allDots) allDots.remove();
+  allDots=svg.selectAll('.dot').data(predinhos).join('circle')
+    .attr('class','dot')
+    .attr('cx',d=>proj([d.lng,d.lat])[0]).attr('cy',d=>proj([d.lng,d.lat])[1])
+    .attr('r',5).attr('fill',d=>RC[d.regiao]||'#888')
+    .attr('stroke','rgba(255,255,255,0.7)').attr('stroke-width',1).attr('opacity',0.75).style('cursor','pointer')
+    .on('mouseenter',(event,d)=>{
+      const k=`${d.d}-${d.m}`; hoveredKey=k;
+      if(d.m!==curMonth){curMonth=d.m;buildCalendar();}else patchCalDay(k);
+      updateDots();
+      const mtt=document.getElementById('map-tooltip');
+      mtt.style.display='block';
+      mtt.innerHTML=`<strong>${d.cidade} / ${d.uf}</strong><span class="meta">${d.dia}/2026 · ${d.rua}</span>`;
+      const r=document.getElementById('map-wrap').getBoundingClientRect();
+      mtt.style.left=Math.min(event.clientX-r.left+10,r.width-205)+'px';
+      mtt.style.top=Math.max(event.clientY-r.top-50,4)+'px';
+    })
+    .on('mousemove',(event)=>{
+      const r=document.getElementById('map-wrap').getBoundingClientRect(), mtt=document.getElementById('map-tooltip');
+      mtt.style.left=Math.min(event.clientX-r.left+10,r.width-205)+'px';
+      mtt.style.top=Math.max(event.clientY-r.top-50,4)+'px';
+    })
+    .on('mouseleave',()=>{ if(hoveredKey)patchCalDay(hoveredKey); hoveredKey=null; updateDots(); document.getElementById('map-tooltip').style.display='none'; })
+    .on('click',(event,d)=>{
+      curMonth=d.m; const k=`${d.d}-${d.m}`, was=selectedKey===k;
+      selectedKey=was?null:k; hoveredKey=null;
+      buildCalendar(); updateDots(); was?clearDetail():updateDetail(d);
+    });
+}
+
+const w=600,h=660;
+const svg=d3.select('#map').append('svg').attr('viewBox',`0 0 ${w} ${h}`).attr('width','100%');
+const proj=d3.geoMercator().center([-54,-14]).scale(700).translate([w/2,h/2]);
+const gp=d3.geoPath().projection(proj);
+
+d3.json('https://cdn.jsdelivr.net/npm/datamaps@0.5.10/src/js/data/bra.topo.json').then(topo=>{
+  const key=Object.keys(topo.objects)[0];
+  const features=topojson.feature(topo,topo.objects[key]).features;
+  svg.selectAll('.sp').data(features).join('path').attr('class','sp')
+    .attr('d',gp)
+    .attr('fill',d=>{const n=d.properties.name||d.properties.NAME||'';const r=SR[n];return r?RC[r]+'18':'#E8E6DF';})
+    .attr('stroke','#fff').attr('stroke-width',0.7);
+  svgReady=true;
+  loadData();
+});
+
+document.getElementById('prev-month').addEventListener('click',()=>{if(curMonth>1){curMonth--;selectedKey=null;hoveredKey=null;buildCalendar();updateDots();clearDetail();}});
+document.getElementById('next-month').addEventListener('click',()=>{if(curMonth<12){curMonth++;selectedKey=null;hoveredKey=null;buildCalendar();updateDots();clearDetail();}});
+document.querySelectorAll('.btn-filter').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.btn-filter').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); activeRegion=btn.dataset.region;
+    buildCalendar(); updateDots(); updateStats();
+  });
+});
+
+/* FALLBACK — dados locais usados quando SHEET_CSV_URL está vazio ou inacessível */
+const FALLBACK=[
+  {d:1,m:1,dia:'01/01',rua:'1º de Janeiro',cidade:'Parobé',uf:'RS',regiao:'Sul',lat:-29.626,lng:-50.833,img:''},
+  {d:2,m:1,dia:'02/01',rua:'Dois de Janeiro',cidade:'Arroio do Meio',uf:'RS',regiao:'Sul',lat:-29.397,lng:-51.952,img:''},
+  {d:3,m:1,dia:'03/01',rua:'Três de Janeiro',cidade:'Vargem Grande',uf:'MA',regiao:'Norte',lat:-3.544,lng:-43.917,img:''},
+  {d:4,m:1,dia:'04/01',rua:'Quatro de Janeiro',cidade:'Fortaleza',uf:'CE',regiao:'Nordeste',lat:-3.717,lng:-38.543,img:''},
+  {d:5,m:1,dia:'05/01',rua:'Cinco de Janeiro',cidade:'Belo Horizonte',uf:'MG',regiao:'Sudeste',lat:-19.917,lng:-43.934,img:''},
+  {d:6,m:1,dia:'06/01',rua:'Seis de Janeiro',cidade:'Mossoró',uf:'RN',regiao:'Nordeste',lat:-5.188,lng:-37.344,img:''},
+  {d:7,m:1,dia:'07/01',rua:'Sete de Janeiro',cidade:'Salvador',uf:'BA',regiao:'Nordeste',lat:-12.971,lng:-38.501,img:''},
+  {d:8,m:1,dia:'08/01',rua:'Oito de Janeiro',cidade:'Manoel Ribas',uf:'PR',regiao:'Sul',lat:-24.519,lng:-51.668,img:''},
+  {d:9,m:1,dia:'09/01',rua:'Nove de Janeiro',cidade:'Itaporanga',uf:'PB',regiao:'Nordeste',lat:-7.302,lng:-38.148,img:''},
+  {d:10,m:1,dia:'10/01',rua:'Dez de Janeiro',cidade:'Ulianópolis',uf:'PA',regiao:'Norte',lat:-3.737,lng:-47.479,img:''},
+  {d:11,m:1,dia:'11/01',rua:'Onze de Janeiro',cidade:'Vitória',uf:'ES',regiao:'Sudeste',lat:-20.315,lng:-40.312,img:''},
+  {d:12,m:1,dia:'12/01',rua:'Doze de Janeiro',cidade:'Lagoa Vermelha',uf:'RS',regiao:'Sul',lat:-28.208,lng:-51.524,img:''},
+  {d:13,m:1,dia:'13/01',rua:'Treze de Janeiro',cidade:'Cambará do Sul',uf:'RS',regiao:'Sul',lat:-29.042,lng:-50.143,img:''},
+  {d:14,m:1,dia:'14/01',rua:'Quatorze de Janeiro',cidade:'Manaus',uf:'AM',regiao:'Norte',lat:-3.119,lng:-60.022,img:''},
+  {d:15,m:1,dia:'15/01',rua:'Quinze de Janeiro',cidade:'Canoas',uf:'RS',regiao:'Sul',lat:-29.918,lng:-51.183,img:''},
+  {d:16,m:1,dia:'16/01',rua:'Dezesseis de Janeiro',cidade:'Carlos Barbosa',uf:'RS',regiao:'Sul',lat:-29.298,lng:-51.503,img:''},
+  {d:17,m:1,dia:'17/01',rua:'Dezessete de Janeiro',cidade:'Várzea Grande',uf:'MT',regiao:'Centro Oeste',lat:-15.646,lng:-56.132,img:''},
+  {d:18,m:1,dia:'18/01',rua:'Dezoito de Janeiro',cidade:'Porto Velho',uf:'RO',regiao:'Norte',lat:-8.761,lng:-63.900,img:''},
+  {d:19,m:1,dia:'19/01',rua:'Dezenove de Janeiro',cidade:'Nova Roma do Sul',uf:'RS',regiao:'Sul',lat:-28.97,lng:-51.39,img:''},
+  {d:20,m:1,dia:'20/01',rua:'Vinte de Janeiro',cidade:'São Sebastião do Caí',uf:'RS',regiao:'Sul',lat:-29.594,lng:-51.380,img:''},
+  {d:21,m:1,dia:'21/01',rua:'Vinte e Um de Janeiro',cidade:'Goioxim',uf:'PR',regiao:'Sul',lat:-25.398,lng:-52.031,img:''},
+  {d:22,m:1,dia:'22/01',rua:'Vinte e Dois de Janeiro',cidade:'Quirinópolis',uf:'GO',regiao:'Centro Oeste',lat:-18.450,lng:-50.452,img:''},
+  {d:23,m:1,dia:'23/01',rua:'Vinte e Três de Janeiro',cidade:'Barão de Cotegipe',uf:'RS',regiao:'Sul',lat:-27.627,lng:-52.383,img:''},
+  {d:24,m:1,dia:'24/01',rua:'Vinte e Quatro de Janeiro',cidade:'Xapuri',uf:'AC',regiao:'Norte',lat:-10.652,lng:-68.503,img:''},
+  {d:25,m:1,dia:'25/01',rua:'Vinte e Cinco de Janeiro',cidade:'Marília',uf:'SP',regiao:'Sudeste',lat:-22.213,lng:-49.946,img:''},
+  {d:26,m:1,dia:'26/01',rua:'Vinte e Seis de Janeiro',cidade:'Recife',uf:'PE',regiao:'Nordeste',lat:-8.054,lng:-34.881,img:''},
+  {d:27,m:1,dia:'27/01',rua:'Vinte e Sete de Janeiro',cidade:'Olinda',uf:'PE',regiao:'Nordeste',lat:-8.009,lng:-34.855,img:''},
+  {d:28,m:1,dia:'28/01',rua:'28 de Janeiro',cidade:'Salvador',uf:'BA',regiao:'Nordeste',lat:-12.978,lng:-38.512,img:''},
+  {d:29,m:1,dia:'29/01',rua:'Vinte e Nove de Janeiro',cidade:'Paulo de Faria',uf:'SP',regiao:'Sudeste',lat:-20.034,lng:-49.401,img:''},
+  {d:30,m:1,dia:'30/01',rua:'30 de Janeiro',cidade:'União da Vitória',uf:'PR',regiao:'Sul',lat:-26.228,lng:-51.088,img:''},
+  {d:31,m:1,dia:'31/01',rua:'Trinta e Um de Janeiro',cidade:'São Domingos do Maranhão',uf:'MA',regiao:'Norte',lat:-5.578,lng:-44.378,img:''},
+  {d:1,m:2,dia:'01/02',rua:'Primeiro de Fevereiro',cidade:'Gracho Cardoso',uf:'SE',regiao:'Nordeste',lat:-10.210,lng:-37.687,img:''},
+  {d:2,m:2,dia:'02/02',rua:'Dois de Fevereiro',cidade:'Rio de Janeiro',uf:'RJ',regiao:'Sudeste',lat:-22.906,lng:-43.173,img:''},
+  {d:3,m:2,dia:'03/02',rua:'Três de Fevereiro',cidade:'Guapé',uf:'MG',regiao:'Sudeste',lat:-20.764,lng:-45.921,img:''},
+  {d:4,m:2,dia:'04/02',rua:'Quatro de Fevereiro',cidade:'Seropédica',uf:'RJ',regiao:'Sudeste',lat:-22.748,lng:-43.706,img:''},
+  {d:5,m:2,dia:'05/02',rua:'Cinco de Fevereiro',cidade:'Campinas',uf:'SP',regiao:'Sudeste',lat:-22.905,lng:-47.063,img:''},
+  {d:6,m:2,dia:'06/02',rua:'Seis de Fevereiro',cidade:"Olho D'Água das Flores",uf:'AL',regiao:'Nordeste',lat:-9.537,lng:-37.295,img:''},
+  {d:7,m:2,dia:'07/02',rua:'Sete de Fevereiro',cidade:'Catanduva',uf:'SP',regiao:'Sudeste',lat:-21.138,lng:-48.973,img:''},
+  {d:8,m:2,dia:'08/02',rua:'Oito de Fevereiro',cidade:'Água Clara',uf:'MS',regiao:'Centro Oeste',lat:-20.447,lng:-52.876,img:''},
+  {d:9,m:2,dia:'09/02',rua:'Nove de Fevereiro',cidade:'Igrejinha',uf:'RS',regiao:'Sul',lat:-29.573,lng:-50.786,img:''},
+  {d:10,m:2,dia:'10/02',rua:'Dez de Fevereiro',cidade:'Belém',uf:'PA',regiao:'Norte',lat:-1.455,lng:-48.502,img:''},
+  {d:11,m:2,dia:'11/02',rua:'Onze de Fevereiro',cidade:'Campo Grande',uf:'MS',regiao:'Centro Oeste',lat:-20.470,lng:-54.620,img:''},
+  {d:12,m:2,dia:'12/02',rua:'Doze de Fevereiro',cidade:'Chapada',uf:'RS',regiao:'Sul',lat:-28.076,lng:-53.148,img:''},
+  {d:13,m:2,dia:'13/02',rua:'Treze de Fevereiro',cidade:'Tatuí',uf:'SP',regiao:'Sudeste',lat:-23.355,lng:-47.857,img:''},
+  {d:14,m:2,dia:'14/02',rua:'Catorze de Fevereiro',cidade:'Pontes e Lacerda',uf:'MT',regiao:'Centro Oeste',lat:-15.225,lng:-59.336,img:''},
+  {d:15,m:2,dia:'15/02',rua:'Quinze de Fevereiro',cidade:'Cornélio Procópio',uf:'PR',regiao:'Sul',lat:-23.182,lng:-50.649,img:''},
+  {d:16,m:2,dia:'16/02',rua:'Dezesseis de Fevereiro',cidade:'Cachoeirinha',uf:'RS',regiao:'Sul',lat:-29.953,lng:-51.094,img:''},
+  {d:17,m:2,dia:'17/02',rua:'Dezessete de Fevereiro',cidade:'Itaguaçu',uf:'ES',regiao:'Sudeste',lat:-19.800,lng:-40.859,img:''},
+  {d:18,m:2,dia:'18/02',rua:'Dezoito de Fevereiro',cidade:'São Paulo',uf:'SP',regiao:'Sudeste',lat:-23.550,lng:-46.633,img:''},
+  {d:19,m:2,dia:'19/02',rua:'Dezenove de Fevereiro',cidade:'Rio de Janeiro',uf:'RJ',regiao:'Sudeste',lat:-22.912,lng:-43.181,img:''},
+  {d:20,m:2,dia:'20/02',rua:'Vinte de Fevereiro',cidade:'Carrasco Bonito',uf:'TO',regiao:'Norte',lat:-5.547,lng:-47.974,img:''},
+  {d:21,m:2,dia:'21/02',rua:'Vinte e Um de Fevereiro',cidade:'Hortolândia',uf:'SP',regiao:'Sudeste',lat:-22.858,lng:-47.215,img:''},
+  {d:22,m:2,dia:'22/02',rua:'Vinte e Dois de Fevereiro',cidade:'Santa Maria da Serra',uf:'SP',regiao:'Sudeste',lat:-22.567,lng:-48.163,img:''},
+  {d:23,m:2,dia:'23/02',rua:'Vinte e Três de Fevereiro',cidade:'Nova Olinda do Norte',uf:'AM',regiao:'Norte',lat:-3.891,lng:-59.093,img:''},
+  {d:24,m:2,dia:'24/02',rua:'Vinte e Quatro de Fevereiro',cidade:'São Bernardo do Campo',uf:'SP',regiao:'Sudeste',lat:-23.694,lng:-46.565,img:''},
+  {d:25,m:2,dia:'25/02',rua:'Vinte e Cinco de Fevereiro',cidade:'Tracunhaém',uf:'PE',regiao:'Nordeste',lat:-7.806,lng:-35.217,img:''},
+  {d:26,m:2,dia:'26/02',rua:'Vinte e Seis de Fevereiro',cidade:'Arcoverde',uf:'PE',regiao:'Nordeste',lat:-8.418,lng:-37.054,img:''},
+  {d:27,m:2,dia:'27/02',rua:'Vinte e Sete de Fevereiro',cidade:"Mirassol D'Oeste",uf:'MT',regiao:'Centro Oeste',lat:-15.676,lng:-58.094,img:''},
+  {d:28,m:2,dia:'28/02',rua:'Vinte e Oito de Fevereiro',cidade:'Rolante',uf:'RS',regiao:'Sul',lat:-29.649,lng:-50.729,img:''},
+  {d:29,m:2,dia:'29/02',rua:'Vinte e Nove de Fevereiro',cidade:'Macaíba',uf:'RN',regiao:'Nordeste',lat:-5.857,lng:-35.356,img:''},
+  {d:31,m:2,dia:'31/02',rua:'Trinta e Um de Fevereiro',cidade:'Tracunhaém',uf:'PE',regiao:'Nordeste',lat:-7.811,lng:-35.222,img:''},
+  {d:1,m:3,dia:'01/03',rua:'Primeiro de Março',cidade:'Tramandaí',uf:'RS',regiao:'Sul',lat:-30.009,lng:-50.132,img:''},
+  {d:2,m:3,dia:'02/03',rua:'Dois de Março',cidade:'Itacarambi',uf:'MG',regiao:'Sudeste',lat:-15.099,lng:-44.099,img:''},
+  {d:3,m:3,dia:'03/03',rua:'Três de Março',cidade:'Autazes',uf:'AM',regiao:'Norte',lat:-3.577,lng:-59.131,img:''},
+  {d:4,m:3,dia:'04/03',rua:'Quatro de Março',cidade:'Taubaté',uf:'SP',regiao:'Sudeste',lat:-23.026,lng:-45.556,img:''},
+  {d:5,m:3,dia:'05/03',rua:'Cinco de Março',cidade:'Paverama',uf:'RS',regiao:'Sul',lat:-29.624,lng:-51.738,img:''},
+  {d:6,m:3,dia:'06/03',rua:'Seis de Março',cidade:'Jijoca de Jericoacoara',uf:'CE',regiao:'Nordeste',lat:-2.796,lng:-40.499,img:''},
+  {d:7,m:3,dia:'07/03',rua:'Sete de Março',cidade:'Dezesseis de Novembro',uf:'RS',regiao:'Sul',lat:-28.224,lng:-53.807,img:''},
+  {d:8,m:3,dia:'08/03',rua:'Oito de Março',cidade:'Jacareí',uf:'SP',regiao:'Sudeste',lat:-23.305,lng:-45.966,img:''},
+  {d:9,m:3,dia:'09/03',rua:'Nove de Março',cidade:'Minas Novas',uf:'MG',regiao:'Sudeste',lat:-17.213,lng:-42.589,img:''},
+  {d:10,m:3,dia:'10/03',rua:'Dez de Março',cidade:'Salto do Jacuí',uf:'RS',regiao:'Sul',lat:-29.097,lng:-53.211,img:''},
+  {d:11,m:3,dia:'11/03',rua:'Onze de Março',cidade:'Bebedouro',uf:'SP',regiao:'Sudeste',lat:-20.949,lng:-48.479,img:''},
+  {d:12,m:3,dia:'12/03',rua:'Doze de Março',cidade:'Olinda',uf:'PE',regiao:'Nordeste',lat:-8.015,lng:-34.862,img:''},
+  {d:13,m:3,dia:'13/03',rua:'Treze de Março',cidade:'Antônio Prado',uf:'RS',regiao:'Sul',lat:-28.858,lng:-51.279,img:''},
+  {d:14,m:3,dia:'14/03',rua:'Catorze de Março',cidade:'Ladário',uf:'MS',regiao:'Centro Oeste',lat:-19.001,lng:-57.599,img:''},
+  {d:15,m:3,dia:'15/03',rua:'Quinze de Março',cidade:'Kaloré',uf:'PR',regiao:'Sul',lat:-23.818,lng:-51.668,img:''},
+  {d:16,m:3,dia:'16/03',rua:'Dezesseis de Março',cidade:'Petrópolis',uf:'RJ',regiao:'Sudeste',lat:-22.505,lng:-43.178,img:''},
+  {d:17,m:3,dia:'17/03',rua:'Dezessete de Março',cidade:'Victor Graeff',uf:'RS',regiao:'Sul',lat:-28.537,lng:-52.759,img:''},
+  {d:18,m:3,dia:'18/03',rua:'Dezoito de Março',cidade:'Pedregulho',uf:'SP',regiao:'Sudeste',lat:-20.254,lng:-47.477,img:''},
+  {d:19,m:3,dia:'19/03',rua:'Dezenove de Março',cidade:'Crateús',uf:'CE',regiao:'Nordeste',lat:-5.178,lng:-40.679,img:''},
+  {d:20,m:3,dia:'20/03',rua:'Vinte de Março',cidade:'Gentil',uf:'RS',regiao:'Sul',lat:-28.431,lng:-52.441,img:''},
+  {d:21,m:3,dia:'21/03',rua:'Vinte e Um de Março',cidade:'Potirendaba',uf:'SP',regiao:'Sudeste',lat:-21.043,lng:-49.374,img:''},
+];
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function(){
+const RC={'Sul':'#1D9E75','Sudeste':'#185FA5','Nordeste':'#993C1D','Centro Oeste':'#854F0B','Norte':'#534AB7'};
+const ALL_UF=['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
+const UF_NOME={'AC':'Acre','AL':'Alagoas','AM':'Amazonas','AP':'Amapá','BA':'Bahia','CE':'Ceará','DF':'Distrito Federal','ES':'Espírito Santo','GO':'Goiás','MA':'Maranhão','MG':'Minas Gerais','MS':'Mato Grosso do Sul','MT':'Mato Grosso','PA':'Pará','PB':'Paraíba','PE':'Pernambuco','PI':'Piauí','PR':'Paraná','RJ':'Rio de Janeiro','RN':'Rio Grande do Norte','RO':'Rondônia','RR':'Roraima','RS':'Rio Grande do Sul','SC':'Santa Catarina','SE':'Sergipe','SP':'São Paulo','TO':'Tocantins'};
+const MONTHS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function hav(a,b){
+  const R=6371,toR=Math.PI/180;
+  const dlat=(b[0]-a[0])*toR,dlon=(b[1]-a[1])*toR;
+  const h=Math.sin(dlat/2)**2+Math.cos(a[0]*toR)*Math.cos(b[0]*toR)*Math.sin(dlon/2)**2;
+  return R*2*Math.asin(Math.sqrt(h));
+}
+
+function icard(icon,title,body,cls=''){
+  return `<div class="ins-icard ${cls}"><div class="ins-icon">${icon}</div><div><div class="ins-icard-title">${title}</div><div class="ins-icard-body">${body}</div></div></div>`;
+}
+
+function brow(label,count,max,color){
+  return `<div class="ins-bar-row"><div class="ins-bar-label" title="${label}">${label}</div><div class="ins-bar-track"><div class="ins-bar-fill" style="width:${Math.round(count/max*100)}%;background:${color}"></div></div><div class="ins-bar-count">${count}</div></div>`;
+}
+
+const origBoot = window.boot;
+window.boot = function(data){
+  if(origBoot) origBoot(data);
+  renderInsights(data);
+};
+
+function renderInsights(data){
+  if(!data||!data.length) return;
+  const total=data.length;
+  const hoje=new Date();
+  const dias=Math.round((hoje-new Date(2026,0,1))/(864e5))+1;
+
+  // km
+  const sorted=[...data].sort((a,b)=>{
+    if(a.m!==b.m) return a.m-b.m; return a.d-b.d;
+  });
+  let km=0;
+  for(let i=1;i<sorted.length;i++) km+=hav([sorted[i-1].lat,sorted[i-1].lng],[sorted[i].lat,sorted[i].lng]);
+  const kmFmt=Math.round(km).toLocaleString('pt-BR');
+
+  // progress
+  const pct=Math.round(total/365*100);
+  document.getElementById('i-total').textContent=total;
+  document.getElementById('i-restam').textContent=365-total;
+  document.getElementById('i-pct').textContent=pct+'%';
+  document.getElementById('i-km').textContent=kmFmt+' km';
+  document.getElementById('i-prog').style.width=pct+'%';
+  document.getElementById('i-prog-l').textContent=total+' feitos';
+
+  // cidades
+  const cidades=data.map(r=>r.cidade||'').filter(Boolean);
+  const maisLonga=[...cidades].sort((a,b)=>b.length-a.length)[0]||'—';
+  const maisCurta=[...cidades].sort((a,b)=>a.length-b.length)[0]||'—';
+
+  // maior salto
+  let maiorSalto=0,maiorPar=['',''];
+  for(let i=1;i<sorted.length;i++){
+    const d=hav([sorted[i-1].lat,sorted[i-1].lng],[sorted[i].lat,sorted[i].lng]);
+    if(d>maiorSalto){maiorSalto=d;maiorPar=[sorted[i-1].cidade,sorted[i].cidade];}
+  }
+
+  // estados
+  const estCount={};
+  data.forEach(r=>{const u=(r.uf||'').toUpperCase();if(u)estCount[u]=(estCount[u]||0)+1;});
+  const visitados=Object.keys(estCount);
+  const naoVisitados=ALL_UF.filter(u=>!visitados.includes(u));
+  const topUF=Object.entries(estCount).sort((a,b)=>b[1]-a[1])[0];
+
+  // regiões
+  const regCount={};
+  data.forEach(r=>{const g=(r.regiao||'').trim();if(g)regCount[g]=(regCount[g]||0)+1;});
+  const regioes=Object.entries(regCount).sort((a,b)=>b[1]-a[1]);
+  const topReg=regioes[0],botReg=regioes[regioes.length-1];
+
+  // meses
+  const mesCount={};
+  data.forEach(r=>{if(r.m)mesCount[r.m]=(mesCount[r.m]||0)+1;});
+
+  // records
+  document.getElementById('i-records').innerHTML=`
+    <div class="ins-rec-card"><div class="ins-rec-val">${kmFmt} km</div><div class="ins-rec-label">percurso virtual total</div></div>
+    <div class="ins-rec-card"><div class="ins-rec-val">${Math.round(maiorSalto).toLocaleString('pt-BR')} km</div><div class="ins-rec-label">maior salto (${maiorPar[0]} → ${maiorPar[1]})</div></div>
+    <div class="ins-rec-card"><div class="ins-rec-val">${Math.round(km/Math.max(sorted.length-1,1)).toLocaleString('pt-BR')} km</div><div class="ins-rec-label">média por salto</div></div>
+    <div class="ins-rec-card"><div class="ins-rec-val">${maisLonga}</div><div class="ins-rec-label">cidade com nome mais longo</div></div>
+    <div class="ins-rec-card"><div class="ins-rec-val">${maisCurta}</div><div class="ins-rec-label">cidade com nome mais curto</div></div>
+    <div class="ins-rec-card"><div class="ins-rec-val">${topUF?topUF[0]+' ('+topUF[1]+'x)':'—'}</div><div class="ins-rec-label">estado mais desenhado</div></div>
+  `;
+
+  const voltas=Math.round(km/40075*10)/10;
+  const ritmo=Math.round(total/Math.max(dias,1)*10)/10;
+  const ritmoNec=Math.round((365-total)/Math.max(365-dias,1)*10)/10;
+  document.getElementById('i-fun').innerHTML=
+    icard('🌍',`${kmFmt} km — ${voltas} voltas ao redor da Terra`,`Em linha reta, de cidade em cidade, você já viajou o equivalente a ${voltas} circunferências terrestres. E ainda nem saiu de casa.`,'fun')+
+    icard('✏️',`Ritmo atual: ${ritmo} predinho/dia`,`Pra fechar o ano em dia, você precisa de ${ritmoNec}/dia. ${ritmoNec<=ritmo?'Estás adiantado — aproveita pra descansar a mão.':'Bora ligar o modo turbo.'}`,'');
+
+  // regiões chart
+  const rLab=regioes.map(r=>r[0]),rVal=regioes.map(r=>r[1]),rCol=rLab.map(r=>RC[r]||'#888');
+  new Chart(document.getElementById('i-chart-reg'),{
+    type:'doughnut',
+    data:{labels:rLab,datasets:[{data:rVal,backgroundColor:rCol,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw} (${Math.round(c.raw/total*100)}%)`}}}}
+  });
+  const maxR=Math.max(...rVal,1);
+  document.getElementById('i-bar-reg').innerHTML=regioes.map(([r,n])=>brow(r,n,maxR,RC[r]||'#888')).join('');
+  document.getElementById('i-ins-reg').innerHTML=
+    (topReg?icard('📍',`${topReg[0]} lidera com ${topReg[1]} predinhos (${Math.round(topReg[1]/total*100)}%)`,`Faz sentido — é onde as raízes ficam.`,'good'):'')+
+    (botReg?icard('🗺️',`${botReg[0]} ainda é terra a explorar`,`Só ${botReg[1]} predinho${botReg[1]>1?'s':''} — tem muita rua com data esperando por lá.`,'warn'):'');
+
+  // estados
+  const estSort=Object.entries(estCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const maxE=estSort[0]?estSort[0][1]:1;
+  document.getElementById('i-bar-est').innerHTML=estSort.map(([u,n])=>brow(UF_NOME[u]||u,n,maxE,'#1D9E75')).join('');
+  document.getElementById('i-missing').innerHTML=naoVisitados.map(u=>`<span class="ins-pill">${UF_NOME[u]||u}</span>`).join('');
+
+  // meses chart
+  const mLab=[],mVal=[];
+  const mesAtual=new Date().getMonth()+1;
+  for(let m=1;m<=mesAtual;m++){mLab.push(MONTHS[m-1]);mVal.push(mesCount[m]||0);}
+  const mMax=Math.max(...mVal,1);
+  const mCol=mVal.map(v=>v===mMax?'#1D9E75':v===0?'#d3d1c7':'#9FE1CB');
+  new Chart(document.getElementById('i-chart-mes'),{
+    type:'bar',
+    data:{labels:mLab,datasets:[{data:mVal,backgroundColor:mCol,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#888780',font:{size:11}}},y:{grid:{color:'#f1efe8'},ticks:{color:'#888780',font:{size:11},stepSize:1},beginAtZero:true}}}
+  });
+  const mesMais=Object.entries(mesCount).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('i-ins-mes').innerHTML=mesMais?icard('🌟',`${MONTHS[mesMais[0]-1]} foi o mês mais produtivo`,`${mesMais[1]} predinhos — provavelmente teve uma semana boa ou muita chuva que não deixou sair.`,'good'):'';
+
+  // próximos
+  document.getElementById('i-proximos').innerHTML=
+    (naoVisitados.length?icard('🎯','Conquiste novos estados',`Ainda faltam ${naoVisitados.length} estados. Os mais fáceis de encontrar ruas com datas tendem a ser cidades do interior. Já tem sugestão de algum seguidor?`,'warn'):'')+
+    (botReg?icard('⚖️',`Reequilibre a ${botReg[0]}`,`Com apenas ${botReg[1]} predinho${botReg[1]>1?'s':''}, essa região merece mais atenção nas próximas semanas.`,'warn'):'')+
+    icard('📸','Preenche as imagens que faltam na planilha','Predinhos com foto têm muito mais impacto — quem ver vai querer encomendar na hora.','')+
+    icard('📢','Compartilha esses dados nos stories','Esses números contam uma história incrível. Um print do painel de progresso com o link já é conteúdo.','good');
+}
+})();
+</script>
+
+</body>
+</html>

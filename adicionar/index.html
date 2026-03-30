@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Adicionar Predinho</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f1efe8;color:#1a1a18;min-height:100vh}
+@media(prefers-color-scheme:dark){body{background:#1a1a18;color:#e8e6df}}
+
+#wrap{max-width:480px;margin:0 auto;padding:16px}
+
+#header{text-align:center;padding:20px 0 18px;margin-bottom:4px}
+#header .tag{font-size:10px;letter-spacing:0.08em;color:#888780;text-transform:uppercase;margin-bottom:6px}
+#header h1{font-size:20px;font-weight:500;color:#1a1a18}
+@media(prefers-color-scheme:dark){#header h1{color:#e8e6df}}
+
+.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:12px;border:0.5px solid #d3d1c7}
+@media(prefers-color-scheme:dark){.card{background:#2c2c2a;border-color:#3d3d3a}}
+
+.card-title{font-size:11px;font-weight:500;color:#888780;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:14px}
+
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+label{display:block;font-size:12px;color:#888780;margin-bottom:5px}
+input,select{
+  width:100%;
+  height:44px;
+  padding:0 12px;
+  font-size:15px;
+  color:#1a1a18;
+  background:#f1efe8;
+  border:0.5px solid #d3d1c7;
+  border-radius:8px;
+  outline:none;
+  transition:border-color .15s,background .15s;
+  -webkit-appearance:none;
+}
+@media(prefers-color-scheme:dark){
+  input,select{background:#1a1a18;color:#e8e6df;border-color:#3d3d3a}
+}
+input:focus,select:focus{border-color:#5DCAA5;background:#fff}
+@media(prefers-color-scheme:dark){input:focus,select:focus{background:#2c2c2a}}
+input::placeholder{color:#b4b2a9}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+.coords-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
+.coords-btn{
+  height:44px;
+  background:#E1F5EE;
+  color:#0F6E56;
+  border:0.5px solid #9FE1CB;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:500;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  white-space:nowrap;
+  transition:opacity .15s;
+}
+.coords-btn:active{opacity:.8}
+.coords-hint{font-size:11px;color:#888780;margin-top:5px;line-height:1.4}
+
+.region-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:5px 10px;border-radius:12px;margin-top:8px;transition:all .2s}
+
+#submit-btn{
+  width:100%;
+  height:52px;
+  background:#1D9E75;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:500;
+  cursor:pointer;
+  transition:opacity .15s,transform .1s;
+  margin-top:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+#submit-btn:active{opacity:.85;transform:scale(.98)}
+#submit-btn:disabled{background:#d3d1c7;cursor:default;transform:none}
+
+#feedback{
+  margin-top:12px;
+  padding:14px 16px;
+  border-radius:10px;
+  font-size:13px;
+  line-height:1.5;
+  display:none;
+  text-align:center;
+}
+#feedback.ok{background:#F0FBF6;color:#0F6E56}
+#feedback.err{background:#FEF2F2;color:#A32D2D}
+
+.back-link{display:block;text-align:center;margin-top:16px;font-size:12px;color:#888780;text-decoration:none}
+.back-link:hover{color:#1a1a18}
+@media(prefers-color-scheme:dark){.back-link:hover{color:#e8e6df}}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;display:none}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+<script>
+const SHEET_URL='https://script.google.com/macros/s/AKfycbzTnhTf2CH2Q6nVnla3YgJC-1mx7I804AsKIhASMYsCZrgWZwfyjAnZS-oIKu4xQnbXSg/exec';
+const REGIOES={
+  RS:'Sul',SC:'Sul',PR:'Sul',
+  SP:'Sudeste',RJ:'Sudeste',MG:'Sudeste',ES:'Sudeste',
+  BA:'Nordeste',PE:'Nordeste',CE:'Nordeste',MA:'Nordeste',
+  RN:'Nordeste',PB:'Nordeste',AL:'Nordeste',SE:'Nordeste',PI:'Nordeste',
+  MS:'Centro Oeste',MT:'Centro Oeste',GO:'Centro Oeste',DF:'Centro Oeste',
+  PA:'Norte',AM:'Norte',AC:'Norte',RO:'Norte',RR:'Norte',AP:'Norte',TO:'Norte'
+};
+const RC_BG  ={Sul:'#E1F5EE',Sudeste:'#E6F1FB',Nordeste:'#FAECE7','Centro Oeste':'#FAEEDA',Norte:'#EEEDFE'};
+const RC_TEXT={Sul:'#0F6E56',Sudeste:'#185FA5',Nordeste:'#993C1D','Centro Oeste':'#854F0B',Norte:'#534AB7'};
+const RC_BOR ={Sul:'#9FE1CB',Sudeste:'#B5D4F4',Nordeste:'#F5C4B3','Centro Oeste':'#FAC775',Norte:'#CECBF6'};
+</script>
+
+<div id="header">
+  <div class="tag">@unspredinhos · 2026</div>
+  <h1>Predinho do Dia</h1>
+</div>
+
+<div class="card">
+  <div class="card-title">Data</div>
+  <div class="row3">
+    <div class="field">
+      <label>Dia</label>
+      <input type="number" id="f-dia" min="1" max="31" placeholder="26">
+    </div>
+    <div class="field">
+      <label>Mês</label>
+      <select id="f-mes">
+        <option value="">—</option>
+        <option value="1">Janeiro</option>
+        <option value="2">Fevereiro</option>
+        <option value="3">Março</option>
+        <option value="4">Abril</option>
+        <option value="5">Maio</option>
+        <option value="6">Junho</option>
+        <option value="7">Julho</option>
+        <option value="8">Agosto</option>
+        <option value="9">Setembro</option>
+        <option value="10">Outubro</option>
+        <option value="11">Novembro</option>
+        <option value="12">Dezembro</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Rua (nome)</label>
+      <input type="text" id="f-rua" placeholder="Vinte e Seis de Março">
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Localização</div>
+  <div class="row">
+    <div class="field">
+      <label>Cidade</label>
+      <input type="text" id="f-cidade" placeholder="Porto Alegre" oninput="updateRegiao()">
+    </div>
+    <div class="field">
+      <label>Estado (UF)</label>
+      <select id="f-uf" onchange="updateRegiao()">
+        <option value="">—</option>
+        <option>AC</option><option>AL</option><option>AM</option><option>AP</option>
+        <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+        <option>GO</option><option>MA</option><option>MG</option><option>MS</option>
+        <option>MT</option><option>PA</option><option>PB</option><option>PE</option>
+        <option>PI</option><option>PR</option><option>RJ</option><option>RN</option>
+        <option>RO</option><option>RR</option><option>RS</option><option>SC</option>
+        <option>SE</option><option>SP</option><option>TO</option>
+      </select>
+    </div>
+  </div>
+  <div id="regiao-badge" style="display:none"></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Coordenadas</div>
+  <div class="coords-wrap">
+    <div>
+      <div class="field" style="margin-bottom:0">
+        <label>Latitude</label>
+        <input type="text" id="f-lat" placeholder="-29.626" inputmode="decimal">
+      </div>
+    </div>
+    <div>
+      <div class="field" style="margin-bottom:0">
+        <label>Longitude</label>
+        <input type="text" id="f-lng" placeholder="-51.183" inputmode="decimal">
+      </div>
+    </div>
+  </div>
+  <button class="coords-btn" style="width:100%;margin-top:10px" onclick="pegarLocalizacao()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+    Usar minha localização atual
+  </button>
+  <div class="coords-hint">Ou cole as coordenadas do Google Maps — aceita ponto e vírgula.</div>
+</div>
+
+<div class="card">
+  <div class="card-title">Imagem</div>
+  <div class="field" style="margin-bottom:0">
+    <label>Link da imagem (Google Drive)</label>
+    <input type="url" id="f-img" placeholder="Cole o link do Google Drive aqui" inputmode="url" oninput="previewImg(this.value)">
+  </div>
+</div>
+
+<button id="submit-btn" onclick="enviar()">
+  <span class="spinner" id="spinner"></span>
+  <span id="submit-txt">Adicionar predinho</span>
+</button>
+
+<div id="feedback"></div>
+
+<a class="back-link" href="/">← Ver mapa</a>
+
+</div>
+
+<script>
+function updateRegiao(){
+  const uf=document.getElementById('f-uf').value.toUpperCase();
+  const reg=REGIOES[uf];
+  const badge=document.getElementById('regiao-badge');
+  if(reg){
+    badge.style.display='block';
+    badge.innerHTML=`<span class="region-badge" style="background:${RC_BG[reg]};color:${RC_TEXT[reg]};border:0.5px solid ${RC_BOR[reg]}">${reg}</span>`;
+  } else {
+    badge.style.display='none';
+  }
+}
+
+function pegarLocalizacao(){
+  if(!navigator.geolocation){alert('Geolocalização não disponível neste dispositivo.');return;}
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      document.getElementById('f-lat').value=pos.coords.latitude.toFixed(6);
+      document.getElementById('f-lng').value=pos.coords.longitude.toFixed(6);
+    },
+    err=>alert('Não foi possível obter a localização: '+err.message)
+  );
+}
+
+function normalizar(v){ return parseFloat(String(v).replace(',','.')); }
+
+function normalizarImg(url){
+  if(!url) return '';
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
+  if(m) return 'https://lh3.googleusercontent.com/d/' + m[1];
+  return url;
+}
+
+function previewImg(url){
+  const clean = normalizarImg(url.trim());
+  const wrap = document.getElementById('img-preview');
+  const el = document.getElementById('img-preview-el');
+  if(clean){
+    el.src = clean;
+    wrap.style.display = 'block';
+    el.onerror = () => { wrap.style.display = 'none'; };
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function hoje(){
+  const d=new Date();
+  return {dia:d.getDate(),mes:d.getMonth()+1};
+}
+
+// Preenche data de hoje ao carregar
+window.addEventListener('DOMContentLoaded',()=>{
+  const h=hoje();
+  document.getElementById('f-dia').value=h.dia;
+  document.getElementById('f-mes').value=h.mes;
+});
+
+async function enviar(){
+  const dia=parseInt(document.getElementById('f-dia').value);
+  const mes=parseInt(document.getElementById('f-mes').value);
+  const rua=document.getElementById('f-rua').value.trim();
+  const cidade=document.getElementById('f-cidade').value.trim();
+  const uf=document.getElementById('f-uf').value.toUpperCase().trim();
+  const lat=normalizar(document.getElementById('f-lat').value);
+  const lng=normalizar(document.getElementById('f-lng').value);
+  const img=normalizarImg(document.getElementById('f-img').value.trim());
+
+  if(!dia||!mes||!cidade||!uf||isNaN(lat)||isNaN(lng)){
+    mostrar('err','Preenche pelo menos: dia, mês, cidade, estado e coordenadas.');
+    return;
+  }
+
+  const btn=document.getElementById('submit-btn');
+  const spinner=document.getElementById('spinner');
+  const txt=document.getElementById('submit-txt');
+  btn.disabled=true;
+  spinner.style.display='block';
+  txt.textContent='Enviando...';
+
+  try{
+    const res=await fetch(SHEET_URL,{
+      method:'POST',
+      body:JSON.stringify({dia,mes,rua,cidade,uf,latitude:lat,longitude:lng,img}),
+    });
+    const json=await res.json();
+    if(json.ok){
+      mostrar('ok',`Predinho de ${cidade} adicionado! O mapa atualiza na próxima vez que for aberto.`);
+      limpar();
+    } else {
+      mostrar('err','Erro ao salvar: '+(json.error||'tente de novo'));
+    }
+  }catch(e){
+    mostrar('err','Erro de conexão: '+e.message);
+  }finally{
+    btn.disabled=false;
+    spinner.style.display='none';
+    txt.textContent='Adicionar predinho';
+  }
+}
+
+function mostrar(tipo,msg){
+  const fb=document.getElementById('feedback');
+  fb.className=tipo;
+  fb.textContent=msg;
+  fb.style.display='block';
+  fb.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function limpar(){
+  const h=hoje();
+  document.getElementById('f-dia').value=h.dia;
+  document.getElementById('f-mes').value=h.mes;
+  ['f-rua','f-cidade','f-lat','f-lng','f-img'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-uf').value='';
+  document.getElementById('regiao-badge').style.display='none';
+}
+</script>
+</body>
+</html>
