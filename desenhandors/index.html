@@ -145,9 +145,6 @@
       max-width: 900px;
       margin: 20px auto 0;
       padding: 0 24px;
-      opacity: 0;
-      animation: fadeUp .6s .25s forwards;
-      position: relative;
     }
     .search-inner { position: relative; }
     .search-input {
@@ -173,19 +170,17 @@
       color: var(--muted);
       width: 15px; height: 15px;
     }
+    /* dropdown — appendado no body via JS, posição fixed */
     #search-results {
       display: none;
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0; right: 0;
+      position: fixed;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 10px;
-      overflow: hidden;
-      z-index: 200;
-      box-shadow: 0 8px 24px rgba(0,0,0,.15);
-      max-height: 260px;
       overflow-y: auto;
+      z-index: 9999;
+      box-shadow: 0 8px 28px rgba(0,0,0,.18);
+      max-height: 260px;
     }
     .sr-item {
       display: flex;
@@ -482,7 +477,6 @@
     </svg>
     <input id="search-input" class="search-input" type="text"
       placeholder="Buscar município…" autocomplete="off" spellcheck="false">
-    <div id="search-results"></div>
   </div>
 </div>
 
@@ -525,6 +519,8 @@
   <p><a href="https://wa.me/5551993115340" target="_blank">Encomendar um predinho</a></p>
 </footer>
 
+<div id="search-results"></div>
+
 <div id="tooltip">
   <div class="tt-city" id="tt-city"></div>
   <div class="tt-hint" id="tt-hint"></div>
@@ -534,7 +530,7 @@
 <script>
 (async () => {
   const GEO_URL   = 'https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-43-mun.json';
-  const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vScjRr8nRfqSpUjtnvDba0bRyRqH210VMCgU-IFBkRDJGJnv4dorpZFLjgBeaR8AA/pub?gid=1099056259&single=true&output=csv';
+  const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQsYS-p7-maIA2eQgTEAEyqp6jadYehfnNbPQ5MBmLLMhjL4Ci8wiOaNVKP6O7i70lMX-s68Lt_QGm8/pub?gid=1099056259&single=true&output=csv';
   const TOTAL     = 497;
 
   /* normaliza para comparação sem acento */
@@ -700,7 +696,13 @@
   const searchInput   = document.getElementById('search-input');
   const searchResults = document.getElementById('search-results');
 
-  /* lista de todos os nomes do GeoJSON */
+  function positionDropdown() {
+    const r = searchInput.getBoundingClientRect();
+    searchResults.style.top   = (r.bottom + 4) + 'px';
+    searchResults.style.left  = r.left + 'px';
+    searchResults.style.width = r.width + 'px';
+  }
+
   const allGeoNames = geoData.features
     .map(f => f.properties.name || f.properties.NM_MUN || '')
     .filter(Boolean);
@@ -732,6 +734,8 @@
           + `<span class="sr-name">${name}</span>${badge}</div>`;
       }).join('');
     }
+
+    positionDropdown();
     searchResults.style.display = 'block';
 
     searchResults.querySelectorAll('.sr-item[data-mun]').forEach(el => {
@@ -747,8 +751,17 @@
     });
   });
 
+  window.addEventListener('resize', () => {
+    if (searchResults.style.display === 'block') positionDropdown();
+  });
+  window.addEventListener('scroll', () => {
+    if (searchResults.style.display === 'block') positionDropdown();
+  }, { passive: true });
+
   document.addEventListener('click', e => {
-    if (!e.target.closest('.search-wrap')) searchResults.style.display = 'none';
+    if (!e.target.closest('.search-wrap') && e.target !== searchResults && !searchResults.contains(e.target)) {
+      searchResults.style.display = 'none';
+    }
   });
 
 })();
