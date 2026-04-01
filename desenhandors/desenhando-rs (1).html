@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desenhando o RS · @unspredinhos</title>
+  <meta name="description" content="Um predinho para cada um dos 497 municípios do Rio Grande do Sul. Por Bruno Lorenz · @unspredinhos.">
+  <meta property="og:title" content="Desenhando o RS · @unspredinhos">
+  <meta property="og:description" content="Um predinho para cada um dos 497 municípios do Rio Grande do Sul.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange:      #E85D30;
+      --orange-d:    #C44020;
+      --orange-pale: #FDF0EB;
+      --ink:         #1a1714;
+      --muted:       #6b6760;
+      --border:      rgba(26,23,20,.12);
+      --bg:          #faf8f5;
+      --card:        #ffffff;
+      --serif:       'Instrument Serif', Georgia, serif;
+      --sans:        'DM Sans', system-ui, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink:         #ece8e2;
+        --muted:       #9c9891;
+        --border:      rgba(236,232,226,.12);
+        --bg:          #181614;
+        --card:        #222019;
+        --orange-pale: #2a1a12;
+      }
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* HEADER */
+    header {
+      padding: 48px 24px 28px;
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      opacity: 0;
+      animation: fadeUp .6s .05s forwards;
+    }
+    .brand {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(32px, 6vw, 52px);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+    h1 em { font-style: italic; color: var(--orange); }
+    .tagline {
+      font-size: 15px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 300;
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .6s .15s forwards;
+    }
+    .stat {
+      flex: 1;
+      min-width: 100px;
+      padding: 14px 16px 14px 0;
+      border-top: 2px solid var(--border);
+    }
+    .stat:first-child { border-top-color: var(--orange); }
+    .stat-num {
+      font-family: var(--serif);
+      font-size: 34px;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+      letter-spacing: .03em;
+    }
+
+    /* PROGRESS */
+    .progress-wrap {
+      max-width: 900px;
+      margin: 18px auto 0;
+      padding: 0 24px;
+      opacity: 0;
+      animation: fadeUp .6s .2s forwards;
+    }
+    .progress-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 2px;
+      width: 0;
+      transition: width 1.2s cubic-bezier(.16,1,.3,1);
+    }
+    .progress-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* SEARCH */
+    .search-wrap {
+      max-width: 900px;
+      margin: 20px auto 0;
+      padding: 0 24px;
+      opacity: 0;
+      animation: fadeUp .6s .25s forwards;
+      position: relative;
+    }
+    .search-inner { position: relative; }
+    .search-input {
+      width: 100%;
+      padding: 10px 16px 10px 40px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: var(--sans);
+      font-size: 14px;
+      background: var(--card);
+      color: var(--ink);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .search-input:focus { border-color: var(--orange); }
+    .search-input::placeholder { color: var(--muted); }
+    .search-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+      width: 15px; height: 15px;
+    }
+    #search-results {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 50;
+      box-shadow: 0 8px 24px rgba(0,0,0,.1);
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .sr-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background .1s;
+      gap: 8px;
+    }
+    .sr-item:last-child { border-bottom: none; }
+    .sr-item:hover { background: var(--orange-pale); }
+    .sr-name { font-weight: 500; color: var(--ink); flex: 1; }
+    .sr-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .sr-badge.done { background: var(--orange-pale); color: var(--orange-d); }
+    .sr-badge.todo { background: rgba(26,23,20,.06); color: var(--muted); }
+
+    /* MAP SECTION */
+    .map-section {
+      max-width: 900px;
+      margin: 20px auto 0;
+      padding: 0 24px;
+      opacity: 0;
+      animation: fadeUp .6s .3s forwards;
+    }
+    .map-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    #map-svg-wrap {
+      width: 100%;
+      position: relative;
+    }
+    #map-svg-wrap svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* municípios */
+    .mun-path {
+      fill: #e8e5e0;
+      stroke: #fff;
+      stroke-width: .4;
+      cursor: default;
+      transition: fill .1s;
+    }
+    @media (prefers-color-scheme: dark) {
+      .mun-path { fill: #2e2b27; stroke: #181614; }
+    }
+    .mun-path:not(.mun-done):hover { fill: #d8d4ce; }
+    @media (prefers-color-scheme: dark) {
+      .mun-path:not(.mun-done):hover { fill: #3a3733; }
+    }
+    .mun-done {
+      fill: var(--orange);
+      stroke: #fff;
+      stroke-width: .4;
+      cursor: pointer;
+    }
+    .mun-done:hover { fill: var(--orange-d); }
+    .mun-highlight {
+      stroke: var(--orange-d) !important;
+      stroke-width: 1.5 !important;
+    }
+    .mun-path.mun-highlight:not(.mun-done) { fill: #f5c3b2 !important; }
+    .mun-done.mun-highlight               { fill: var(--orange-d) !important; }
+
+    /* loading */
+    #map-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--card);
+      gap: 8px;
+    }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* tooltip hover */
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-size: 13px;
+      color: var(--ink);
+      z-index: 90;
+      box-shadow: 0 4px 14px rgba(0,0,0,.1);
+      white-space: nowrap;
+    }
+    #tooltip .tt-city { font-weight: 500; }
+    #tooltip .tt-hint { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* MODAL sobre o mapa */
+    #modal-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(26,23,20,.5);
+      z-index: 80;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+    }
+    #modal-overlay.open { display: flex; }
+    #modal {
+      background: var(--card);
+      border-radius: 14px;
+      max-width: 320px;
+      width: 88%;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      animation: popIn .22s cubic-bezier(.16,1,.3,1);
+      position: relative;
+    }
+    @keyframes popIn {
+      from { transform: scale(.9); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+    #modal-img-wrap {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--orange-pale);
+      position: relative;
+      overflow: hidden;
+    }
+    #modal-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    #modal-img-ph {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    #modal-body { padding: 16px 18px 20px; }
+    #modal-city {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+    #modal-num { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    #modal-close {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(0,0,0,.38);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      z-index: 2;
+      line-height: 1;
+    }
+    #modal-close:hover { background: rgba(0,0,0,.58); }
+
+    /* legend */
+    .legend {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .leg-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .leg-sq {
+      width: 12px; height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* FOOTER */
+    footer {
+      max-width: 900px;
+      margin: 36px auto 48px;
+      padding: 24px 24px 0;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      opacity: 0;
+      animation: fadeUp .6s .4s forwards;
+    }
+    footer p { font-size: 12px; color: var(--muted); }
+    footer a { color: var(--orange); text-decoration: none; font-weight: 500; }
+    footer a:hover { text-decoration: underline; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .stat { min-width: 80px; }
+      .stat-num { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">@unspredinhos · Projeto 2026</div>
+  <h1>Desenhando <em>o RS</em></h1>
+  <p class="tagline">Um predinho em aquarela para cada um dos 497 municípios do Rio Grande do Sul.</p>
+</header>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num" id="s-done">—</div>
+    <div class="stat-label">desenhados</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" id="s-left">—</div>
+    <div class="stat-label">faltando</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" id="s-pct">—</div>
+    <div class="stat-label">concluído</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">497</div>
+    <div class="stat-label">municípios no RS</div>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-track">
+    <div class="progress-fill" id="prog-fill"></div>
+  </div>
+  <div class="progress-label">
+    <span id="prog-label">carregando…</span>
+    <span>497</span>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-inner">
+    <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="6.5" cy="6.5" r="4.5"/>
+      <line x1="10.2" y1="10.2" x2="14" y2="14"/>
+    </svg>
+    <input id="search-input" class="search-input" type="text"
+      placeholder="Buscar município…" autocomplete="off" spellcheck="false">
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<div class="map-section">
+  <div class="map-card">
+
+    <div id="modal-overlay">
+      <div id="modal">
+        <div id="modal-img-wrap">
+          <button id="modal-close" aria-label="Fechar">✕</button>
+          <img id="modal-img" src="" alt="">
+          <div id="modal-img-ph">sem imagem</div>
+        </div>
+        <div id="modal-body">
+          <div id="modal-city"></div>
+          <div id="modal-num"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="map-svg-wrap">
+      <div id="map-loading"><div class="spinner"></div> Carregando mapa…</div>
+    </div>
+
+    <div class="legend">
+      <div class="leg-item">
+        <div class="leg-sq" style="background:var(--orange)"></div>
+        <span>Predinho feito — clique para ver</span>
+      </div>
+      <div class="leg-item">
+        <div class="leg-sq" style="background:#e8e5e0;border:1px solid #ccc"></div>
+        <span>Ainda por desenhar</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Aquarelas e desenhos: <a href="https://instagram.com/unspredinhos" target="_blank">Bruno Lorenz · @unspredinhos</a> · 2026</p>
+  <p><a href="https://wa.me/5551993115340" target="_blank">Encomendar um predinho</a></p>
+</footer>
+
+<div id="tooltip">
+  <div class="tt-city" id="tt-city"></div>
+  <div class="tt-hint" id="tt-hint"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script>
+(async () => {
+  const GEO_URL   = 'https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-43-mun.json';
+  const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vScjRr8nRfqSpUjtnvDba0bRyRqH210VMCgU-IFBkRDJGJnv4dorpZFLjgBeaR8AA/pub?gid=1099056259&single=true&output=csv';
+  const TOTAL     = 497;
+
+  /* normaliza para comparação sem acento */
+  function norm(s) {
+    return (s || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9 ]/g, '').trim();
+  }
+
+  /* parse CSV robusto */
+  function parseCSV(text) {
+    const rows = text.trim().split(/\r?\n/).slice(1);
+    return rows.map(row => {
+      const cols = []; let cur = '', inQ = false;
+      for (const c of row) {
+        if (c === '"') { inQ = !inQ; }
+        else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+        else cur += c;
+      }
+      cols.push(cur.trim());
+      return {
+        no:   (cols[0] || '').replace(/"/g, ''),
+        city: (cols[1] || '').replace(/"/g, ''),
+        img:  (cols[4] || '').replace(/"/g, '')
+      };
+    }).filter(d => d.city);
+  }
+
+  const loadingEl = document.getElementById('map-loading');
+
+  const [geoRes, sheetRes] = await Promise.allSettled([
+    fetch(GEO_URL).then(r => r.json()),
+    fetch(SHEET_CSV).then(r => r.text())
+  ]);
+
+  if (geoRes.status === 'rejected') {
+    loadingEl.textContent = '⚠ Não foi possível carregar o mapa.';
+    console.error('GeoJSON:', geoRes.reason);
+    return;
+  }
+
+  const geoData = geoRes.value;
+  const entries = sheetRes.status === 'fulfilled' ? parseCSV(sheetRes.value) : [];
+  if (sheetRes.status === 'rejected') console.warn('Planilha não carregou:', sheetRes.reason);
+
+  /* mapa nome normalizado → entry */
+  const entryMap = new Map(entries.map(e => [norm(e.city), e]));
+
+  /* stats */
+  const done = entries.length;
+  const pct  = ((done / TOTAL) * 100).toFixed(1);
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-left').textContent = TOTAL - done;
+  document.getElementById('s-pct').textContent  = pct + '%';
+  document.getElementById('prog-label').textContent = done + ' desenhados';
+  requestAnimationFrame(() => {
+    document.getElementById('prog-fill').style.width = pct + '%';
+  });
+
+  /* D3 SVG */
+  const wrap = document.getElementById('map-svg-wrap');
+  const W = 700, H = 640;
+  const svg = d3.select(wrap).append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('width', '100%');
+
+  const proj    = d3.geoMercator().fitExtent([[16,16],[W-16,H-16]], geoData);
+  const pathGen = d3.geoPath().projection(proj);
+
+  /* tooltip */
+  const tip    = document.getElementById('tooltip');
+  const ttCity = document.getElementById('tt-city');
+  const ttHint = document.getElementById('tt-hint');
+
+  function showTip(event, name, isDone) {
+    ttCity.textContent = name;
+    ttHint.textContent = isDone ? 'clique para ver o predinho' : 'ainda não desenhado';
+    const vw = window.innerWidth;
+    let x = event.clientX + 12, y = event.clientY - 44;
+    if (x + 210 > vw) x = event.clientX - 218;
+    if (y < 4) y = event.clientY + 12;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    tip.style.display = 'block';
+  }
+  function hideTip() { tip.style.display = 'none'; }
+
+  /* modal */
+  const overlay   = document.getElementById('modal-overlay');
+  const modalImg  = document.getElementById('modal-img');
+  const modalPh   = document.getElementById('modal-img-ph');
+  const modalCity = document.getElementById('modal-city');
+  const modalNum  = document.getElementById('modal-num');
+
+  function openModal(entry) {
+    modalCity.textContent = entry.city;
+    modalNum.textContent  = entry.no ? 'Predinho #' + entry.no : '';
+    if (entry.img && entry.img.startsWith('http')) {
+      modalImg.style.display = 'block';
+      modalPh.style.display  = 'none';
+      modalImg.src = entry.img;
+      modalImg.onerror = () => {
+        modalImg.style.display = 'none';
+        modalPh.style.display  = 'flex';
+        modalPh.textContent = 'imagem não disponível';
+      };
+    } else {
+      modalImg.style.display = 'none';
+      modalPh.style.display  = 'flex';
+      modalPh.textContent = 'sem imagem ainda';
+    }
+    overlay.classList.add('open');
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    modalImg.src = '';
+    clearHighlight();
+  }
+
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  /* highlight */
+  let hlPath = null;
+  function clearHighlight() {
+    if (hlPath) { hlPath.classList.remove('mun-highlight'); hlPath = null; }
+  }
+  function highlightByName(geoName) {
+    clearHighlight();
+    const el = wrap.querySelector(`path[data-geoname="${CSS.escape(geoName)}"]`);
+    if (el) { el.classList.add('mun-highlight'); hlPath = el; }
+  }
+
+  /* desenha municípios — coloridos por match de nome */
+  svg.append('g').selectAll('path')
+    .data(geoData.features)
+    .enter().append('path')
+    .attr('d', pathGen)
+    .attr('data-geoname', d => d.properties.name || d.properties.NM_MUN || '')
+    .attr('class', d => {
+      const geoName = d.properties.name || d.properties.NM_MUN || '';
+      return entryMap.has(norm(geoName)) ? 'mun-path mun-done' : 'mun-path';
+    })
+    .on('mousemove', function(event, d) {
+      const geoName = d.properties.name || d.properties.NM_MUN || '';
+      showTip(event, geoName, entryMap.has(norm(geoName)));
+    })
+    .on('mouseleave', hideTip)
+    .on('click', function(event, d) {
+      const geoName = d.properties.name || d.properties.NM_MUN || '';
+      const entry   = entryMap.get(norm(geoName));
+      if (!entry) return;
+      hideTip();
+      highlightByName(geoName);
+      openModal(entry);
+    });
+
+  loadingEl.remove();
+  svg.on('mouseleave', hideTip);
+
+  /* ── BUSCA ── */
+  const searchInput   = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+
+  /* lista de todos os nomes do GeoJSON */
+  const allGeoNames = geoData.features
+    .map(f => f.properties.name || f.properties.NM_MUN || '')
+    .filter(Boolean);
+
+  searchInput.addEventListener('input', () => {
+    const q = norm(searchInput.value);
+    clearHighlight();
+    if (!q) { searchResults.style.display = 'none'; return; }
+
+    const matches = allGeoNames
+      .filter(n => norm(n).includes(q))
+      .sort((a, b) => {
+        const as = norm(a).startsWith(q), bs = norm(b).startsWith(q);
+        if (as && !bs) return -1;
+        if (!as && bs) return 1;
+        return a.localeCompare(b, 'pt-BR');
+      })
+      .slice(0, 12);
+
+    if (!matches.length) {
+      searchResults.innerHTML = '<div class="sr-item"><span class="sr-name" style="color:var(--muted)">Nenhum município encontrado</span></div>';
+    } else {
+      searchResults.innerHTML = matches.map(name => {
+        const isDone = entryMap.has(norm(name));
+        const badge  = isDone
+          ? `<span class="sr-badge done">desenhado ✓</span>`
+          : `<span class="sr-badge todo">pendente</span>`;
+        return `<div class="sr-item" data-mun="${name.replace(/"/g,'&quot;')}">`
+          + `<span class="sr-name">${name}</span>${badge}</div>`;
+      }).join('');
+    }
+    searchResults.style.display = 'block';
+
+    searchResults.querySelectorAll('.sr-item[data-mun]').forEach(el => {
+      el.addEventListener('click', () => {
+        const name  = el.dataset.mun;
+        const entry = entryMap.get(norm(name));
+        searchInput.value = name;
+        searchResults.style.display = 'none';
+        highlightByName(name);
+        wrap.closest('.map-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (entry) openModal(entry);
+      });
+    });
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.search-wrap')) searchResults.style.display = 'none';
+  });
+
+})();
+</script>
+</body>
+</html>
