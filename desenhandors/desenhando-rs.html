@@ -387,7 +387,7 @@
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script>
 (async () => {
-  const GEO_URL   = 'https://cdn.jsdelivr.net/gh/tbrugz/geodata-br@master/geojson/geojs-43-mun.json';
+  const GEO_URL   = 'https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-43-mun.json';
   const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vScjRr8nRfqSpUjtnvDba0bRyRqH210VMCgU-IFBkRDJGJnv4dorpZFLjgBeaR8AA/pub?gid=1099056259&single=true&output=csv';
   const TOTAL     = 497;
 
@@ -423,8 +423,12 @@
   const loadingEl = document.getElementById('map-loading');
 
   if (geoRes.status === 'rejected') {
-    loadingEl.innerHTML = '⚠ Não foi possível carregar o mapa.';
+    loadingEl.innerHTML = '⚠ Não foi possível carregar o mapa. Verifique o console (F12).';
+    console.error('GeoJSON error:', geoRes.reason);
     return;
+  }
+  if (sheetRes.status === 'rejected') {
+    console.warn('Planilha não carregou — mapa aparece sem pins.', sheetRes.reason);
   }
 
   const geoData = geoRes.value;
