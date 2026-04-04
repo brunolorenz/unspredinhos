@@ -346,7 +346,8 @@ const ORD = ['','1º','2º','3º','4º','5º','6º','7º','8º','9º','10º',
   '11º','12º','13º','14º','15º','16º','17º','18º','19º','20º',
   '21º','22º','23º','24º','25º','26º','27º','28º','29º','30º','31º'];
 
-let currentMonth = 1, currentDay = null, currentUF = null;
+const _today = new Date();
+let currentMonth = _today.getMonth() + 1, currentDay = _today.getDate(), currentUF = null;
 
 function getKey(d, m) { return String(d).padStart(2,'0') + '-' + String(m).padStart(2,'0'); }
 
@@ -379,7 +380,6 @@ function renderDays() {
 }
 
 function renderResults() {
-  const HIGHLIGHT_UF = new Set(['AP','PI','RR','DF']);
   const area = document.getElementById('resultsArea');
   if (!currentDay) {
     area.innerHTML = '<div class="prompt-state">Escolha um dia no calendário</div>';
@@ -414,12 +414,14 @@ function renderResults() {
       </div>
       <div class="uf-filter">
         <button class="uf-btn${!currentUF ? ' active' : ''}" onclick="setUF(null)">Todos</button>
-        ${ufs.map(uf => { const isHL = HIGHLIGHT_UF.has(uf); const hlStyle = isHL ? ' style="border-color:#E07B3A;color:#E07B3A"' : ''; return `<button class="uf-btn${currentUF === uf ? ' active' : ''}"${hlStyle} onclick="setUF('${uf}')">${uf} <span style="opacity:.5;font-weight:400">${byUF[uf].length}</span></button>`; }).join('')}
+        ${ufs.map(uf => `<button class="uf-btn${currentUF === uf ? ' active' : ''}" onclick="setUF('${uf}')">${uf} <span style="opacity:.5;font-weight:400">${byUF[uf].length}</span></button>`).join('')}
       </div>
     </div>`;
 
   const groups   = currentUF ? {[currentUF]: byUF[currentUF]} : byUF;
   const showUFs  = currentUF ? [currentUF] : ufs;
+
+  const HIGHLIGHT_UF = new Set(['AP','PI','RR','DF']);
 
   showUFs.forEach(uf => {
     const ufStyle = HIGHLIGHT_UF.has(uf) ? ' style="color:#E07B3A"' : '';
