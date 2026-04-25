@@ -319,8 +319,20 @@ async function loadCSV() {
   try {
     bar.style.width = '10%';
     msg.textContent = 'Baixando dados…';
-    const resp = await fetch('ruas_com_datas.csv');
-    if (!resp.ok) throw new Error('Arquivo CSV não encontrado (status '+resp.status+')');
+    // Try multiple paths in case the file is in a different folder
+    const csvPaths = [
+      'ruas_com_datas.csv',
+      '../ruas_com_datas.csv',
+      '/unspredinhos/ruas_com_datas.csv',
+    ];
+    let resp = null;
+    for (const path of csvPaths) {
+      try {
+        const r = await fetch(path);
+        if (r.ok) { resp = r; break; }
+      } catch(e) {}
+    }
+    if (!resp) throw new Error('CSV não encontrado. Verifique se ruas_com_datas.csv está na mesma pasta que index.html');
     bar.style.width = '35%';
     msg.textContent = 'Processando 0%';
     const text = await resp.text();
