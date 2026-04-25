@@ -106,7 +106,7 @@
   .street-item { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.05); }
   .street-name { font-size:14px; color:var(--ink); }
   .street-city { font-size:12px; color:var(--faded); white-space:nowrap; }
-  .maps-link { font-size:11px; font-weight:500; color:var(--ink); text-decoration:none; opacity:0; transition:opacity 0.1s; margin-left:6px; }
+  .maps-link { font-size:11px; font-weight:500; color:var(--ink); text-decoration:none; transition:opacity 0.1s; margin-left:6px; opacity:0.4; }
   .street-item:hover .maps-link { opacity:1; }
 
   /* Vote button */
@@ -208,6 +208,7 @@
   <!-- NAV TABS -->
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchView('buscador', this)">Buscador</button>
+    <button class="nav-tab" onclick="switchView('busca', this)">Buscar cidade</button>
     <button class="nav-tab" onclick="switchView('ranking', this)">Ranking de votos</button>
   </div>
 
@@ -223,7 +224,28 @@
     </div>
   </div>
 
-  <!-- RANKING VIEW -->
+  <!-- BUSCA POR CIDADE -->
+  <div class="view" id="view-busca">
+    <div class="ranking-wrap">
+      <div class="ranking-header" style="margin-bottom:20px;">
+        <div class="ranking-title">Buscar cidade</div>
+        <div class="ranking-sub">Descubra em quais datas sua cidade aparece</div>
+      </div>
+      <div style="position:relative;margin-bottom:28px;">
+        <input type="text" id="searchInput" placeholder="Digite o nome da cidade…"
+          oninput="searchCity(this.value)"
+          style="width:100%;padding:14px 16px;font-family:'Inter',sans-serif;font-size:16px;
+                 border:1.5px solid var(--line);border-radius:8px;background:var(--bg);
+                 color:var(--ink);outline:none;transition:border-color 0.15s;"
+          onfocus="this.style.borderColor='var(--ink)'"
+          onblur="this.style.borderColor='var(--line)'">
+        <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--faded);font-size:14px;">⌕</span>
+      </div>
+      <div id="searchResults"><div class="ranking-empty">Digite o nome de uma cidade acima.</div></div>
+    </div>
+  </div>
+
+  <!-- RANKING -->
   <div class="view" id="view-ranking">
     <div class="ranking-wrap">
       <div class="ranking-header">
@@ -531,7 +553,7 @@ function renderDays() {
     const hasData = avail.has(d);
     btn.className = 'day-btn'+(hasData?' has-data':' no-data')+(d===currentDay?' selected':'');
     btn.textContent = String(d).padStart(2,'0');
-    if (hasData) btn.onclick = ()=>{ currentDay=d; currentUF=null; renderDays(); renderResults(); };
+    if (hasData) btn.onclick = ()=>{ currentDay=d; currentUF=null; renderDays(); renderResults(); updateURL(); };
     c.appendChild(btn);
   }
 }
@@ -559,7 +581,15 @@ async function renderResults() {
 
   let html = `<div class="results-header">
     <div class="results-street">${streetLabel}</div>
-    <div class="results-date">${currentDay} de ${MONTHS[currentMonth]}</div>
+    <div style="display:flex;align-items:baseline;gap:16px;">
+      <div class="results-date">${currentDay} de ${MONTHS[currentMonth]}</div>
+      <button onclick="shareDate()" style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
+        letter-spacing:0.08em;text-transform:uppercase;padding:5px 12px;border-radius:4px;
+        border:1.5px solid var(--line);background:transparent;color:var(--faded);cursor:pointer;
+        transition:all 0.12s;white-space:nowrap;" title="Copiar link desta data">
+        ↗ compartilhar
+      </button>
+    </div>
     <div class="results-stats">
       <div><div class="results-stat-num">${uniqueCities.toLocaleString('pt-BR')}</div><div class="results-stat-label">cidades</div></div>
       <div class="results-stat-sep"></div>
@@ -620,10 +650,129 @@ async function renderResults() {
 function setUF(uf) { currentUF=uf; renderResults(); }
 function openMaps(el) { window.open('https://www.google.com/maps/search/?api=1&query='+el.getAttribute('data-q'),'_blank'); }
 
-// Auto-seleciona o dia de hoje
-const today = new Date();
-currentMonth = today.getMonth() + 1;
-currentDay   = today.getDate();
+// ── Busca por cidade ──
+function searchCity(query) {
+  const results = document.getElementById('searchResults');
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) {
+    results.innerHTML = '<div class="ranking-empty">Digite pelo menos 2 letras.</div>';
+    return;
+  }
+
+  // Collect all matching (cidade, uf) across all dates
+  const cityDates = {}; // "cidade|uf" -> [{dia, mes}]
+  Object.entries(DATA).forEach(([key, entries]) => {
+    const dia = parseInt(key.slice(0,2)), mes = parseInt(key.slice(3,5));
+    const seen = new Set();
+    entries.forEach(e => {
+      if (e.c.toLowerCase().includes(q)) {
+        const ck = e.c+'|'+e.u;
+        if (!seen.has(ck)) {
+          seen.add(ck);
+          if (!cityDates[ck]) cityDates[ck] = {cidade: e.c, uf: e.u, dates: []};
+          cityDates[ck].dates.push({dia, mes});
+        }
+      }
+    });
+  });
+
+  const matches = Object.values(cityDates).sort((a,b) => a.cidade.localeCompare(b.cidade));
+
+  if (matches.length === 0) {
+    results.innerHTML = '<div class="ranking-empty">Nenhuma cidade encontrada.</div>';
+    return;
+  }
+
+  const votes = {}; // aggregate all votes for display
+  Object.entries(votesCache).forEach(([key, cities]) => {
+    Object.entries(cities).forEach(([ck, count]) => {
+      votes[ck] = (votes[ck]||0) + count;
+    });
+  });
+
+  results.innerHTML = matches.slice(0,40).map(m => {
+    const ck = m.cidade+'|'+m.uf;
+    const totalVotes = votes[ck] || 0;
+    const hi = HIGHLIGHT_UFS.has(m.uf);
+    const datesHtml = m.dates
+      .sort((a,b) => a.mes - b.mes || a.dia - b.dia)
+      .map(({dia, mes}) => {
+        const vk = `${dia}-${mes}-${m.cidade}-${m.uf}`;
+        const voted = votedCache.has(vk);
+        return `<button onclick="goToDate(${dia},${mes})"
+          style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
+                 padding:4px 10px;border-radius:4px;border:1.5px solid ${voted?'var(--vote)':'var(--line)'};
+                 background:${voted?'var(--vote)':'transparent'};color:${voted?'#fff':'var(--faded)'};
+                 cursor:pointer;transition:all 0.12s;"
+          onmouseover="if(!${voted})this.style.borderColor='var(--ink)';this.style.color=!${voted}?'var(--ink)':null;"
+          onmouseout="if(!${voted})this.style.borderColor='var(--line)';this.style.color=!${voted}?'var(--faded)':null;">
+          ${dia}/${mes}
+        </button>`;
+      }).join('');
+
+    return `<div class="rank-item" style="grid-template-columns:1fr auto;gap:12px;">
+      <div>
+        <div class="rank-city">${m.cidade} <span style="font-weight:400;color:${hi?'var(--vote)':'var(--muted)'};font-size:13px">${m.uf}${hi?' ✦':''}</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">${datesHtml}</div>
+      </div>
+      <div class="rank-votes" style="min-width:60px;">
+        ${totalVotes>0?`<div class="rank-votes-num">${totalVotes}</div><div class="rank-votes-label">voto${totalVotes!==1?'s':''}</div>`:''}
+      </div>
+    </div>`;
+  }).join('') + (matches.length > 40 ? `<div style="font-size:13px;color:var(--faded);padding:16px 0;">Mostrando 40 de ${matches.length} resultados. Seja mais específico.</div>` : '');
+}
+
+function shareDate() {
+  updateURL();
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: `Predinho do Dia — ${currentDay} de ${MONTHS[currentMonth]}`, url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => showToast('🔗 Link copiado!'));
+  }
+}
+  currentMonth = mes;
+  currentDay   = dia;
+  currentUF    = null;
+  // Switch to buscador tab
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-buscador').classList.add('active');
+  document.querySelectorAll('.nav-tab')[0].classList.add('active');
+  renderMonthTabs(); renderDays(); renderResults();
+  updateURL();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── URL compartilhável ──
+function updateURL() {
+  if (!currentDay) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('dia', currentDay);
+  url.searchParams.set('mes', currentMonth);
+  window.history.replaceState({}, '', url.toString());
+}
+
+function readURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  const dia = parseInt(params.get('dia'));
+  const mes = parseInt(params.get('mes'));
+  if (dia >= 1 && dia <= 31 && mes >= 1 && mes <= 12) {
+    return { dia, mes };
+  }
+  return null;
+}
+
+// Auto-seleciona: URL params têm prioridade, senão usa o dia de hoje
+const urlParams = readURLParams();
+if (urlParams) {
+  currentMonth = urlParams.mes;
+  currentDay   = urlParams.dia;
+} else {
+  const today  = new Date();
+  currentMonth = today.getMonth() + 1;
+  currentDay   = today.getDate();
+}
 
 loadCSV();
 </script>
