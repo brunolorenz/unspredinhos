@@ -103,6 +103,20 @@ header{padding:40px 60px 36px;border-bottom:1px solid var(--line);display:flex;a
   cursor:pointer;border-radius:4px;transition:all .12s;}
 .scbtn:hover{border-color:var(--ink);color:var(--ink);}
 .empty{font-size:14px;color:var(--faded);font-style:italic;padding:20px 0;}
+.sci-card{padding:16px 0;border-bottom:1px solid var(--line);}
+.sci-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.sci-count{font-size:12px;color:var(--faded);white-space:nowrap;flex-shrink:0;}
+.sci-dates{display:flex;flex-direction:column;gap:2px;}
+.sci-row{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:10px;
+  padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.04);}
+.sci-row.past{opacity:.45;}
+.sci-date{font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap;}
+.sci-date:hover{text-decoration:underline;}
+.sci-date-indent{display:block;}
+.sci-logr{font-size:13px;color:var(--muted);}
+.sci-maps{font-size:11px;font-weight:500;color:var(--ink);text-decoration:none;
+  opacity:.55;white-space:nowrap;transition:opacity .1s;}
+.sci-row:hover .sci-maps{opacity:1;}
 .rkwrap{padding:36px 60px;}
 .rktitle{font-size:36px;font-weight:900;letter-spacing:-.03em;line-height:1;}
 .rksub{font-size:14px;color:var(--muted);margin-top:8px;margin-bottom:24px;}
@@ -498,24 +512,56 @@ function searchCity(q){
   const matches=Object.values(CITY_IDX).filter(c=>c.cidade.toLowerCase().includes(ql));
   matches.sort((a,b)=>a.cidade.localeCompare(b.cidade,'pt-BR'));
   if(!matches.length){ res.innerHTML='<div class="empty">Nenhuma cidade encontrada.</div>'; return; }
+
+  const today=new Date();
+  const todayVal=today.getMonth()*100+today.getDate(); // mes*100+dia para comparar
+
   res.innerHTML=matches.slice(0,50).map(c=>{
-    const dates=[...c.keys].sort().map(k=>parseInt(k.slice(0,2))+'/'+parseInt(k.slice(3,5))).join(', ');
-    const oneDk=c.keys.size===1?JSON.stringify([...c.keys][0]):'';
-    return `<div class="sci">
-      <div style="grid-column:1/-1">
+    // Sort dates: upcoming first (ascending), then past (ascending)
+    const sortedKeys=[...c.keys].sort((a,b)=>{
+      const da=parseInt(a.slice(0,2)), ma=parseInt(a.slice(3,5));
+      const db=parseInt(b.slice(0,2)), mb=parseInt(b.slice(3,5));
+      const va=(ma-1)*100+da, vb=(mb-1)*100+db;
+      const ta=todayVal, isPastA=va<ta, isPastB=vb<tb;
+      const isPastB2=vb<ta;
+      // upcoming first, then past; within each group sort by date asc
+      if(!isPastA&&isPastB2) return -1;
+      if(isPastA&&!isPastB2) return 1;
+      return va-vb;
+    });
+
+    const dateRows=sortedKeys.map(k=>{
+      const d=parseInt(k.slice(0,2)), m=parseInt(k.slice(3,5));
+      const val=(m-1)*100+d;
+      const isPast=val<todayVal;
+      const dateItems=(DATA[k]||[]).filter(e=>e.c===c.cidade&&e.u===c.uf);
+      const logradouros=dateItems.map(e=>e.l);
+      return {k, d, m, isPast, logradouros};
+    });
+
+    const count=dateRows.reduce((s,r)=>s+r.logradouros.length,0);
+
+    return `<div class="sci-card">
+      <div class="sci-head">
         <div class="scn">${c.cidade} <span style="font-weight:400;font-size:13px;color:var(--muted)">${c.uf}</span></div>
-        <div class="scd">${[...c.keys].sort().map(k=>{
-          const d=parseInt(k.slice(0,2)),m=parseInt(k.slice(3,5));
-          // Find any logradouro for this date+city combination
-          const dateKey=k, dateItems=(DATA[dateKey]||[]).filter(e=>e.c===c.cidade&&e.u===c.uf);
-          const logr=dateItems.length>0?dateItems[0].l:('Rua '+ORD[d]+' de '+MONTHS[m]);
-          const mapsQ=encodeURIComponent(logr+', '+c.cidade+', '+c.uf+', Brasil');
-          const mapsUrl='https://www.google.com/maps/search/?api=1&query='+mapsQ;
-          return `<span style="display:inline-flex;align-items:center;gap:6px;margin-right:12px;margin-top:6px">
-            <a href="#" onclick="goTo(${JSON.stringify(k)});return false;" style="color:var(--ink);text-decoration:none;font-weight:500">${d}/${m}</a>
-            <a href="${mapsUrl}" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none" title="${logr}">↗ maps</a>
-          </span>`;
-        }).join('')}</div>
+        <div class="sci-count">${count} logradouro${count!==1?'s':''} · ${dateRows.length} data${dateRows.length!==1?'s':''}</div>
+      </div>
+      <div class="sci-dates">
+        ${dateRows.map(({k,d,m,isPast,logradouros})=>{
+          const dateLabel=`${d} de ${MONTHS[m]}`;
+          return logradouros.map((logr,idx)=>{
+            const mapsQ=encodeURIComponent(logr+', '+c.cidade+', '+c.uf+', Brasil');
+            const mapsUrl='https://www.google.com/maps/search/?api=1&query='+mapsQ;
+            return `<div class="sci-row${isPast?' past':''}">
+              ${idx===0
+                ? `<span class="sci-date" onclick="goTo(${JSON.stringify(k)})" title="Ver no buscador">${dateLabel}</span>`
+                : `<span class="sci-date-indent"></span>`
+              }
+              <span class="sci-logr">${logr}</span>
+              <a class="sci-maps" href="${mapsUrl}" target="_blank" rel="noopener">↗ maps</a>
+            </div>`;
+          }).join('');
+        }).join('')}
       </div>
     </div>`;
   }).join('');
