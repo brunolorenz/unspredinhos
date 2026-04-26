@@ -514,57 +514,53 @@ function searchCity(q){
   if(!matches.length){ res.innerHTML='<div class="empty">Nenhuma cidade encontrada.</div>'; return; }
 
   const today=new Date();
-  const todayVal=today.getMonth()*100+today.getDate(); // mes*100+dia para comparar
+  const todayMD=(today.getMonth()+1)*100+today.getDate();
 
-  res.innerHTML=matches.slice(0,50).map(c=>{
-    // Sort dates: upcoming first (ascending), then past (ascending)
+  let html='';
+  matches.slice(0,50).forEach(c=>{
+    // Sort: upcoming first, past after
     const sortedKeys=[...c.keys].sort((a,b)=>{
-      const da=parseInt(a.slice(0,2)), ma=parseInt(a.slice(3,5));
-      const db=parseInt(b.slice(0,2)), mb=parseInt(b.slice(3,5));
-      const va=(ma-1)*100+da, vb=(mb-1)*100+db;
-      const ta=todayVal, isPastA=va<ta, isPastB=vb<tb;
-      const isPastB2=vb<ta;
-      // upcoming first, then past; within each group sort by date asc
-      if(!isPastA&&isPastB2) return -1;
-      if(isPastA&&!isPastB2) return 1;
+      const ma=parseInt(a.slice(3,5)), da=parseInt(a.slice(0,2));
+      const mb=parseInt(b.slice(3,5)), db=parseInt(b.slice(0,2));
+      const va=ma*100+da, vb=mb*100+db;
+      const pa=va<todayMD, pb=vb<todayMD;
+      if(!pa&&pb) return -1;
+      if(pa&&!pb) return 1;
       return va-vb;
     });
 
-    const dateRows=sortedKeys.map(k=>{
+    let count=0;
+    sortedKeys.forEach(k=>{ count+=(DATA[k]||[]).filter(e=>e.c===c.cidade&&e.u===c.uf).length; });
+
+    html+='<div class="sci-card">';
+    html+='<div class="sci-head">';
+    html+='<div class="scn">'+c.cidade+' <span style="font-weight:400;font-size:13px;color:var(--muted)">'+c.uf+'</span></div>';
+    html+='<div class="sci-count">'+count+' logradouro'+(count!==1?'s':'')+' · '+sortedKeys.length+' data'+(sortedKeys.length!==1?'s':'')+'</div>';
+    html+='</div>';
+    html+='<div class="sci-dates">';
+
+    sortedKeys.forEach(k=>{
       const d=parseInt(k.slice(0,2)), m=parseInt(k.slice(3,5));
-      const val=(m-1)*100+d;
-      const isPast=val<todayVal;
+      const isPast=(m*100+d)<todayMD;
       const dateItems=(DATA[k]||[]).filter(e=>e.c===c.cidade&&e.u===c.uf);
-      const logradouros=dateItems.map(e=>e.l);
-      return {k, d, m, isPast, logradouros};
+      dateItems.forEach(function(e, idx){
+        const mapsQ=encodeURIComponent(e.l+', '+c.cidade+', '+c.uf+', Brasil');
+        const mapsUrl='https://www.google.com/maps/search/?api=1&query='+mapsQ;
+        html+='<div class="sci-row'+(isPast?' past':'')+'">';
+        if(idx===0){
+          html+='<span class="sci-date" onclick="goTo(\''+k+'\')" title="Ver no buscador">'+d+' de '+MONTHS[m]+'</span>';
+        } else {
+          html+='<span class="sci-date-indent"></span>';
+        }
+        html+='<span class="sci-logr">'+e.l+'</span>';
+        html+='<a class="sci-maps" href="'+mapsUrl+'" target="_blank" rel="noopener">↗ maps</a>';
+        html+='</div>';
+      });
     });
 
-    const count=dateRows.reduce((s,r)=>s+r.logradouros.length,0);
-
-    return `<div class="sci-card">
-      <div class="sci-head">
-        <div class="scn">${c.cidade} <span style="font-weight:400;font-size:13px;color:var(--muted)">${c.uf}</span></div>
-        <div class="sci-count">${count} logradouro${count!==1?'s':''} · ${dateRows.length} data${dateRows.length!==1?'s':''}</div>
-      </div>
-      <div class="sci-dates">
-        ${dateRows.map(({k,d,m,isPast,logradouros})=>{
-          const dateLabel=`${d} de ${MONTHS[m]}`;
-          return logradouros.map((logr,idx)=>{
-            const mapsQ=encodeURIComponent(logr+', '+c.cidade+', '+c.uf+', Brasil');
-            const mapsUrl='https://www.google.com/maps/search/?api=1&query='+mapsQ;
-            return `<div class="sci-row${isPast?' past':''}">
-              ${idx===0
-                ? `<span class="sci-date" onclick="goTo(${JSON.stringify(k)})" title="Ver no buscador">${dateLabel}</span>`
-                : `<span class="sci-date-indent"></span>`
-              }
-              <span class="sci-logr">${logr}</span>
-              <a class="sci-maps" href="${mapsUrl}" target="_blank" rel="noopener">↗ maps</a>
-            </div>`;
-          }).join('');
-        }).join('')}
-      </div>
-    </div>`;
-  }).join('');
+    html+='</div></div>';
+  });
+  res.innerHTML=html;
 }
 function goTo(key){
   curDay=parseInt(key.slice(0,2)); curMonth=parseInt(key.slice(3,5)); curUF=null;
