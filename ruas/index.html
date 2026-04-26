@@ -153,7 +153,7 @@ header{padding:40px 60px 36px;border-bottom:1px solid var(--line);display:flex;a
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
       @unspredinhos
     </a>
-    <a class="sobtn" href="https://brunolorenz.com" target="_blank" rel="noopener">
+    <a class="sobtn" href="https://brunolorenz.com.br" target="_blank" rel="noopener">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       brunolorenz.com
     </a>
@@ -501,14 +501,17 @@ function searchCity(q){
   res.innerHTML=matches.slice(0,50).map(c=>{
     const dates=[...c.keys].sort().map(k=>parseInt(k.slice(0,2))+'/'+parseInt(k.slice(3,5))).join(', ');
     const oneDk=c.keys.size===1?JSON.stringify([...c.keys][0]):'';
+    const mapsQ=encodeURIComponent(c.cidade+', '+c.uf+', Brasil');
+    const mapsUrl='https://www.google.com/maps/search/?api=1&query='+mapsQ;
     return `<div class="sci">
       <div>
         <div class="scn">${c.cidade} <span style="font-weight:400;font-size:13px;color:var(--muted)">${c.uf}</span></div>
-        <div class="scd">${dates}</div>
+        <div class="scd">${[...c.keys].sort().map(k=>{
+          const d=parseInt(k.slice(0,2)),m=parseInt(k.slice(3,5));
+          return `<a href="#" onclick="goTo(${JSON.stringify(k)});return false;" style="color:var(--ink);text-decoration:none;margin-right:8px">${d}/${m}</a>`;
+        }).join('')}</div>
       </div>
-      ${c.keys.size===1
-        ? `<button class="scbtn" onclick="goTo(${oneDk})">Ver data</button>`
-        : `<span class="scuf">${c.keys.size} datas</span>`}
+      <a class="scbtn" href="${mapsUrl}" target="_blank" rel="noopener">↗ maps</a>
     </div>`;
   }).join('');
 }
