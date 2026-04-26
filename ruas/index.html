@@ -395,11 +395,19 @@ function renderRanking(){
   if(!top.length){ list.innerHTML='<div class="empty">Nenhum voto registrado ainda.</div>'; return; }
   list.innerHTML=top.map((v,i)=>{
     const pct=Math.round((v.votos/max)*100);
+    const rkKey=String(v.dia).padStart(2,'0')+'-'+String(v.mes).padStart(2,'0');
+    const rkItems=(DATA[rkKey]||[]).filter(e=>e.c===v.cidade&&e.u===v.uf);
+    const rkLogr=rkItems.length>0?rkItems[0].l:('Rua '+ORD[v.dia]+' de '+MONTHS[v.mes]);
+    const rkQ=encodeURIComponent(rkLogr+', '+v.cidade+', '+v.uf+', Brasil');
+    const rkUrl='https://www.google.com/maps/search/?api=1&query='+rkQ;
     return `<div class="rki">
       <div class="rkpos${i<3?' top':''}">${i+1}</div>
       <div>
         <div class="rkcity">${v.cidade} <span style="font-weight:400;color:var(--muted);font-size:13px">${v.uf}</span></div>
-        <div class="rkdate">${v.dia} de ${MONTHS[v.mes]}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
+          <div class="rkdate">${v.dia} de ${MONTHS[v.mes]}</div>
+          <a href="${rkUrl}" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none;opacity:.7">↗ maps</a>
+        </div>
         <div class="rkbar"><div class="rkfill" style="width:${pct}%"></div></div>
       </div>
       <div style="text-align:right">
@@ -548,12 +556,18 @@ function searchCity(q){
         const mapsUrl='https://www.google.com/maps/search/?api=1&query='+mapsQ;
         html+='<div class="sci-row'+(isPast?' past':'')+'">';
         if(idx===0){
-          html+='<span class="sci-date" onclick="goTo(\''+k+'\')" title="Ver no buscador">'+d+' de '+MONTHS[m]+'</span>';
+          html+='<span class="sci-date" onclick="goTo(\''+k+'\')">'+d+' de '+MONTHS[m]+'</span>';
         } else {
           html+='<span class="sci-date-indent"></span>';
         }
         html+='<span class="sci-logr">'+e.l+'</span>';
+        const vk2=d+'-'+m+'-'+c.cidade+'-'+c.uf;
+        const voted2=votedCache.has(vk2);
+        const vc2=((votesCache[k]||{})[c.cidade+'|'+c.uf])||0;
+        html+='<span style="display:inline-flex;align-items:center;gap:6px">';
         html+='<a class="sci-maps" href="'+mapsUrl+'" target="_blank" rel="noopener">↗ maps</a>';
+        if(idx===0) html+='<button class="vbtn'+(voted2?' voted':'')+'" onclick="vote('+d+','+m+',\''+c.cidade.replace(/'/g,"\\'")+'\',\''+c.uf+'\',this)" style="padding:3px 8px;font-size:11px"><i class="heart">'+(voted2?'♥':'♡')+'</i>'+(vc2?' '+vc2:'')+'</button>';
+        html+='</span>';
         html+='</div>';
       });
     });
