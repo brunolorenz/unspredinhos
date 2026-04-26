@@ -83,9 +83,9 @@ header{padding:20px 60px 18px;border-bottom:1px solid var(--line);display:flex;a
 .sc{font-size:12px;color:var(--faded);white-space:nowrap;}
 .ml{font-size:11px;font-weight:500;color:var(--ink);text-decoration:none;opacity:.55;margin-left:6px;transition:opacity .1s;}
 .si:hover .ml{opacity:1;}
-.vbtn{position:relative;display:flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
-  padding:8px 14px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--faded);
-  cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;
+.vbtn{position:relative;display:inline-flex;align-items:center;gap:0;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
+  padding:8px 12px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--faded);
+  cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;width:fit-content;
   min-height:36px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .vbtn:hover:not(.voted){border-color:var(--vote);color:var(--vote);transform:scale(1.05);}
 .vbtn.voted{background:var(--vote);border-color:var(--vote);color:#fff;}
@@ -376,7 +376,7 @@ function vote(dia,mes,cidade,uf,btn){
   votedCache.add(vk);
   localStorage.setItem('pdd_votes',JSON.stringify([...votedCache]));
   btn.classList.add('voted');
-  btn.innerHTML=`<i class="heart">♥</i> ${count}`;
+  btn.innerHTML=`<i class="heart">♥</i>${count?'&thinsp;'+count:''}`;
   spawnParticles(cx,cy);
   toast(`♥ ${cidade} — voto registrado!`);
   rebuildVotes();
@@ -524,8 +524,7 @@ async function renderResults(){
             <span class="sn">${e.l}<a class="ml" href="${mapsUrl}" target="_blank" rel="noopener">↗ maps</a></span>
             <span class="sc">${e.c}</span>
             <button class="vbtn${voted?' voted':''}" onclick='voteBtn(this,${JSON.stringify([curDay,curMonth,cidade,uf])})'>
-              <i class="heart">${voted?'♥':'♡'}</i>${count?' '+count:''}
-            </button>
+              <i class="heart">${voted?'♥':'♡'}</i>${count?'&thinsp;'+count:''}</button>
           </div>`;
         } else {
           html+=`<div class="si">
@@ -596,7 +595,7 @@ function searchCity(q){
         const vc2=((votesCache[k]||{})[c.cidade+'|'+c.uf])||0;
         html+='<span style="display:inline-flex;align-items:center;gap:6px">';
         html+='<a class="sci-maps" href="'+mapsUrl+'" target="_blank" rel="noopener">↗ maps</a>';
-        if(idx===0) html+='<button class="vbtn'+(voted2?' voted':'')+'" onclick="vote('+d+','+m+',\''+c.cidade.replace(/'/g,"\\'")+'\',\''+c.uf+'\',this)" style="padding:3px 8px;font-size:11px"><i class="heart">'+(voted2?'♥':'♡')+'</i>'+(vc2?' '+vc2:'')+'</button>';
+        if(idx===0) html+='<button class="vbtn'+(voted2?' voted':'')+'" onclick="vote('+d+','+m+',\''+c.cidade.replace(/'/g,"\\'")+'\',\''+c.uf+'\',this)" style="padding:3px 8px;font-size:11px"><i class="heart">'+(voted2?'♥':'♡')+'</i>'+(vc2?'&thinsp;'+vc2:'')+'</button>';
         html+='</span>';
         html+='</div>';
       });
