@@ -501,17 +501,22 @@ function searchCity(q){
   res.innerHTML=matches.slice(0,50).map(c=>{
     const dates=[...c.keys].sort().map(k=>parseInt(k.slice(0,2))+'/'+parseInt(k.slice(3,5))).join(', ');
     const oneDk=c.keys.size===1?JSON.stringify([...c.keys][0]):'';
-    const mapsQ=encodeURIComponent(c.cidade+', '+c.uf+', Brasil');
-    const mapsUrl='https://www.google.com/maps/search/?api=1&query='+mapsQ;
     return `<div class="sci">
-      <div>
+      <div style="grid-column:1/-1">
         <div class="scn">${c.cidade} <span style="font-weight:400;font-size:13px;color:var(--muted)">${c.uf}</span></div>
         <div class="scd">${[...c.keys].sort().map(k=>{
           const d=parseInt(k.slice(0,2)),m=parseInt(k.slice(3,5));
-          return `<a href="#" onclick="goTo(${JSON.stringify(k)});return false;" style="color:var(--ink);text-decoration:none;margin-right:8px">${d}/${m}</a>`;
+          // Find any logradouro for this date+city combination
+          const dateKey=k, dateItems=(DATA[dateKey]||[]).filter(e=>e.c===c.cidade&&e.u===c.uf);
+          const logr=dateItems.length>0?dateItems[0].l:('Rua '+ORD[d]+' de '+MONTHS[m]);
+          const mapsQ=encodeURIComponent(logr+', '+c.cidade+', '+c.uf+', Brasil');
+          const mapsUrl='https://www.google.com/maps/search/?api=1&query='+mapsQ;
+          return `<span style="display:inline-flex;align-items:center;gap:6px;margin-right:12px;margin-top:6px">
+            <a href="#" onclick="goTo(${JSON.stringify(k)});return false;" style="color:var(--ink);text-decoration:none;font-weight:500">${d}/${m}</a>
+            <a href="${mapsUrl}" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none" title="${logr}">↗ maps</a>
+          </span>`;
         }).join('')}</div>
       </div>
-      <a class="scbtn" href="${mapsUrl}" target="_blank" rel="noopener">↗ maps</a>
     </div>`;
   }).join('');
 }
