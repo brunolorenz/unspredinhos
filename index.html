@@ -770,11 +770,11 @@ function renderInsights(data){
   document.getElementById('i-ins-mes').innerHTML=mesMais?icard('🌟',`${MONTHS[mesMais[0]-1]} foi o mês mais produtivo`,`${mesMais[1]} predinhos — provavelmente teve uma semana boa ou muita chuva que não deixou sair.`,'good'):'';
 
   // próximos
-  document.getElementById('i-proximos').innerHTML=
-    (naoVisitados.length?icard('🎯','Conquiste novos estados',`Ainda faltam ${naoVisitados.length} estados. Os mais fáceis de encontrar ruas com datas tendem a ser cidades do interior. Já tem sugestão de algum seguidor?`,'warn'):'')+
-    (botReg?icard('⚖️',`Reequilibre a ${botReg[0]}`,`Com apenas ${botReg[1]} predinho${botReg[1]>1?'s':''}, essa região merece mais atenção nas próximas semanas.`,'warn'):'')+
-    icard('📸','Preenche as imagens que faltam na planilha','Predinhos com foto têm muito mais impacto — quem ver vai querer encomendar na hora.','')+
-    icard('📢','Compartilha esses dados nos stories','Esses números contam uma história incrível. Um print do painel de progresso com o link já é conteúdo.','good');
+  //document.getElementById('i-proximos').innerHTML=
+    //(naoVisitados.length?icard('🎯','Conquiste novos estados',`Ainda faltam ${naoVisitados.length} estados. Os mais fáceis de encontrar ruas com datas tendem a ser cidades do interior. Já tem sugestão de algum seguidor?`,'warn'):'')+
+    //(botReg?icard('⚖️',`Reequilibre a ${botReg[0]}`,`Com apenas ${botReg[1]} predinho${botReg[1]>1?'s':''}, essa região merece mais atenção nas próximas semanas.`,'warn'):'')+
+    //icard('📸','Preenche as imagens que faltam na planilha','Predinhos com foto têm muito mais impacto — quem ver vai querer encomendar na hora.','')+
+    //icard('📢','Compartilha esses dados nos stories','Esses números contam uma história incrível. Um print do painel de progresso com o link já é conteúdo.','good');
 }
 })();
 </script>
