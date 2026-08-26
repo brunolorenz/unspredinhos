@@ -282,6 +282,12 @@
     color:var(--ink-soft); font-size:11px; text-align:center; padding:10px;
     font-family:'Space Mono',monospace;
   }
+  .leaf-mask{
+    position:absolute; left:0; right:0; bottom:0;
+    height:23%;
+    background:var(--paper);
+    border-radius:0 0 var(--radius) var(--radius);
+  }
   .stamp{
     position:absolute; top:8px; right:8px;
     width:34px; height:34px;
@@ -634,6 +640,7 @@
         '<div class="leaf-inner">' +
           '<div class="leaf-face leaf-front">' +
             (d.img ? '<img src="'+imgUrl(d.img,480)+'" alt="Predinho de '+escapeHtml(d.rua)+'" loading="lazy">' : '<div class="imgfallback">sem imagem</div>') +
+            '<div class="leaf-mask"></div>' +
             (isToday ? '<span class="today-flag">hoje</span>' : '') +
             '<span class="stamp">'+d.dia+'</span>' +
             '<button class="zoom-btn" aria-label="Ampliar imagem" data-action="zoom">' +
