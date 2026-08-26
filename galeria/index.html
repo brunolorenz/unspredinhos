@@ -686,9 +686,14 @@
     return DATA.find(d => d.dia === dia && d.mes === mes);
   }
 
+  function toDecimal(coord){
+    // Sheet stores coordinates with a comma as decimal separator (pt-BR), e.g. "-23,560077"
+    return (coord || '').trim().replace(',', '.');
+  }
+
   function mapsUrl(d){
     if(d.lat && d.lng){
-      return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(d.lat) + ',' + encodeURIComponent(d.lng);
+      return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(toDecimal(d.lat) + ',' + toDecimal(d.lng));
     }
     if(d.rua || d.cidade){
       return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([d.rua, d.cidade, d.uf].filter(Boolean).join(', '));
