@@ -692,7 +692,9 @@
   }
 
   function mapsUrl(d){
-    if(d.lat && d.lng){
+    // Coordinates from Jan 1 through Apr 4 aren't reliable — use the address fallback for those.
+    const coordsReliable = (d.mes > 4) || (d.mes === 4 && d.dia >= 5);
+    if(coordsReliable && d.lat && d.lng){
       return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(toDecimal(d.lat) + ',' + toDecimal(d.lng));
     }
     if(d.rua || d.cidade){
