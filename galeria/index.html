@@ -240,7 +240,7 @@
   }
 
   .leaf{
-    aspect-ratio:3/4;
+    aspect-ratio:39/40;
     perspective:1200px;
     position:relative;
   }
@@ -271,9 +271,9 @@
     box-shadow:var(--shadow);
     border:1px solid rgba(38,34,29,0.08);
   }
-  .leaf-front{ background:#ddd3ba; }
+  .leaf-front{ background:#F4EEE0; }
   .leaf-front img{
-    width:100%; height:100%; object-fit:cover; display:block;
+    width:100%; height:130%; object-fit:cover; object-position:top; display:block;
     transition:transform .5s ease;
   }
   .leaf:hover .leaf-front img{ transform:scale(1.045); }
@@ -281,12 +281,6 @@
     width:100%;height:100%;display:flex;align-items:center;justify-content:center;
     color:var(--ink-soft); font-size:11px; text-align:center; padding:10px;
     font-family:'Space Mono',monospace;
-  }
-  .leaf-mask{
-    position:absolute; left:0; right:0; bottom:0;
-    height:23%;
-    background:var(--paper);
-    border-radius:0 0 var(--radius) var(--radius);
   }
   .stamp{
     position:absolute; top:8px; right:8px;
@@ -640,7 +634,6 @@
         '<div class="leaf-inner">' +
           '<div class="leaf-face leaf-front">' +
             (d.img ? '<img src="'+imgUrl(d.img,480)+'" alt="Predinho de '+escapeHtml(d.rua)+'" loading="lazy">' : '<div class="imgfallback">sem imagem</div>') +
-            '<div class="leaf-mask"></div>' +
             (isToday ? '<span class="today-flag">hoje</span>' : '') +
             '<span class="stamp">'+d.dia+'</span>' +
             '<button class="zoom-btn" aria-label="Ampliar imagem" data-action="zoom">' +
