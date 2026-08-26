@@ -181,45 +181,6 @@
     gap:22px 16px;
   }
 
-  /* ---------- Real weekday-aligned calendar ---------- */
-  .weekday-row{
-    display:grid;
-    grid-template-columns:repeat(7, 1fr);
-    gap:10px;
-    margin:0 0 8px;
-  }
-  .weekday-row span{
-    font-family:'Space Mono', monospace;
-    font-size:10.5px;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    color:var(--ink-soft);
-    opacity:0.65;
-    text-align:center;
-  }
-  .calendar{
-    display:grid;
-    grid-template-columns:repeat(7, 1fr);
-    gap:10px;
-  }
-  .cal-empty{ visibility:hidden; }
-  .cal-blank{
-    aspect-ratio:3/4;
-    border-radius:var(--radius);
-    border:1px dashed var(--line);
-    display:flex; align-items:flex-start; justify-content:flex-end;
-    padding:6px;
-    font-family:'Space Mono', monospace;
-    font-size:11px;
-    color:var(--ink-soft);
-    opacity:0.35;
-  }
-  @media (max-width: 640px){
-    .calendar, .weekday-row{ gap:6px; }
-    .stamp{ width:24px; height:24px; font-size:10.5px; top:5px; right:5px; }
-    .leaf-caption{ font-size:9.5px; padding:10px 6px 5px; }
-  }
-
   .leaf{
     aspect-ratio:3/4;
     perspective:1200px;
@@ -465,28 +426,9 @@
 <script>
 (function(){
   const SHEET_ID = '1BPJ37xzZDbycJ10Pd_9_YqiX_GMIVPMqhcmSd0l1bxI';
-  const CANDIDATE_URLS = [
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=Predinhos%202026',
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=predinhos_2026',
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv',
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&gid=0',
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv'
-  ];
+  const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=0';
 
   const MESES = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const YEAR = 2026;
-
-  function isValidCalendarDate(dia, mes){
-    const dt = new Date(YEAR, mes - 1, dia);
-    return dt.getFullYear() === YEAR && dt.getMonth() === mes - 1 && dt.getDate() === dia;
-  }
-  function daysInMonth(mes){
-    return new Date(YEAR, mes, 0).getDate();
-  }
-  function weekdayOf(dia, mes){
-    return new Date(YEAR, mes - 1, dia).getDay();
-  }
 
   const monthsNav = document.getElementById('months');
   const main = document.getElementById('main');
@@ -541,38 +483,11 @@
     return clean + '=w' + w;
   }
 
-  async function fetchCSV(url){
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('HTTP ' + res.status + ' ao buscar ' + url);
-    return res.text();
-  }
-
-  function looksLikeOurSheet(text){
-    const firstLine = (text.split('\n')[0] || '').toLowerCase();
-    return firstLine.includes('dia') && firstLine.includes('rua');
-  }
-
   async function loadData(){
-    if(location.protocol === 'file:'){
-      showError(new Error('Esta página foi aberta como arquivo local (file://). Sirva-a por http — GitHub Pages, "npx serve", etc. — senão o navegador bloqueia a leitura da planilha.'));
-      return;
-    }
     try{
-      let text = null;
-      let lastErr = null;
-      for(const url of CANDIDATE_URLS){
-        try{
-          const candidate = await fetchCSV(url);
-          if(looksLikeOurSheet(candidate)){
-            text = candidate;
-            break;
-          }
-          lastErr = new Error('Resposta de ' + url + ' não parece ter as colunas esperadas (Dia/Rua).');
-        } catch(e){
-          lastErr = e;
-        }
-      }
-      if(text === null) throw lastErr || new Error('Nenhuma das URLs testadas funcionou.');
+      const res = await fetch(CSV_URL);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
       const rows = parseCSV(text);
       const body = rows.slice(1).filter(r => r[0] && r[0].trim() !== '');
       DATA = body.map(r => ({
@@ -587,7 +502,7 @@
         lng: (r[8]||'').trim(),
         img: (r[9]||'').trim(),
         nota: (r[10]||'').trim()
-      })).filter(d => !isNaN(d.dia) && !isNaN(d.mes) && isValidCalendarDate(d.dia, d.mes));
+      })).filter(d => !isNaN(d.dia) && !isNaN(d.mes));
 
       if(!DATA.length) throw new Error('Planilha carregada, mas sem linhas de dados reconhecíveis.');
 
@@ -658,24 +573,10 @@
   function renderMonth(m){
     setActiveMonthBtn(m);
     const items = DATA.filter(d => d.mes === m).sort((a,b) => a.dia - b.dia);
-    const byDay = new Map(items.map(d => [d.dia, d]));
-    const total = daysInMonth(m);
-    const leadingBlanks = weekdayOf(1, m);
-
-    let cells = '';
-    for(let i = 0; i < leadingBlanks; i++){
-      cells += '<div class="cal-empty"></div>';
-    }
-    for(let dia = 1; dia <= total; dia++){
-      const d = byDay.get(dia);
-      cells += d ? cardHTML(d) : '<div class="cal-blank">'+dia+'</div>';
-    }
-
-    statusLine.textContent = items.length + ' predinhos em ' + MESES[m].toLowerCase() + ' de ' + YEAR;
+    statusLine.textContent = items.length + ' predinhos em ' + MESES[m].toLowerCase();
     main.innerHTML =
-      '<h2 class="month-title">'+MESES[m]+' <small>'+items.length+' de '+total+' dias</small></h2>' +
-      '<div class="weekday-row">' + DIAS_SEMANA.map(w => '<span>'+w+'</span>').join('') + '</div>' +
-      '<div class="calendar">' + cells + '</div>';
+      '<h2 class="month-title">'+MESES[m]+' <small>'+items.length+' dias</small></h2>' +
+      '<div class="grid">' + items.map(cardHTML).join('') + '</div>';
     attachCardEvents();
   }
 
@@ -736,7 +637,7 @@
     main.innerHTML =
       '<div class="error-state">' +
         '<p><strong>Não consegui carregar a planilha automaticamente.</strong></p>' +
-        '<p>Confirme que ela está como "Qualquer pessoa com o link pode visualizar" e que esta página está sendo aberta via http/https (não abrindo o arquivo direto no navegador).</p>' +
+        '<p>Verifique se ela está compartilhada como "Qualquer pessoa com o link pode visualizar" e recarregue a página.</p>' +
         '<code>' + escapeHtml(String(err.message || err)) + '</code>' +
       '</div>';
     statusLine.textContent = '';
