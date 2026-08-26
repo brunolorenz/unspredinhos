@@ -475,11 +475,11 @@
 (function(){
   const SHEET_ID = '1BPJ37xzZDbycJ10Pd_9_YqiX_GMIVPMqhcmSd0l1bxI';
   const CANDIDATE_URLS = [
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=Predinhos%202026',
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=predinhos_2026',
     'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv',
+    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv',
     'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&gid=0',
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv'
+    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=Predinhos%202026',
+    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=predinhos_2026'
   ];
 
   const MESES = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -513,6 +513,7 @@
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
 
   let DATA = [];
+  let DEBUG_INFO = '';
   const today = new Date();
   const todayDay = today.getDate();
   const todayMonth = today.getMonth() + 1;
@@ -566,21 +567,26 @@
       return;
     }
     try{
-      let text = null;
+      let best = null; // { text, url, rowCount }
       let lastErr = null;
       for(const url of CANDIDATE_URLS){
         try{
           const candidate = await fetchCSV(url);
-          if(looksLikeOurSheet(candidate)){
-            text = candidate;
-            break;
+          if(!looksLikeOurSheet(candidate)){
+            lastErr = new Error('Resposta de ' + url + ' não parece ter as colunas esperadas (Dia/Rua).');
+            continue;
           }
-          lastErr = new Error('Resposta de ' + url + ' não parece ter as colunas esperadas (Dia/Rua).');
+          const rowCount = candidate.split('\n').filter(l => l.trim() !== '').length;
+          if(!best || rowCount > best.rowCount){
+            best = { text: candidate, url, rowCount };
+          }
         } catch(e){
           lastErr = e;
         }
       }
-      if(text === null) throw lastErr || new Error('Nenhuma das URLs testadas funcionou.');
+      if(!best) throw lastErr || new Error('Nenhuma das URLs testadas funcionou.');
+      console.log('[Predinho do Dia] fonte usada:', best.url, '—', best.rowCount, 'linhas');
+      const text = best.text;
       const rows = parseCSV(text);
       const body = rows.slice(1).filter(r => r[0] && r[0].trim() !== '');
       DATA = body.map(r => ({
@@ -598,6 +604,8 @@
       })).filter(d => !isNaN(d.dia) && !isNaN(d.mes) && isValidCalendarDate(d.dia, d.mes));
 
       if(!DATA.length) throw new Error('Planilha carregada, mas sem linhas de dados reconhecíveis.');
+
+      DEBUG_INFO = best.rowCount + ' linhas lidas de: ' + best.url;
 
       buildMonthNav();
       renderGallery();
@@ -682,7 +690,7 @@
 
   function renderGallery(){
     const present = Array.from(new Set(DATA.map(d => d.mes))).sort((a,b) => a - b);
-    statusLine.textContent = DATA.length + ' predinhos, de ' + MESES[present[0]].toLowerCase() + ' a ' + MESES[present[present.length-1]].toLowerCase() + ' de ' + YEAR;
+    statusLine.textContent = DATA.length + ' predinhos, de ' + MESES[present[0]].toLowerCase() + ' a ' + MESES[present[present.length-1]].toLowerCase() + ' de ' + YEAR + '  ·  ' + DEBUG_INFO;
     main.innerHTML = present.map(renderMonthSection).join('');
     attachCardEvents();
   }
