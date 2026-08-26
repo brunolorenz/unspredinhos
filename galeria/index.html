@@ -226,7 +226,17 @@
   @media (max-width: 640px){
     .calendar, .weekday-row{ gap:6px; }
     .stamp{ width:24px; height:24px; font-size:10.5px; top:5px; right:5px; }
-    .leaf-caption{ font-size:9.5px; padding:10px 6px 5px; }
+  }
+
+  /* Mobile: drop the weekday-aligned calendar, show a plain photo grid */
+  @media (max-width: 720px){
+    .weekday-row{ display:none; }
+    .cal-empty, .cal-blank{ display:none; }
+    .calendar{
+      grid-template-columns:repeat(auto-fill, minmax(108px, 1fr));
+      gap:10px;
+    }
+    .month-title{ margin:18px 4px 10px; font-size:1.25rem; }
   }
 
   .leaf{
@@ -271,14 +281,6 @@
     width:100%;height:100%;display:flex;align-items:center;justify-content:center;
     color:var(--ink-soft); font-size:11px; text-align:center; padding:10px;
     font-family:'Space Mono',monospace;
-  }
-  .leaf-caption{
-    position:absolute; left:0; right:0; bottom:0;
-    padding:16px 10px 8px;
-    background:linear-gradient(to top, rgba(20,17,13,0.72), transparent);
-    color:#F3EDDD;
-    font-size:11.5px;
-    line-height:1.25;
   }
   .stamp{
     position:absolute; top:8px; right:8px;
@@ -440,8 +442,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input type="text" id="search" placeholder="Buscar por rua, cidade ou UF…">
       </div>
-      <button class="btn-ghost" id="todayBtn">Hoje</button>
-      <button class="btn-ghost" id="randomBtn">Aleatório</button>
     </div>
     <div class="status-line" id="statusLine"></div>
   </div>
@@ -501,8 +501,6 @@
   const main = document.getElementById('main');
   const statusLine = document.getElementById('statusLine');
   const searchInput = document.getElementById('search');
-  const todayBtn = document.getElementById('todayBtn');
-  const randomBtn = document.getElementById('randomBtn');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
   const lightboxRua = document.getElementById('lightboxRua');
@@ -513,7 +511,6 @@
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
 
   let DATA = [];
-  let DEBUG_INFO = '';
   const today = new Date();
   const todayDay = today.getDate();
   const todayMonth = today.getMonth() + 1;
@@ -605,7 +602,6 @@
 
       if(!DATA.length) throw new Error('Planilha carregada, mas sem linhas de dados reconhecíveis.');
 
-      DEBUG_INFO = best.rowCount + ' linhas lidas de: ' + best.url;
 
       buildMonthNav();
       renderGallery();
@@ -643,7 +639,6 @@
             '<button class="zoom-btn" aria-label="Ampliar imagem" data-action="zoom">' +
               '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>' +
             '</button>' +
-            '<div class="leaf-caption">'+escapeHtml(d.rua)+'</div>' +
           '</div>' +
           '<div class="leaf-face leaf-back">' +
             '<span class="region-tag ' + regionClass(d.regiao) + '">' + escapeHtml(d.regiao || '—') + '</span>' +
@@ -690,7 +685,7 @@
 
   function renderGallery(){
     const present = Array.from(new Set(DATA.map(d => d.mes))).sort((a,b) => a - b);
-    statusLine.textContent = DATA.length + ' predinhos, de ' + MESES[present[0]].toLowerCase() + ' a ' + MESES[present[present.length-1]].toLowerCase() + ' de ' + YEAR + '  ·  ' + DEBUG_INFO;
+    statusLine.textContent = DATA.length + ' predinhos, de ' + MESES[present[0]].toLowerCase() + ' a ' + MESES[present[present.length-1]].toLowerCase() + ' de ' + YEAR;
     main.innerHTML = present.map(renderMonthSection).join('');
     attachCardEvents();
   }
@@ -769,28 +764,6 @@
     clearTimeout(searchDebounce);
     const val = this.value;
     searchDebounce = setTimeout(() => applySearchFilter(val), 150);
-  });
-
-  todayBtn.addEventListener('click', function(){
-    searchInput.value = '';
-    applySearchFilter('');
-    const el = document.querySelector('.leaf.is-today');
-    if(el){
-      el.scrollIntoView({behavior:'smooth', block:'center'});
-      el.classList.add('flipped');
-    }
-  });
-
-  randomBtn.addEventListener('click', function(){
-    if(!DATA.length) return;
-    searchInput.value = '';
-    applySearchFilter('');
-    const pick = DATA[Math.floor(Math.random() * DATA.length)];
-    const el = document.querySelector('.leaf[data-dia="'+pick.dia+'"][data-mes="'+pick.mes+'"]');
-    if(el){
-      el.scrollIntoView({behavior:'smooth', block:'center'});
-      el.classList.add('flipped');
-    }
   });
 
   loadData();
