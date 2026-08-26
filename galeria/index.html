@@ -169,6 +169,14 @@
     margin:22px 4px 16px;
     display:flex; align-items:baseline; gap:10px;
   }
+  .month-section{
+    padding-top:18px;
+    border-top:1px dashed var(--line);
+  }
+  .month-section:first-of-type{
+    border-top:none;
+    padding-top:0;
+  }
   .month-title small{
     font-family:'Space Mono', monospace;
     font-size:12px; font-weight:400;
@@ -203,6 +211,7 @@
     gap:10px;
   }
   .cal-empty{ visibility:hidden; }
+  .search-hide{ display:none !important; }
   .cal-blank{
     aspect-ratio:3/4;
     border-radius:var(--radius);
@@ -504,7 +513,6 @@
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
 
   let DATA = [];
-  let currentMonth = new Date().getMonth() + 1;
   const today = new Date();
   const todayDay = today.getDate();
   const todayMonth = today.getMonth() + 1;
@@ -592,8 +600,7 @@
       if(!DATA.length) throw new Error('Planilha carregada, mas sem linhas de dados reconhecíveis.');
 
       buildMonthNav();
-      if(!DATA.some(d => d.mes === currentMonth)) currentMonth = DATA[0].mes;
-      renderMonth(currentMonth);
+      renderGallery();
     } catch(err){
       showError(err);
     }
@@ -604,28 +611,22 @@
     monthsNav.innerHTML = '';
     present.forEach(m => {
       const btn = document.createElement('button');
-      btn.className = 'month-btn' + (m === currentMonth ? ' active' : '');
+      btn.className = 'month-btn';
       btn.textContent = MESES[m];
-      btn.addEventListener('click', () => {
-        searchInput.value = '';
-        currentMonth = m;
-        renderMonth(m);
-      });
       btn.dataset.month = m;
+      btn.addEventListener('click', () => {
+        const section = document.getElementById('mes-' + m);
+        if(section) section.scrollIntoView({behavior:'smooth', block:'start'});
+      });
       monthsNav.appendChild(btn);
-    });
-  }
-
-  function setActiveMonthBtn(m){
-    Array.from(monthsNav.children).forEach(btn => {
-      btn.classList.toggle('active', parseInt(btn.dataset.month,10) === m);
     });
   }
 
   function cardHTML(d){
     const isToday = d.dia === todayDay && d.mes === todayMonth;
+    const searchBlob = (d.rua + ' ' + d.cidade + ' ' + d.uf).toLowerCase();
     return (
-      '<div class="leaf' + (isToday ? ' is-today' : '') + '" data-dia="'+d.dia+'" data-mes="'+d.mes+'">' +
+      '<div class="leaf' + (isToday ? ' is-today' : '') + '" data-dia="'+d.dia+'" data-mes="'+d.mes+'" data-search="'+escapeHtml(searchBlob)+'">' +
         '<div class="leaf-inner">' +
           '<div class="leaf-face leaf-front">' +
             (d.img ? '<img src="'+imgUrl(d.img,480)+'" alt="Predinho de '+escapeHtml(d.rua)+'" loading="lazy">' : '<div class="imgfallback">sem imagem</div>') +
@@ -655,8 +656,7 @@
     return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function renderMonth(m){
-    setActiveMonthBtn(m);
+  function renderMonthSection(m){
     const items = DATA.filter(d => d.mes === m).sort((a,b) => a.dia - b.dia);
     const byDay = new Map(items.map(d => [d.dia, d]));
     const total = daysInMonth(m);
@@ -671,30 +671,44 @@
       cells += d ? cardHTML(d) : '<div class="cal-blank">'+dia+'</div>';
     }
 
-    statusLine.textContent = items.length + ' predinhos em ' + MESES[m].toLowerCase() + ' de ' + YEAR;
-    main.innerHTML =
-      '<h2 class="month-title">'+MESES[m]+' <small>'+items.length+' de '+total+' dias</small></h2>' +
-      '<div class="weekday-row">' + DIAS_SEMANA.map(w => '<span>'+w+'</span>').join('') + '</div>' +
-      '<div class="calendar">' + cells + '</div>';
+    return (
+      '<section class="month-section" id="mes-'+m+'">' +
+        '<h2 class="month-title">'+MESES[m]+' <small>'+items.length+' de '+total+' dias</small></h2>' +
+        '<div class="weekday-row">' + DIAS_SEMANA.map(w => '<span>'+w+'</span>').join('') + '</div>' +
+        '<div class="calendar">' + cells + '</div>' +
+      '</section>'
+    );
+  }
+
+  function renderGallery(){
+    const present = Array.from(new Set(DATA.map(d => d.mes))).sort((a,b) => a - b);
+    statusLine.textContent = DATA.length + ' predinhos, de ' + MESES[present[0]].toLowerCase() + ' a ' + MESES[present[present.length-1]].toLowerCase() + ' de ' + YEAR;
+    main.innerHTML = present.map(renderMonthSection).join('');
     attachCardEvents();
   }
 
-  function renderSearch(query){
+  function applySearchFilter(query){
     const q = query.trim().toLowerCase();
-    const items = DATA.filter(d =>
-      d.rua.toLowerCase().includes(q) ||
-      d.cidade.toLowerCase().includes(q) ||
-      d.uf.toLowerCase().includes(q)
-    ).sort((a,b) => a.mes - b.mes || a.dia - b.dia);
-    statusLine.textContent = items.length + ' resultado(s) para "' + query + '"';
-    if(!items.length){
-      main.innerHTML = '<div class="empty-state">Nenhum predinho encontrado para "'+escapeHtml(query)+'".</div>';
+    if(q === ''){
+      document.querySelectorAll('.search-hide').forEach(el => el.classList.remove('search-hide'));
+      document.querySelectorAll('.month-section').forEach(el => el.classList.remove('search-hide'));
+      const present = Array.from(new Set(DATA.map(d => d.mes))).sort((a,b) => a - b);
+      statusLine.textContent = DATA.length + ' predinhos, de ' + MESES[present[0]].toLowerCase() + ' a ' + MESES[present[present.length-1]].toLowerCase() + ' de ' + YEAR;
       return;
     }
-    main.innerHTML =
-      '<h2 class="month-title">Resultados <small>'+items.length+'</small></h2>' +
-      '<div class="grid">' + items.map(cardHTML).join('') + '</div>';
-    attachCardEvents();
+    let matches = 0;
+    document.querySelectorAll('.month-section').forEach(section => {
+      let sectionHasMatch = false;
+      section.querySelectorAll('.leaf').forEach(leaf => {
+        const isMatch = (leaf.dataset.search || '').includes(q);
+        leaf.classList.toggle('search-hide', !isMatch);
+        if(isMatch){ sectionHasMatch = true; matches++; }
+      });
+      section.querySelectorAll('.cal-blank').forEach(b => b.classList.add('search-hide'));
+      section.querySelectorAll('.cal-empty').forEach(b => b.classList.add('search-hide'));
+      section.classList.toggle('search-hide', !sectionHasMatch);
+    });
+    statusLine.textContent = matches + ' resultado(s) para "' + query + '"';
   }
 
   function attachCardEvents(){
@@ -746,38 +760,29 @@
   searchInput.addEventListener('input', function(){
     clearTimeout(searchDebounce);
     const val = this.value;
-    searchDebounce = setTimeout(() => {
-      if(val.trim() === '') renderMonth(currentMonth);
-      else renderSearch(val);
-    }, 180);
+    searchDebounce = setTimeout(() => applySearchFilter(val), 150);
   });
 
   todayBtn.addEventListener('click', function(){
     searchInput.value = '';
-    currentMonth = todayMonth;
-    renderMonth(todayMonth);
-    requestAnimationFrame(() => {
-      const el = document.querySelector('.leaf.is-today');
-      if(el){
-        el.scrollIntoView({behavior:'smooth', block:'center'});
-        el.classList.add('flipped');
-      }
-    });
+    applySearchFilter('');
+    const el = document.querySelector('.leaf.is-today');
+    if(el){
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      el.classList.add('flipped');
+    }
   });
 
   randomBtn.addEventListener('click', function(){
     if(!DATA.length) return;
     searchInput.value = '';
+    applySearchFilter('');
     const pick = DATA[Math.floor(Math.random() * DATA.length)];
-    currentMonth = pick.mes;
-    renderMonth(pick.mes);
-    requestAnimationFrame(() => {
-      const el = document.querySelector('.leaf[data-dia="'+pick.dia+'"][data-mes="'+pick.mes+'"]');
-      if(el){
-        el.scrollIntoView({behavior:'smooth', block:'center'});
-        el.classList.add('flipped');
-      }
-    });
+    const el = document.querySelector('.leaf[data-dia="'+pick.dia+'"][data-mes="'+pick.mes+'"]');
+    if(el){
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      el.classList.add('flipped');
+    }
   });
 
   loadData();
