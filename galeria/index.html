@@ -192,7 +192,7 @@
   /* ---------- Real weekday-aligned calendar ---------- */
   .weekday-row{
     display:grid;
-    grid-template-columns:repeat(7, 1fr);
+    grid-template-columns:repeat(7, minmax(0, 1fr));
     gap:10px;
     margin:0 0 8px;
   }
@@ -207,7 +207,7 @@
   }
   .calendar{
     display:grid;
-    grid-template-columns:repeat(7, 1fr);
+    grid-template-columns:repeat(7, minmax(0, 1fr));
     gap:10px;
   }
   .cal-empty{ visibility:hidden; }
@@ -241,8 +241,8 @@
 
   .leaf{
     aspect-ratio:39/40;
-    perspective:1200px;
     position:relative;
+    cursor:pointer;
   }
   .leaf::before{
     /* stacked-paper shadow, like leaves behind the current one */
@@ -254,30 +254,21 @@
     z-index:0;
     box-shadow:0 6px 14px -8px rgba(38,34,29,0.4);
   }
-  .leaf-inner{
+  .leaf-card{
     position:absolute; inset:0;
-    transform-style:preserve-3d;
-    transition:transform .7s cubic-bezier(.2,.8,.2,1);
-    cursor:pointer;
-    z-index:1;
-  }
-  .leaf.flipped .leaf-inner{ transform:rotateY(180deg); }
-
-  .leaf-face{
-    position:absolute; inset:0;
-    backface-visibility:hidden;
     border-radius:var(--radius);
     overflow:hidden;
     box-shadow:var(--shadow);
     border:1px solid rgba(38,34,29,0.08);
+    background:#F4EEE0;
+    z-index:1;
   }
-  .leaf-front{ background:#F4EEE0; }
-  .leaf-front img{
+  .leaf-card img{
     width:100%; height:130%; object-fit:cover; object-position:top; display:block;
     transition:transform .5s ease;
   }
-  .leaf:hover .leaf-front img{ transform:scale(1.045); }
-  .leaf-front .imgfallback{
+  .leaf:hover .leaf-card img{ transform:scale(1.045); }
+  .leaf-card .imgfallback{
     width:100%;height:100%;display:flex;align-items:center;justify-content:center;
     color:var(--ink-soft); font-size:11px; text-align:center; padding:10px;
     font-family:'Space Mono',monospace;
@@ -302,60 +293,6 @@
     font-size:9.5px; font-weight:700; letter-spacing:0.05em;
     padding:3px 6px; border-radius:4px;
     transform:rotate(-4deg);
-  }
-  .zoom-btn{
-    position:absolute; bottom:8px; right:8px;
-    width:26px; height:26px; border-radius:50%;
-    background:rgba(20,17,13,0.55);
-    border:none; color:#fff; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; transition:opacity .15s ease;
-  }
-  .leaf:hover .zoom-btn, .leaf:focus-within .zoom-btn{ opacity:1; }
-  .zoom-btn svg{ width:13px; height:13px; }
-
-  .leaf-back{
-    background:var(--ink);
-    color:var(--paper);
-    transform:rotateY(180deg);
-    display:flex; flex-direction:column;
-    padding:16px 14px 12px;
-  }
-  .leaf-back .region-tag{
-    align-self:flex-start;
-    font-family:'Space Mono', monospace;
-    font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase;
-    padding:3px 7px; border-radius:4px;
-    margin-bottom:10px;
-  }
-  .leaf-back .rua{
-    font-family:'Fraunces', serif;
-    font-style:italic; font-weight:600;
-    font-size:16px; line-height:1.2;
-    margin:0 0 8px;
-  }
-  .leaf-back .cidade{
-    font-size:12.5px; color:#D8CFB9;
-    margin-bottom:auto;
-  }
-  .leaf-back .cidade b{ color:var(--paper); font-weight:600; }
-  .leaf-back .nota{
-    font-size:11px; color:#C8BEA5; line-height:1.4;
-    border-top:1px dashed rgba(239,231,214,0.25);
-    padding-top:8px; margin-top:8px;
-  }
-  .leaf-back .back-footer{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-top:10px;
-  }
-  .leaf-back .data-mono{
-    font-family:'Space Mono', monospace; font-size:11px; opacity:0.7;
-  }
-  .leaf-back .ampliar{
-    font-family:'Space Mono', monospace; font-size:10.5px;
-    text-transform:uppercase; letter-spacing:0.03em;
-    color:var(--paper); text-decoration:underline;
-    background:none; border:none; cursor:pointer; padding:0;
   }
 
   .region-Sul{ background:#2F5D73; }
@@ -396,12 +333,35 @@
   }
   .lightbox-card img{ width:100%; display:block; }
   .lightbox-info{ padding:18px 22px 22px; }
+  .lightbox-info .region-tag{
+    display:inline-block;
+    font-family:'Space Mono', monospace;
+    font-size:10px; letter-spacing:0.06em; text-transform:uppercase;
+    padding:4px 9px; border-radius:5px;
+    color:#fff;
+    margin-bottom:10px;
+  }
   .lightbox-info .rua{
     font-family:'Fraunces', serif; font-style:italic; font-weight:600;
     font-size:22px; margin:0 0 6px;
   }
   .lightbox-info .cidade{ font-size:13.5px; color:var(--ink-soft); margin-bottom:10px; }
   .lightbox-info .nota{ font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+  .maps-link{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:14px;
+    font-family:'Space Mono', monospace;
+    font-size:11.5px; text-transform:uppercase; letter-spacing:0.03em;
+    color:var(--azulejo);
+    text-decoration:none;
+    border:1px solid var(--azulejo);
+    padding:8px 12px;
+    border-radius:7px;
+    transition:all .15s ease;
+  }
+  .maps-link:hover{ background:var(--azulejo); color:#fff; }
+  .maps-link svg{ width:14px; height:14px; }
+  .maps-link.is-hidden{ display:none; }
   .lightbox-close{
     position:fixed; top:22px; right:24px;
     width:38px; height:38px; border-radius:50%;
@@ -464,9 +424,14 @@
   <div class="lightbox-card">
     <img id="lightboxImg" alt="">
     <div class="lightbox-info">
+      <span class="region-tag" id="lightboxRegion"></span>
       <div class="rua" id="lightboxRua"></div>
       <div class="cidade" id="lightboxCidade"></div>
       <div class="nota" id="lightboxNota"></div>
+      <a class="maps-link" id="lightboxMapLink" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        Ver no mapa
+      </a>
     </div>
   </div>
 </div>
@@ -503,9 +468,11 @@
   const searchInput = document.getElementById('search');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxRegion = document.getElementById('lightboxRegion');
   const lightboxRua = document.getElementById('lightboxRua');
   const lightboxCidade = document.getElementById('lightboxCidade');
   const lightboxNota = document.getElementById('lightboxNota');
+  const lightboxMapLink = document.getElementById('lightboxMapLink');
   document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
   lightbox.addEventListener('click', function(e){ if(e.target === lightbox) closeLightbox(); });
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
@@ -628,28 +595,12 @@
 
   function cardHTML(d){
     const isToday = d.dia === todayDay && d.mes === todayMonth;
-    const searchBlob = (d.rua + ' ' + d.cidade + ' ' + d.uf).toLowerCase();
     return (
-      '<div class="leaf' + (isToday ? ' is-today' : '') + '" data-dia="'+d.dia+'" data-mes="'+d.mes+'" data-search="'+escapeHtml(searchBlob)+'">' +
-        '<div class="leaf-inner">' +
-          '<div class="leaf-face leaf-front">' +
-            (d.img ? '<img src="'+imgUrl(d.img,480)+'" alt="Predinho de '+escapeHtml(d.rua)+'" loading="lazy">' : '<div class="imgfallback">sem imagem</div>') +
-            (isToday ? '<span class="today-flag">hoje</span>' : '') +
-            '<span class="stamp">'+d.dia+'</span>' +
-            '<button class="zoom-btn" aria-label="Ampliar imagem" data-action="zoom">' +
-              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>' +
-            '</button>' +
-          '</div>' +
-          '<div class="leaf-face leaf-back">' +
-            '<span class="region-tag ' + regionClass(d.regiao) + '">' + escapeHtml(d.regiao || '—') + '</span>' +
-            '<p class="rua">'+escapeHtml(d.rua)+'</p>' +
-            '<p class="cidade"><b>'+escapeHtml(d.cidade)+'</b>' + (d.uf ? ' — '+escapeHtml(d.uf) : '') + '</p>' +
-            (d.nota ? '<p class="nota">'+escapeHtml(d.nota)+'</p>' : '') +
-            '<div class="back-footer">' +
-              '<span class="data-mono">'+escapeHtml(d.dataStr)+'</span>' +
-              '<button class="ampliar" data-action="zoom">ampliar →</button>' +
-            '</div>' +
-          '</div>' +
+      '<div class="leaf' + (isToday ? ' is-today' : '') + '" data-dia="'+d.dia+'" data-mes="'+d.mes+'" data-rua="'+escapeHtml(d.rua.toLowerCase())+'" data-cidade="'+escapeHtml(d.cidade.toLowerCase())+'" data-uf="'+escapeHtml(d.uf.toLowerCase())+'">' +
+        '<div class="leaf-card">' +
+          (d.img ? '<img src="'+imgUrl(d.img,480)+'" alt="Predinho de '+escapeHtml(d.rua)+'" loading="lazy">' : '<div class="imgfallback">sem imagem</div>') +
+          (isToday ? '<span class="today-flag">hoje</span>' : '') +
+          '<span class="stamp">'+d.dia+'</span>' +
         '</div>' +
       '</div>'
     );
@@ -690,6 +641,15 @@
     attachCardEvents();
   }
 
+  function matchesQuery(leaf, q){
+    // A 2-letter query is treated as a UF code: exact match only, to avoid
+    // false positives like a city/street name that happens to contain those letters.
+    if(q.length === 2){
+      return leaf.dataset.uf === q;
+    }
+    return leaf.dataset.rua.includes(q) || leaf.dataset.cidade.includes(q) || leaf.dataset.uf === q;
+  }
+
   function applySearchFilter(query){
     const q = query.trim().toLowerCase();
     if(q === ''){
@@ -703,7 +663,7 @@
     document.querySelectorAll('.month-section').forEach(section => {
       let sectionHasMatch = false;
       section.querySelectorAll('.leaf').forEach(leaf => {
-        const isMatch = (leaf.dataset.search || '').includes(q);
+        const isMatch = matchesQuery(leaf, q);
         leaf.classList.toggle('search-hide', !isMatch);
         if(isMatch){ sectionHasMatch = true; matches++; }
       });
@@ -716,19 +676,24 @@
 
   function attachCardEvents(){
     document.querySelectorAll('.leaf').forEach(leaf => {
-      leaf.addEventListener('click', function(e){
-        if(e.target.closest('[data-action="zoom"]')){
-          e.stopPropagation();
-          openLightboxFor(leaf);
-          return;
-        }
-        leaf.classList.toggle('flipped');
+      leaf.addEventListener('click', function(){
+        openLightboxFor(leaf);
       });
     });
   }
 
   function findEntry(dia, mes){
     return DATA.find(d => d.dia === dia && d.mes === mes);
+  }
+
+  function mapsUrl(d){
+    if(d.lat && d.lng){
+      return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(d.lat) + ',' + encodeURIComponent(d.lng);
+    }
+    if(d.rua || d.cidade){
+      return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([d.rua, d.cidade, d.uf].filter(Boolean).join(', '));
+    }
+    return null;
   }
 
   function openLightboxFor(leafEl){
@@ -738,9 +703,18 @@
     if(!d) return;
     lightboxImg.src = imgUrl(d.img, 1400);
     lightboxImg.alt = 'Predinho de ' + d.rua;
+    lightboxRegion.textContent = d.regiao || '—';
+    lightboxRegion.className = 'region-tag ' + regionClass(d.regiao);
     lightboxRua.textContent = d.rua;
     lightboxCidade.textContent = d.cidade + (d.uf ? ' — ' + d.uf : '') + (d.dataStr ? ' · ' + d.dataStr : '');
     lightboxNota.textContent = d.nota || '';
+    const url = mapsUrl(d);
+    if(url){
+      lightboxMapLink.href = url;
+      lightboxMapLink.classList.remove('is-hidden');
+    } else {
+      lightboxMapLink.classList.add('is-hidden');
+    }
     lightbox.classList.add('open');
   }
 
