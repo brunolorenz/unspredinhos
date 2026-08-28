@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Stories — Predinho do Dia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-ink:#1B2A3D;
+    --bg-ink-2:#25405D;
+    --paper:#F5ECD9;
+    --paper-soft:#FBF7EF;
+    --gold:#E8A33D;
+    --brick:#B85450;
+    --sage:#6B8F71;
+    --steel:#4E6E8E;
+    --clay:#9C6B4E;
+    --line:rgba(245,236,217,0.18);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg-ink);
+    color:var(--paper-soft);
+    font-family:'DM Sans',sans-serif;
+    min-height:100vh;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:960px;margin:0 auto;}
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,5vw,42px);
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    font-size:14px;
+    color:var(--paper);
+    opacity:0.75;
+    margin:0 0 32px;
+    line-height:1.5;
+  }
+  .panel{
+    background:var(--bg-ink-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:24px;
+    margin-bottom:20px;
+  }
+  .panel h2{
+    font-family:'DM Mono',monospace;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-size:12px;
+    font-weight:500;
+    color:var(--gold);
+    margin:0 0 16px;
+  }
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+  button, select{
+    font-family:'DM Sans',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    border-radius:999px;
+    border:none;
+    padding:11px 20px;
+    cursor:pointer;
+    background:var(--gold);
+    color:var(--bg-ink);
+  }
+  button:hover{filter:brightness(1.08);}
+  button.ghost{
+    background:transparent;
+    color:var(--paper-soft);
+    border:1px solid var(--line);
+    font-weight:500;
+  }
+  select{
+    background:var(--bg-ink);
+    color:var(--paper-soft);
+    border:1px solid var(--line);
+    font-weight:500;
+  }
+  .status{font-size:13px;color:var(--sage);margin-top:10px;min-height:18px;}
+  .status.err{color:var(--brick);}
+  .stats-line{
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    color:var(--paper);
+    opacity:0.8;
+    margin-top:14px;
+    line-height:1.7;
+  }
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+  }
+  .card{
+    background:var(--bg-ink-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+  }
+  .card .name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15px;
+    text-align:center;
+  }
+  .card canvas{
+    width:100%;
+    max-width:230px;
+    height:auto;
+    aspect-ratio:1080/1920;
+    border-radius:10px;
+    display:block;
+    box-shadow:0 8px 24px rgba(0,0,0,0.35);
+  }
+  .hidden{display:none !important;}
+  footer{
+    text-align:center;
+    font-size:11px;
+    color:var(--paper);
+    opacity:0.4;
+    margin-top:40px;
+    font-family:'DM Mono',monospace;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Gerador de Stories</h1>
+  <p class="sub">Predinho do Dia · resumo mensal em 1080×1920, pronto para postar. Os dados vêm sempre ao vivo da planilha publicada — nada é digitado ou carregado à mão aqui.</p>
+
+  <div class="panel" id="loadingPanel">
+    <h2>Carregando</h2>
+    <div class="status" id="loadingStatus">Buscando dados da planilha…</div>
+  </div>
+
+  <div class="panel hidden" id="errorPanel">
+    <h2>Algo deu errado</h2>
+    <p class="sub" style="margin:0 0 16px;">Não consegui buscar os dados da planilha publicada agora. Confira se o link em <strong>Arquivo → Compartilhar → Publicar na Web</strong> continua ativo, ou tente de novo em alguns segundos.</p>
+    <button id="retryBtn">Tentar novamente</button>
+    <div class="status err" id="errorDetail" style="margin-top:12px;"></div>
+  </div>
+
+  <div class="panel hidden" id="controlsPanel">
+    <h2>01 · Mês</h2>
+    <div class="row">
+      <select id="monthSelect"></select>
+      <button id="renderBtn">Gerar stories</button>
+    </div>
+    <div class="stats-line" id="statsLine"></div>
+  </div>
+
+  <div class="panel hidden" id="previewPanel">
+    <h2>02 · Baixar</h2>
+    <div class="cards">
+      <div class="card">
+        <canvas id="c1" width="1080" height="1920"></canvas>
+        <div class="name">Resumo do Mês</div>
+        <button data-target="c1" data-label="resumo">Baixar PNG</button>
+      </div>
+      <div class="card">
+        <canvas id="c2" width="1080" height="1920"></canvas>
+        <div class="name">Todas as Cidades</div>
+        <button data-target="c2" data-label="cidades">Baixar PNG</button>
+      </div>
+      <div class="card">
+        <canvas id="c3" width="1080" height="1920"></canvas>
+        <div class="name">Pelo Brasil</div>
+        <button data-target="c3" data-label="pelo-brasil">Baixar PNG</button>
+      </div>
+      <div class="card">
+        <canvas id="c4" width="1080" height="1920"></canvas>
+        <div class="name">Recordes &amp; Curiosidades</div>
+        <button data-target="c4" data-label="recordes">Baixar PNG</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Uns Predinhos · gerador local, nenhum dado é enviado a servidores</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+/* ---------- constantes / helpers ---------- */
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const REGION_COLORS = {
+  'Norte':'#6B8F71','Nordeste':'#E8A33D','Centro Oeste':'#9C6B4E','Centro-Oeste':'#9C6B4E',
+  'Sudeste':'#4E6E8E','Sul':'#B85450'
+};
+const POA = {lat:-30.0346, lon:-51.2177};
+const BR_OUTLINE = [
+  [-57.625,-30.216],
+  [-53.649,-26.923],
+  [-53.628,-26.125],
+  [-54.13,-25.548],
+  [-54.625,-25.739],
+  [-54.293,-24.021],
+  [-55.401,-23.957],
+  [-55.798,-22.357],
+  [-57.937,-22.09],
+  [-58.166,-20.177],
+  [-57.498,-18.174],
+  [-58.281,-17.272],
+  [-58.241,-16.3],
+  [-60.158,-16.258],
+  [-60.503,-13.776],
+  [-64.316,-12.462],
+  [-65.402,-11.566],
+  [-65.338,-9.762],
+  [-66.647,-9.931],
+  [-68.271,-11.015],
+  [-70.549,-11.009],
+  [-70.482,-9.49],
+  [-71.302,-10.079],
+  [-72.185,-10.054],
+  [-73.227,-9.462],
+  [-73.015,-9.033],
+  [-73.987,-7.524],
+  [-73.12,-6.63],
+  [-72.892,-5.275],
+  [-70.795,-4.251],
+  [-69.894,-4.298],
+  [-69.42,-1.123],
+  [-70.016,0.541],
+  [-69.252,0.603],
+  [-69.219,0.986],
+  [-69.805,1.089],
+  [-69.817,1.715],
+  [-67.538,2.037],
+  [-67.065,1.13],
+  [-65.548,0.789],
+  [-63.369,2.201],
+  [-64.27,2.497],
+  [-64.368,3.797],
+  [-64.816,4.056],
+  [-63.093,3.771],
+  [-60.214,5.244],
+  [-59.538,3.959],
+  [-59.975,2.755],
+  [-59.031,1.318],
+  [-57.336,1.949],
+  [-55.996,1.818],
+  [-55.973,2.51],
+  [-52.94,2.125],
+  [-51.317,4.203],
+  [-50.509,1.902],
+  [-49.974,1.736],
+  [-49.947,1.046],
+  [-50.699,0.223],
+  [-50.388,-0.078],
+  [-48.621,-0.235],
+  [-48.584,-1.238],
+  [-47.825,-0.582],
+  [-44.906,-1.552],
+  [-44.418,-2.138],
+  [-44.582,-2.691],
+  [-43.419,-2.383],
+  [-39.979,-2.873],
+  [-37.223,-4.821],
+  [-35.598,-5.15],
+  [-34.73,-7.343],
+  [-35.128,-8.996],
+  [-38.674,-13.058],
+  [-39.267,-17.868],
+  [-40.945,-21.937],
+  [-41.988,-22.97],
+  [-44.648,-23.352],
+  [-47.649,-24.885],
+  [-48.495,-25.877],
+  [-48.888,-28.674],
+  [-53.374,-33.768],
+  [-53.651,-33.202],
+  [-53.21,-32.728],
+  [-53.788,-32.047],
+  [-56.976,-30.11],
+  [-57.625,-30.216]
+];
+const BR_BOUNDS = {lonMin:-74.5,lonMax:-34.2,latMin:-34.3,latMax:5.7};
+
+function toNum(s){
+  if(s===null||s===undefined) return null;
+  s = String(s).trim();
+  if(s==='') return null;
+  if(/^-?\d+,\d+$/.test(s)) s = s.replace(',','.');
+  const n = parseFloat(s);
+  return isNaN(n) ? null : n;
+}
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function project(lon,lat,box){
+  // projeção equirretangular com correção de cosseno da latitude,
+  // escala uniforme (não estica) e centralizada dentro do box
+  const {lonMin,lonMax,latMin,latMax} = BR_BOUNDS;
+  const meanLat = (latMin+latMax)/2;
+  const cosLat = Math.cos(meanLat*Math.PI/180);
+  const lonSpanAdj = (lonMax-lonMin) * cosLat;
+  const latSpan = latMax-latMin;
+  const scale = Math.min(box.w/lonSpanAdj, box.h/latSpan);
+  const mapW = lonSpanAdj*scale, mapH = latSpan*scale;
+  const offsetX = box.x + (box.w-mapW)/2;
+  const offsetY = box.y + (box.h-mapH)/2;
+  const x = offsetX + (lon-lonMin)*cosLat*scale;
+  const y = offsetY + (latMax-lat)*scale;
+  return {x,y};
+}
+function regionColor(r){
+  return REGION_COLORS[(r||'').trim()] || '#888';
+}
+
+/* ---------- estado ---------- */
+let ROWS = []; // parsed rows: {dia,mes,data,rua,cidade,uf,regiao,lat,lon}
+
+
+/* ---------- parsing ---------- */
+function normalizeHeader(h){
+  return (h||'').toString().trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,''); // remove acentos
+}
+function parseCSVText(text){
+  const result = Papa.parse(text.trim(), {header:true, skipEmptyLines:true, delimiter: text.includes('\t') && !text.includes(',') ? '\t' : undefined});
+  const fields = result.meta.fields || [];
+  const map = {};
+  fields.forEach(f=>{
+    const n = normalizeHeader(f);
+    if(n.startsWith('dia')) map.dia=f;
+    else if(n.startsWith('mes')) map.mes=f;
+    else if(n.startsWith('data')) map.data=f;
+    else if(n.startsWith('rua')) map.rua=f;
+    else if(n.startsWith('cidade')) map.cidade=f;
+    else if(n==='uf') map.uf=f;
+    else if(n.startsWith('regiao')) map.regiao=f;
+    else if(n.startsWith('latitude')) map.lat=f;
+    else if(n.startsWith('longitude')) map.lon=f;
+  });
+  const rows = result.data.map(r=>{
+    const cidade = (map.cidade ? r[map.cidade] : '') || '';
+    if(!cidade.trim()) return null;
+    return {
+      dia: toNum(map.dia?r[map.dia]:null),
+      mes: toNum(map.mes?r[map.mes]:null),
+      data: map.data?(r[map.data]||''):'',
+      rua: map.rua?(r[map.rua]||''):'',
+      cidade: cidade.trim(),
+      uf: map.uf?(r[map.uf]||'').trim():'',
+      regiao: map.regiao?(r[map.regiao]||'').trim():'',
+      lat: toNum(map.lat?r[map.lat]:null),
+      lon: toNum(map.lon?r[map.lon]:null),
+    };
+  }).filter(r=>r && r.mes);
+  return rows;
+}
+
+/* ---------- UI wiring ---------- */
+function afterDataLoaded(rows, sourceLabel){
+  ROWS = rows;
+  populateMonths();
+  document.getElementById('controlsPanel').classList.remove('hidden');
+  document.getElementById('statsLine').textContent = `${rows.length} predinhos carregados · ${sourceLabel}`;
+}
+function populateMonths(){
+  const months = [...new Set(ROWS.map(r=>r.mes))].sort((a,b)=>a-b);
+  const sel = document.getElementById('monthSelect');
+  sel.innerHTML = months.map(m=>`<option value="${m}">${MESES[m-1]||m}</option>`).join('');
+  sel.value = months[months.length-1];
+}
+
+document.getElementById('renderBtn').addEventListener('click', renderAll);
+document.getElementById('monthSelect').addEventListener('change', renderAll);
+
+document.querySelectorAll('button[data-target]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const canvas = document.getElementById(btn.dataset.target);
+    const sel = document.getElementById('monthSelect');
+    const mesNome = (MESES[sel.value-1]||'mes').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    canvas.toBlob(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `predinho-do-dia-${mesNome}-${btn.dataset.label}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  });
+});
+
+/* ---------- cálculo de estatísticas ---------- */
+function tally(rows, keyFn){
+  const t = {};
+  rows.forEach(r=>{
+    const k = keyFn(r);
+    if(!k) return;
+    t[k] = (t[k]||0)+1;
+  });
+  return t;
+}
+function topEntry(t){
+  let bestKey=null, bestCount=-1;
+  Object.entries(t).forEach(([k,v])=>{ if(v>bestCount){bestKey=k;bestCount=v;} });
+  return bestKey ? {key:bestKey, count:bestCount} : null;
+}
+function computeMonthStats(mes){
+  const monthRows = ROWS.filter(r=>r.mes===mes).sort((a,b)=>(a.dia||0)-(b.dia||0));
+  const regionTally = tally(monthRows, r=>r.regiao || '—');
+  const ufTally = tally(monthRows, r=>r.uf);
+  const ufSet = new Set(monthRows.map(r=>r.uf).filter(Boolean));
+  const withCoords = monthRows.filter(r=>r.lat!=null && r.lon!=null);
+  let farthest = null, farthestDist = -1;
+  withCoords.forEach(r=>{
+    const d = haversine(POA.lat,POA.lon,r.lat,r.lon);
+    if(d>farthestDist){ farthestDist=d; farthest=r; }
+  });
+  let routeKm = 0;
+  for(let i=1;i<withCoords.length;i++){
+    routeKm += haversine(withCoords[i-1].lat,withCoords[i-1].lon,withCoords[i].lat,withCoords[i].lon);
+  }
+  const ytdRows = ROWS;
+  const ytdUf = new Set(ytdRows.map(r=>r.uf).filter(Boolean));
+  const topUfMonth = topEntry(ufTally);
+  const longestRua = monthRows.reduce((best,r)=> (r.rua && r.rua.length > (best?.rua.length||0)) ? r : best, null);
+  return {
+    mes, monthRows, regionTally, ufTally, ufSet,
+    farthest, farthestDist, routeKm,
+    total: monthRows.length,
+    ytdTotal: ytdRows.length,
+    ytdStates: ytdUf.size,
+    topUfMonth, longestRua
+  };
+}
+function computeYearStats(){
+  // usa a ordem original das linhas (ordem real de postagem), não o rótulo fictício de dia/mês
+  const withCoords = ROWS.filter(r=>r.lat!=null && r.lon!=null);
+  let routeKmYear = 0;
+  for(let i=1;i<withCoords.length;i++){
+    routeKmYear += haversine(withCoords[i-1].lat,withCoords[i-1].lon,withCoords[i].lat,withCoords[i].lon);
+  }
+  const cityTally = tally(ROWS, r=> (r.cidade+'|'+r.uf));
+  const topCityEntry = topEntry(cityTally);
+  const topCity = topCityEntry ? {label: topCityEntry.key.split('|')[0]+', '+topCityEntry.key.split('|')[1], count: topCityEntry.count} : null;
+
+  const ufTallyYear = tally(ROWS, r=>r.uf);
+  const topUfYear = topEntry(ufTallyYear);
+
+  // maior sequência seguida no mesmo estado, na ordem em que foram pintados
+  let bestUf=null, bestLen=0, bestStart=0, bestEnd=0;
+  let curUf=null, curLen=0, curStart=0;
+  ROWS.forEach((r,i)=>{
+    if(r.uf && r.uf===curUf){
+      curLen++;
+    } else {
+      curUf = r.uf; curLen = r.uf?1:0; curStart=i;
+    }
+    if(curLen>bestLen){ bestLen=curLen; bestUf=curUf; bestStart=curStart; bestEnd=i; }
+  });
+  const streak = bestUf ? {uf:bestUf, len:bestLen, from:ROWS[bestStart], to:ROWS[bestEnd]} : null;
+
+  return {routeKmYear, topCity, topUfYear, streak, total: ROWS.length};
+}
+
+/* ---------- desenho: helpers visuais ---------- */
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function watercolorBlob(ctx,x,y,r,color,alpha){
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  for(let i=0;i<4;i++){
+    const ox = (Math.random()-0.5)*r*0.5;
+    const oy = (Math.random()-0.5)*r*0.5;
+    const rr = r*(0.7+Math.random()*0.5);
+    const grad = ctx.createRadialGradient(x+ox,y+oy,0,x+ox,y+oy,rr);
+    grad.addColorStop(0,color);
+    grad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x+ox,y+oy,rr,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+function drawPredinho(ctx,x,y,w,h,color){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.fillStyle = color;
+  // corpo
+  ctx.fillRect(0,h*0.18,w,h*0.82);
+  // cornija / parapeito
+  ctx.fillRect(-w*0.06,h*0.10,w*1.12,h*0.10);
+  // janelas
+  const cols=2, rows=3;
+  const pad=w*0.14, gapX=w*0.14, gapY=h*0.10;
+  const winW=(w-pad*2-gapX*(cols-1))/cols;
+  const winH=h*0.62/rows - gapY*0.6;
+  ctx.fillStyle = 'rgba(0,0,0,0)';
+  for(let c=0;c<cols;c++){
+    for(let rIdx=0;rIdx<rows;rIdx++){
+      const wx = pad + c*(winW+gapX);
+      const wy = h*0.30 + rIdx*(winH+gapY);
+      ctx.save();
+      ctx.globalCompositeOperation='destination-out';
+      ctx.fillRect(wx,wy,winW,winH);
+      ctx.restore();
+    }
+  }
+  ctx.restore();
+}
+function loadFonts(){
+  return Promise.all([
+    document.fonts.load('600 40px Fraunces'),
+    document.fonts.load('800 40px Fraunces'),
+    document.fonts.load('400 20px "DM Sans"'),
+    document.fonts.load('700 20px "DM Sans"'),
+    document.fonts.load('500 20px "DM Mono"')
+  ]).catch(()=>{});
+}
+function drawStatCard(ctx, x, y, w, h, eyebrow, big, small, accent){
+  roundRect(ctx, x, y, w, h, 18);
+  ctx.fillStyle = 'rgba(245,236,217,0.06)';
+  ctx.fill();
+  ctx.fillStyle = accent;
+  ctx.font = '500 22px "DM Mono"';
+  ctx.textAlign='left';
+  ctx.fillText(eyebrow.toUpperCase(), x+36, y+52);
+  ctx.fillStyle = '#FBF7EF';
+  ctx.font = '600 50px "Fraunces"';
+  const lines = wrapText(ctx, big, x+36, y+108, w-72, 54, 'left');
+  ctx.font = '400 23px "DM Sans"';
+  ctx.fillStyle = 'rgba(251,247,239,0.65)';
+  wrapText(ctx, small, x+36, y+108+(lines-1)*54+42, w-72, 30, 'left');
+}
+function wrapText(ctx,text,x,y,maxWidth,lineHeight,align){
+  const words = text.split(' ');
+  let line='';
+  const lines=[];
+  words.forEach(word=>{
+    const test = line ? line+' '+word : word;
+    if(ctx.measureText(test).width > maxWidth && line){
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if(line) lines.push(line);
+  lines.forEach((l,i)=>{
+    ctx.textAlign = align||'left';
+    ctx.fillText(l, x, y+i*lineHeight);
+  });
+  return lines.length;
+}
+
+/* ---------- template 1: Resumo do Mês ---------- */
+function drawSummary(ctx, stats){
+  const W=1080,H=1920;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#1B2A3D';
+  ctx.fillRect(0,0,W,H);
+  watercolorBlob(ctx, 860, 220, 380, '#4E6E8E', 0.35);
+  watercolorBlob(ctx, 140, 1500, 420, '#B85450', 0.22);
+
+  // eyebrow
+  ctx.fillStyle = '#E8A33D';
+  ctx.font = '500 26px "DM Mono"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('PREDINHO DO DIA · 2026', W/2, 140);
+
+  // mês
+  ctx.fillStyle = '#FBF7EF';
+  ctx.font = '600 128px "Fraunces"';
+  ctx.textAlign = 'center';
+  ctx.fillText(MESES[stats.mes-1], W/2, 262);
+
+  // número hero
+  ctx.font = '800 380px "Fraunces"';
+  ctx.fillStyle = '#E8A33D';
+  ctx.fillText(String(stats.total), W/2, 640);
+  ctx.font = '500 34px "DM Sans"';
+  ctx.fillStyle = '#FBF7EF';
+  ctx.fillText(stats.total===1 ? 'predinho pintado' : 'predinhos pintados', W/2, 690);
+
+  // mini-mapa
+  const box = {x:150, y:820, w:780, h:760};
+  ctx.strokeStyle = 'rgba(245,236,217,0.5)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  BR_OUTLINE.forEach(([lon,lat],i)=>{
+    const p = project(lon,lat,box);
+    if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(245,236,217,0.06)';
+  ctx.fill();
+  ctx.stroke();
+
+  stats.monthRows.forEach(r=>{
+    if(r.lat==null||r.lon==null) return;
+    const p = project(r.lon,r.lat,box);
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,10,0,Math.PI*2);
+    ctx.fillStyle = regionColor(r.regiao);
+    ctx.globalAlpha = 0.9;
+    ctx.fill();
+    ctx.strokeStyle = '#1B2A3D';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // legenda de regiões
+  const order = ['Norte','Nordeste','Centro Oeste','Sudeste','Sul'];
+  let ly = 1660;
+  const present = order.filter(r=> Object.keys(stats.regionTally).some(k=>k.replace('-',' ')===r || k===r));
+  const legendItems = present.map(r=>{
+    const key = Object.keys(stats.regionTally).find(k=>k.replace('-',' ')===r || k===r);
+    return {name:r, count: stats.regionTally[key]||0, color: regionColor(r)};
+  });
+  const totalW = legendItems.length ? 980 : 0;
+  let lx = W/2 - totalW/2;
+  ctx.font = '500 24px "DM Mono"';
+  legendItems.forEach(item=>{
+    ctx.beginPath();
+    ctx.arc(lx+10, ly-8, 9, 0, Math.PI*2);
+    ctx.fillStyle = item.color;
+    ctx.fill();
+    ctx.fillStyle = '#FBF7EF';
+    ctx.textAlign = 'left';
+    const label = `${item.name} ${item.count}`;
+    ctx.fillText(label, lx+28, ly);
+    lx += ctx.measureText(label).width + 60;
+  });
+
+  // rodapé
+  drawPredinho(ctx, W/2-30, 1770, 60, 74, '#E8A33D');
+  ctx.font = '500 24px "DM Mono"';
+  ctx.fillStyle = 'rgba(251,247,239,0.7)';
+  ctx.textAlign = 'center';
+  ctx.fillText('@unspredinhos', W/2, 1888);
+}
+
+/* ---------- template 2: Todas as Cidades ---------- */
+function drawList(ctx, stats){
+  const W=1080,H=1920;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#25405D';
+  ctx.fillRect(0,0,W,H);
+  watercolorBlob(ctx, 100, 100, 320, '#6B8F71', 0.18);
+
+  ctx.textAlign='left';
+  ctx.fillStyle = '#E8A33D';
+  ctx.font = '500 24px "DM Mono"';
+  ctx.fillText('PREDINHO DO DIA · 2026', 90, 120);
+
+  ctx.fillStyle = '#FBF7EF';
+  ctx.font = '600 84px "Fraunces"';
+  ctx.fillText(MESES[stats.mes-1], 90, 220);
+
+  ctx.font = '400 26px "DM Sans"';
+  ctx.fillStyle = 'rgba(251,247,239,0.75)';
+  ctx.fillText(`${stats.total} ${stats.total===1?'cidade desenhada':'cidades desenhadas'}`, 90, 262);
+
+  ctx.strokeStyle = 'rgba(245,236,217,0.25)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(90,300); ctx.lineTo(990,300); ctx.stroke();
+
+  const items = stats.monthRows;
+  const twoCol = items.length > 16;
+  const colW = twoCol ? 430 : 900;
+  const rowH = twoCol ? 58 : 60;
+  const startY = 370;
+  const col1 = twoCol ? items.slice(0, Math.ceil(items.length/2)) : items;
+  const col2 = twoCol ? items.slice(Math.ceil(items.length/2)) : [];
+
+  function drawCol(list, x){
+    list.forEach((r,i)=>{
+      const y = startY + i*rowH;
+      ctx.font = '500 22px "DM Mono"';
+      ctx.fillStyle = '#E8A33D';
+      ctx.textAlign = 'left';
+      const dayStr = String(r.dia).padStart(2,'0');
+      ctx.fillText(dayStr, x, y);
+      ctx.font = twoCol ? '500 26px "DM Sans"' : '500 32px "DM Sans"';
+      ctx.fillStyle = '#FBF7EF';
+      const cityLabel = r.uf ? `${r.cidade}, ${r.uf}` : r.cidade;
+      const maxW = colW - 70;
+      let display = cityLabel;
+      while(ctx.measureText(display).width > maxW && display.length>4){
+        display = display.slice(0,-1);
+      }
+      if(display!==cityLabel) display = display.slice(0,-1)+'…';
+      ctx.fillText(display, x+58, y);
+    });
+  }
+  drawCol(col1, 90);
+  if(twoCol) drawCol(col2, 90+colW+40);
+
+  drawPredinho(ctx, W/2-28, 1770, 56, 70, '#E8A33D');
+  ctx.font = '500 24px "DM Mono"';
+  ctx.fillStyle = 'rgba(251,247,239,0.7)';
+  ctx.textAlign = 'center';
+  ctx.fillText('@unspredinhos', W/2, 1886);
+}
+
+/* ---------- template 3: Pelo Brasil (dataviz) ---------- */
+function drawDataviz(ctx, stats){
+  const W=1080,H=1920;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#1B2A3D';
+  ctx.fillRect(0,0,W,H);
+  watercolorBlob(ctx, 950, 1750, 340, '#9C6B4E', 0.25);
+
+  ctx.textAlign='left';
+  ctx.fillStyle = '#E8A33D';
+  ctx.font = '500 24px "DM Mono"';
+  ctx.fillText('PREDINHO DO DIA · 2026', 90, 120);
+  ctx.fillStyle = '#FBF7EF';
+  ctx.font = '600 76px "Fraunces"';
+  ctx.fillText(`${MESES[stats.mes-1]} pelo Brasil`, 90, 216);
+
+  // barras por região
+  const order = ['Norte','Nordeste','Centro Oeste','Sudeste','Sul'];
+  const data = order.map(r=>{
+    const key = Object.keys(stats.regionTally).find(k=>k.replace('-',' ')===r || k===r);
+    return {name:r, count: key?stats.regionTally[key]:0, color: regionColor(r)};
+  });
+  const maxCount = Math.max(1, ...data.map(d=>d.count));
+  const barsTop = 300, barsLeft=90, barsW=900, barH=70, barGap=34;
+  ctx.font = '500 28px "DM Sans"';
+  data.forEach((d,i)=>{
+    const y = barsTop + i*(barH+barGap);
+    ctx.fillStyle = 'rgba(245,236,217,0.7)';
+    ctx.textAlign='left';
+    ctx.fillText(d.name, barsLeft, y-14);
+    ctx.fillStyle = 'rgba(245,236,217,0.12)';
+    roundRect(ctx, barsLeft, y, barsW, barH, 12); ctx.fill();
+    const w = d.count/maxCount * barsW;
+    ctx.fillStyle = d.color;
+    roundRect(ctx, barsLeft, y, Math.max(w,barH), barH, 12); ctx.fill();
+    ctx.fillStyle = '#1B2A3D';
+    ctx.font = '700 30px "DM Sans"';
+    ctx.textAlign='right';
+    ctx.fillText(String(d.count), barsLeft+Math.max(w,barH)-16, y+46);
+    ctx.font = '500 28px "DM Sans"';
+  });
+
+  const statsTop = barsTop + data.length*(barH+barGap) + 40;
+
+  const farLabel = stats.farthest ? `${stats.farthest.cidade}, ${stats.farthest.uf}` : '—';
+  const farSmall = stats.farthest ? `${Math.round(stats.farthestDist).toLocaleString('pt-BR')} km de Porto Alegre` : '';
+  const kmLabel = `${Math.round(stats.routeKm).toLocaleString('pt-BR')} km`;
+  const topUfLabel = stats.topUfMonth ? `${stats.topUfMonth.key} lidera o mês` : '—';
+  const topUfSmall = stats.topUfMonth ? `${stats.topUfMonth.count} ${stats.topUfMonth.count===1?'predinho':'predinhos'} nesse estado` : '';
+
+  drawStatCard(ctx, 90, statsTop, 900, 178, 'Estado do mês', topUfLabel, topUfSmall, '#6B8F71');
+  drawStatCard(ctx, 90, statsTop+198, 900, 178, 'Cidade mais distante', farLabel, farSmall, '#B85450');
+  drawStatCard(ctx, 90, statsTop+396, 900, 178, 'Percurso do mês', kmLabel, 'somando a distância entre cada predinho pintado, em ordem', '#4E6E8E');
+
+  drawPredinho(ctx, W/2-28, 1836, 56, 66, '#E8A33D');
+}
+
+/* ---------- template 4: Recordes & Curiosidades ---------- */
+function drawRecords(ctx, stats, yearStats){
+  const W=1080,H=1920;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#1B2A3D';
+  ctx.fillRect(0,0,W,H);
+  watercolorBlob(ctx, 120, 200, 360, '#B85450', 0.3);
+  watercolorBlob(ctx, 950, 1600, 380, '#6B8F71', 0.2);
+
+  ctx.fillStyle = '#E8A33D';
+  ctx.font = '500 26px "DM Mono"';
+  ctx.textAlign = 'center';
+  ctx.fillText('PREDINHO DO DIA · 2026', W/2, 140);
+  ctx.fillStyle = '#FBF7EF';
+  ctx.font = '600 76px "Fraunces"';
+  ctx.fillText('Recordes & Curiosidades', W/2, 240);
+  ctx.font = '400 28px "DM Sans"';
+  ctx.fillStyle = 'rgba(251,247,239,0.7)';
+  ctx.fillText(`até ${MESES[stats.mes-1]} de 2026`, W/2, 282);
+
+  // hero: km acumulado no ano
+  ctx.font = '800 260px "Fraunces"';
+  ctx.fillStyle = '#E8A33D';
+  ctx.textAlign = 'center';
+  ctx.fillText(Math.round(yearStats.routeKmYear).toLocaleString('pt-BR'), W/2, 560);
+  ctx.font = '500 32px "DM Sans"';
+  ctx.fillStyle = '#FBF7EF';
+  ctx.fillText('km percorridos no ano, ligando um', W/2, 610);
+  ctx.fillText('predinho ao outro em ordem', W/2, 648);
+
+  let y = 740;
+  const gap = 210;
+
+  if(yearStats.topCity){
+    drawStatCard(ctx, 90, y, 900, 190, 'Cidade favorita do ano', yearStats.topCity.label,
+      `pintada ${yearStats.topCity.count} vezes em 2026`, '#B85450');
+    y += gap;
+  }
+  if(yearStats.topUfYear){
+    drawStatCard(ctx, 90, y, 900, 190, 'Estado mais pintado no ano', yearStats.topUfYear.key,
+      `${yearStats.topUfYear.count} predinhos em 2026`, '#4E6E8E');
+    y += gap;
+  }
+  if(yearStats.streak && yearStats.streak.len>1){
+    const s = yearStats.streak;
+    drawStatCard(ctx, 90, y, 900, 190, 'Sequência recorde', `${s.len} dias seguidos no ${s.uf}`,
+      `de "${s.from.cidade}" até "${s.to.cidade}"`, '#6B8F71');
+    y += gap;
+  }
+  if(stats.longestRua && stats.longestRua.rua){
+    drawStatCard(ctx, 90, y, 900, 190, 'Nome de rua da vez', `"${stats.longestRua.rua}"`,
+      `em ${stats.longestRua.cidade}, ${stats.longestRua.uf}`, '#E8A33D');
+    y += gap;
+  }
+
+  drawPredinho(ctx, W/2-28, 1806, 56, 68, '#E8A33D');
+  ctx.font = '500 24px "DM Mono"';
+  ctx.fillStyle = 'rgba(251,247,239,0.7)';
+  ctx.textAlign = 'center';
+  ctx.fillText('@unspredinhos', W/2, 1896);
+}
+
+/* ---------- render geral ---------- */
+async function renderAll(){
+  if(!ROWS.length) return;
+  await loadFonts();
+  const mes = parseInt(document.getElementById('monthSelect').value,10);
+  const stats = computeMonthStats(mes);
+  const yearStats = computeYearStats();
+
+  const c1 = document.getElementById('c1').getContext('2d');
+  const c2 = document.getElementById('c2').getContext('2d');
+  const c3 = document.getElementById('c3').getContext('2d');
+  const c4 = document.getElementById('c4').getContext('2d');
+  drawSummary(c1, stats);
+  drawList(c2, stats);
+  drawDataviz(c3, stats);
+  drawRecords(c4, stats, yearStats);
+
+  document.getElementById('previewPanel').classList.remove('hidden');
+
+  const regionSummary = Object.entries(stats.regionTally).map(([k,v])=>`${k} ${v}`).join(' · ');
+  document.getElementById('statsLine').innerHTML =
+    `${stats.total} cidades · ${stats.ufSet.size} estados no mês · ${regionSummary}<br>`+
+    `mais distante: ${stats.farthest ? stats.farthest.cidade+'/'+stats.farthest.uf+' ('+Math.round(stats.farthestDist)+' km)' : '—'} · `+
+    `percurso do mês: ${Math.round(stats.routeKm)} km`;
+}
+
+/* ---------- carregamento dos dados (sempre ao vivo, sem fallback) ---------- */
+const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJSnZh8lr-Jkgt4XUC63cu0Ml75_YiWK-Ltty_nlExm6tMUNQXMaI7htEbS1MJnAQbc_6huHlZD0Du/pub?gid=1029790880&single=true&output=csv';
+
+async function loadInitialData(){
+  document.getElementById('loadingPanel').classList.remove('hidden');
+  document.getElementById('errorPanel').classList.add('hidden');
+  document.getElementById('loadingStatus').textContent = 'Buscando dados da planilha…';
+  try{
+    const res = await fetch(LIVE_CSV_URL, {cache:'no-store'});
+    if(!res.ok) throw new Error(`a planilha respondeu com status ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSVText(text);
+    if(!rows.length) throw new Error('o CSV veio vazio ou sem uma coluna Cidade preenchida');
+    afterDataLoaded(rows, 'dados ao vivo da planilha');
+    document.getElementById('loadingPanel').classList.add('hidden');
+    await renderAll();
+  }catch(e){
+    document.getElementById('loadingPanel').classList.add('hidden');
+    document.getElementById('errorPanel').classList.remove('hidden');
+    document.getElementById('errorDetail').textContent = 'Detalhe técnico: ' + e.message;
+  }
+}
+document.getElementById('retryBtn').addEventListener('click', loadInitialData);
+window.addEventListener('DOMContentLoaded', loadInitialData);
+</script>
+</body>
+</html>
