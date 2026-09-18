@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallpaper Predinho do Dia</title>
+<style>
+  :root {
+    --bg: #fff6f0;
+    --ink: #2b241f;
+    --accent: #c96f4a;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 48px;
+  }
+  .wrap { width: 100%; max-width: 420px; }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 4px;
+  }
+  p.sub {
+    margin: 0 0 24px;
+    opacity: 0.7;
+    font-size: 0.92rem;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+  label:first-child { margin-top: 0; }
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #e4d9d0;
+    background: #fffaf6;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+  .row { display: flex; gap: 10px; }
+  .row > div { flex: 1; }
+  button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+  button.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  #status {
+    font-size: 0.85rem;
+    margin-top: 12px;
+    min-height: 1.2em;
+  }
+  #status.error { color: #b3392c; }
+  #status.ok { color: #4a7a4a; }
+  #previewBox {
+    display: none;
+    text-align: center;
+  }
+  #previewBox canvas {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .meta {
+    font-size: 0.82rem;
+    opacity: 0.75;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏠 Wallpaper do seu Predinho</h1>
+  <p class="sub">Escolha o dia do seu aniversário e baixe o predinho daquele dia como papel de parede do celular.</p>
+
+  <div class="card">
+    <label for="mes">Mês de aniversário</label>
+    <select id="mes"></select>
+
+    <label for="dia">Dia</label>
+    <select id="dia"></select>
+
+    <label for="formato">Formato de tela</label>
+    <select id="formato">
+      <option value="1080x2340">Padrão (9:19.5 — iPhone/Android recentes)</option>
+      <option value="1080x2400">Android alongado (9:20)</option>
+      <option value="1080x1920">Formato clássico (9:16)</option>
+    </select>
+
+    <button id="gerarBtn">Gerar wallpaper</button>
+    <div id="status"></div>
+  </div>
+
+  <div class="card" id="previewBox">
+    <canvas id="canvas"></canvas>
+    <div class="meta" id="metaInfo"></div>
+    <button class="secondary" id="downloadBtn">Baixar PNG</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script>
+// =====================================================================
+// CONFIGURAÇÃO — cole aqui o link do CSV publicado da planilha
+// (Arquivo > Compartilhar > Publicar na web > formato CSV)
+// Precisa ter as colunas: Dia, Mês, Data, Rua, Cidade, UF, Região,
+// Latitude, Longitude, URL Imagem, Notas
+// =====================================================================
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQJSnZh8lr-Jkgt4XUC63cu0Ml75_YiWK-Ltty_nlExm6tMUNQXMaI7htEbS1MJnAQbc_6huHlZD0Du/pub?gid=1029790880&single=true&output=csv";
+const BG_COLOR = "#fff6f0";
+// =====================================================================
+
+const meses = [
+  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+];
+const diasNoMes = [31,29,31,30,31,30,31,31,30,31,30,31]; // fev com 29 (2026, mas cobre bissexto)
+
+const mesSelect = document.getElementById("mes");
+const diaSelect = document.getElementById("dia");
+const formatoSelect = document.getElementById("formato");
+const gerarBtn = document.getElementById("gerarBtn");
+const statusEl = document.getElementById("status");
+const previewBox = document.getElementById("previewBox");
+const canvas = document.getElementById("canvas");
+const metaInfo = document.getElementById("metaInfo");
+const downloadBtn = document.getElementById("downloadBtn");
+
+let rows = [];
+
+function popularMeses() {
+  meses.forEach((m, i) => {
+    const opt = document.createElement("option");
+    opt.value = i + 1;
+    opt.textContent = m;
+    mesSelect.appendChild(opt);
+  });
+  popularDias();
+}
+
+function popularDias() {
+  diaSelect.innerHTML = "";
+  const mes = parseInt(mesSelect.value, 10);
+  const max = diasNoMes[mes - 1];
+  for (let d = 1; d <= max; d++) {
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    diaSelect.appendChild(opt);
+  }
+}
+
+mesSelect.addEventListener("change", popularDias);
+
+function setStatus(msg, type) {
+  statusEl.textContent = msg || "";
+  statusEl.className = type || "";
+}
+
+function normalize(str) {
+  return (str || "").toString().trim();
+}
+
+async function carregarCSV() {
+  if (!CSV_URL || CSV_URL.includes("COLE_AQUI")) {
+    setStatus("Configure o CSV_URL no topo do arquivo antes de usar.", "error");
+    gerarBtn.disabled = true;
+    return;
+  }
+  setStatus("Carregando dados...", "");
+  try {
+    const resp = await fetch(CSV_URL);
+    if (!resp.ok) throw new Error("Falha ao buscar CSV (" + resp.status + ")");
+    const text = await resp.text();
+    const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+    rows = parsed.data;
+    setStatus("", "");
+  } catch (err) {
+    setStatus("Erro ao carregar a planilha: " + err.message, "error");
+    gerarBtn.disabled = true;
+  }
+}
+
+function encontrarLinha(dia, mes) {
+  return rows.find(r => {
+    const rDia = parseInt(normalize(r["Dia"]), 10);
+    const rMes = parseInt(normalize(r["Mês"] || r["Mes"]), 10);
+    return rDia === dia && rMes === mes;
+  });
+}
+
+function carregarImagem(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Não foi possível carregar a imagem."));
+    img.src = url;
+  });
+}
+
+async function gerarWallpaper() {
+  const dia = parseInt(diaSelect.value, 10);
+  const mes = parseInt(mesSelect.value, 10);
+  const [targetW, targetH] = formatoSelect.value.split("x").map(Number);
+
+  if (!rows.length) {
+    setStatus("Os dados ainda não carregaram. Tente novamente em instantes.", "error");
+    return;
+  }
+
+  const linha = encontrarLinha(dia, mes);
+  if (!linha) {
+    setStatus("Ainda não há predinho pintado para esse dia.", "error");
+    previewBox.style.display = "none";
+    return;
+  }
+
+  const imgUrl = normalize(linha["URL Imagem"]);
+  if (!imgUrl) {
+    setStatus("Essa data não tem imagem cadastrada.", "error");
+    return;
+  }
+
+  setStatus("Gerando wallpaper...", "");
+  gerarBtn.disabled = true;
+
+  try {
+    const img = await carregarImagem(imgUrl);
+
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext("2d");
+
+    // Preenche o fundo
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, targetW, targetH);
+
+    // A imagem original é 2100x2700 — escala pela largura e centraliza verticalmente
+    const scale = targetW / img.width;
+    const drawW = targetW;
+    const drawH = img.height * scale;
+    const offsetY = (targetH - drawH) / 2;
+
+    ctx.drawImage(img, 0, offsetY, drawW, drawH);
+
+    previewBox.style.display = "block";
+    const rua = normalize(linha["Rua"]);
+    const cidade = normalize(linha["Cidade"]);
+    const uf = normalize(linha["UF"]);
+    metaInfo.textContent = [rua, cidade, uf].filter(Boolean).join(" — ");
+
+    setStatus("Wallpaper pronto!", "ok");
+  } catch (err) {
+    setStatus(
+      "Erro ao gerar imagem: " + err.message +
+      " (o servidor da imagem pode não permitir CORS)",
+      "error"
+    );
+  } finally {
+    gerarBtn.disabled = false;
+  }
+}
+
+downloadBtn.addEventListener("click", () => {
+  try {
+    const link = document.createElement("a");
+    link.download = "predinho-wallpaper.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    setStatus("Não foi possível gerar o download (restrição de CORS na imagem).", "error");
+  }
+});
+
+gerarBtn.addEventListener("click", gerarWallpaper);
+
+popularMeses();
+carregarCSV();
+</script>
+</body>
+</html>
