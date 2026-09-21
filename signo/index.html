@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advinhe o signo do predinho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --deep: #0a0e27;
+    --mid: #141a42;
+    --gold: #e6c27a;
+    --gold-dim: #a68a55;
+    --cream: #f4efe2;
+    --violet: #756bb0;
+    --correct: #6fbf8b;
+    --wrong: #e2665a;
+    --card: rgba(244,239,226,0.06);
+    --card-line: rgba(230,194,122,0.22);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    background: radial-gradient(ellipse at 50% -10%, #1c2456 0%, var(--deep) 55%, #050712 100%);
+    color: var(--cream);
+    font-family:'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body{
+    padding: env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+  }
+
+  /* ---------- starfield ---------- */
+  #sky{
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  .star{
+    position:absolute; border-radius:50%; background:var(--cream);
+    animation:twinkle 5s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:.15;}
+    50%{opacity:.9;}
+  }
+  .constellation{position:absolute; opacity:.5; animation:constellation-glow 7s ease-in-out infinite;}
+  .constellation line{stroke:var(--gold-dim); stroke-width:1; opacity:.55;}
+  .constellation circle{fill:var(--gold);}
+  @keyframes constellation-glow{
+    0%,100%{opacity:.22;}
+    50%{opacity:.6;}
+  }
+
+  /* ---------- layout ---------- */
+  .wrap{
+    position:relative; z-index:1; width:100%; max-width:560px;
+    padding:32px 20px 48px; display:flex; flex-direction:column; align-items:center;
+  }
+  header{ text-align:center; margin-bottom:22px; }
+  h1{
+    font-size: clamp(1.5rem, 5vw, 2.1rem);
+    font-weight:700; margin:0 0 10px;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    margin:0; color:var(--cream); opacity:.65;
+    font-size:.95rem; line-height:1.5; max-width:38ch; margin:0 auto;
+  }
+
+  .status-row{
+    display:flex; gap:10px; margin: 22px 0 6px;
+  }
+  .pill{
+    background:var(--card); border:1px solid var(--card-line);
+    border-radius:999px; padding:7px 16px; font-size:.85rem;
+    display:flex; align-items:center; gap:6px;
+  }
+  .pill b{ color:var(--gold); font-weight:700; }
+
+  /* ---------- arena (predinho + zodiac wheel) ---------- */
+  .arena{
+    position:relative;
+    width:min(88vw, 420px);
+    aspect-ratio:1/1;
+    margin: 18px 0 8px;
+  }
+  .predinho-frame{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:46%; aspect-ratio:1/1; border-radius:50%;
+    overflow:hidden; background:#1a1f45;
+    box-shadow: 0 0 0 1px var(--card-line), 0 0 34px rgba(230,194,122,0.18), 0 12px 30px rgba(0,0,0,.5);
+    transition: box-shadow .3s ease;
+  }
+  .predinho-frame.state-correct{ box-shadow: 0 0 0 3px var(--correct), 0 0 34px rgba(111,191,139,.35); }
+  .predinho-frame.state-wrong{ box-shadow: 0 0 0 3px var(--wrong), 0 0 34px rgba(226,102,90,.35); }
+  .predinho-frame img{
+    position:absolute; top:-18%; left:0;
+    width:100%; height:136%;
+    object-fit:cover; object-position: top center;
+  }
+  .predinho-frame .ph{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:.75rem; color:var(--cream); opacity:.5; text-align:center; padding:10%;
+  }
+
+  .zodiac-btn{
+    position:absolute;
+    width: clamp(40px, 10.5vw, 54px);
+    aspect-ratio:1/1;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    border:1px solid var(--card-line);
+    background: var(--card);
+    color:var(--gold);
+    font-size: clamp(1.1rem, 3.2vw, 1.4rem);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .zodiac-btn:hover{ background:rgba(230,194,122,0.14); border-color:var(--gold); }
+  .zodiac-btn:active{ transform:translate(-50%,-50%) scale(.92); }
+  .zodiac-btn[disabled]{ cursor:default; }
+  .zodiac-btn.pick{ background:var(--violet); border-color:var(--violet); color:var(--cream); }
+  .zodiac-btn.correct{ background:var(--correct); border-color:var(--correct); color:var(--deep); }
+  .zodiac-btn.wrong{ background:var(--wrong); border-color:var(--wrong); color:var(--cream); }
+  .zodiac-btn.dim[disabled]{ opacity:.35; }
+
+  .hint{
+    margin-top:14px; font-size:.85rem; opacity:.55; text-align:center; min-height:1.2em;
+  }
+
+  /* ---------- feedback card ---------- */
+  .feedback{
+    width:100%; max-width:420px; margin-top:18px;
+    background:var(--card); border:1px solid var(--card-line);
+    border-radius:18px; padding:18px 20px;
+    display:none; flex-direction:column; gap:10px;
+    animation: rise .35s ease;
+  }
+  .feedback.show{ display:flex; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  .feedback .verdict{ font-weight:700; font-size:1.05rem; display:flex; align-items:center; gap:8px; }
+  .feedback .verdict.ok{ color:var(--correct); }
+  .feedback .verdict.no{ color:var(--wrong); }
+  .feedback .detail{ font-size:.92rem; line-height:1.55; opacity:.85; }
+  .feedback .detail b{ color:var(--gold); font-weight:600; }
+  .feedback button{
+    align-self:flex-start; margin-top:4px;
+    background:var(--gold); color:var(--deep); border:none;
+    font-family:inherit; font-weight:700; font-size:.9rem;
+    padding:10px 20px; border-radius:999px; cursor:pointer;
+  }
+  .feedback button:active{ transform:scale(.97); }
+
+  /* ---------- end screen ---------- */
+  .end{
+    width:100%; max-width:420px; text-align:center;
+    display:none; flex-direction:column; align-items:center; gap:14px;
+    margin-top:10px;
+  }
+  .end.show{ display:flex; }
+  .end .score{ font-size:3rem; font-weight:700; color:var(--gold); line-height:1; }
+  .end .score span{ font-size:1.4rem; opacity:.6; font-weight:500; }
+  .end p{ margin:0; opacity:.75; font-size:.95rem; max-width:34ch; line-height:1.5; }
+  .end button{
+    background:var(--gold); color:var(--deep); border:none;
+    font-family:inherit; font-weight:700; font-size:.95rem;
+    padding:12px 26px; border-radius:999px; cursor:pointer; margin-top:6px;
+  }
+
+  /* ---------- loading / error ---------- */
+  .state-msg{
+    text-align:center; opacity:.7; font-size:.9rem; margin-top:40px; line-height:1.6;
+  }
+  .state-msg.error{ color:var(--wrong); opacity:1; }
+  .state-msg button{
+    display:block; margin:16px auto 0;
+    background:transparent; color:var(--gold); border:1px solid var(--gold-dim);
+    font-family:inherit; font-weight:600; font-size:.85rem;
+    padding:9px 18px; border-radius:999px; cursor:pointer;
+  }
+
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+
+<div id="sky"></div>
+
+<div class="wrap">
+  <header>
+    <h1>Advinhe o signo do predinho</h1>
+    <p>Cada predinho nasceu num dia do calendário — e todo dia tem um signo. Olhe pra fachada e tente adivinhar o dele.</p>
+  </header>
+
+  <div id="statusRow" class="status-row hidden">
+    <div class="pill">Rodada <b id="roundLabel">1/10</b></div>
+    <div class="pill">Acertos <b id="scoreLabel">0</b></div>
+  </div>
+
+  <div id="loadingMsg" class="state-msg">Carregando os predinhos do céu…</div>
+
+  <div id="arena" class="arena hidden">
+    <div class="predinho-frame" id="predinhoFrame">
+      <img id="predinhoImg" alt="">
+    </div>
+  </div>
+
+  <div id="hint" class="hint hidden">Toque no signo que você acha que é esse predinho</div>
+
+  <div id="feedback" class="feedback"></div>
+
+  <div id="end" class="end">
+    <div class="score"><span id="endScore">0</span><span>/10</span></div>
+    <p id="endMsg"></p>
+    <button id="playAgain">Jogar de novo</button>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQJSnZh8lr-Jkgt4XUC63cu0Ml75_YiWK-Ltty_nlExm6tMUNQXMaI7htEbS1MJnAQbc_6huHlZD0Du/pub?gid=1029790880&single=true&output=csv";
+  var ROUNDS = 10;
+
+  var SIGNS = [
+    {id:'aries',       name:'Áries',       symbol:'♈'},
+    {id:'touro',       name:'Touro',       symbol:'♉'},
+    {id:'gemeos',      name:'Gêmeos',      symbol:'♊'},
+    {id:'cancer',      name:'Câncer',      symbol:'♋'},
+    {id:'leao',        name:'Leão',        symbol:'♌'},
+    {id:'virgem',      name:'Virgem',      symbol:'♍'},
+    {id:'libra',       name:'Libra',       symbol:'♎'},
+    {id:'escorpiao',   name:'Escorpião',   symbol:'♏'},
+    {id:'sagitario',   name:'Sagitário',   symbol:'♐'},
+    {id:'capricornio', name:'Capricórnio', symbol:'♑'},
+    {id:'aquario',     name:'Aquário',     symbol:'♒'},
+    {id:'peixes',      name:'Peixes',      symbol:'♓'}
+  ];
+  var SIGN_BY_ID = {};
+  SIGNS.forEach(function(s){ SIGN_BY_ID[s.id] = s; });
+
+  var MONTHS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+
+  function zodiacFor(month, day){
+    var v = month*100 + day;
+    if (v>=120 && v<=218) return 'aquario';
+    if (v>=219 && v<=320) return 'peixes';
+    if (v>=321 && v<=419) return 'aries';
+    if (v>=420 && v<=520) return 'touro';
+    if (v>=521 && v<=620) return 'gemeos';
+    if (v>=621 && v<=722) return 'cancer';
+    if (v>=723 && v<=822) return 'leao';
+    if (v>=823 && v<=922) return 'virgem';
+    if (v>=923 && v<=1022) return 'libra';
+    if (v>=1023 && v<=1121) return 'escorpiao';
+    if (v>=1122 && v<=1221) return 'sagitario';
+    return 'capricornio';
+  }
+
+  // ---------- CSV parsing ----------
+  function parseCSVLine(line){
+    var out = [], cur = '', inQ = false;
+    for (var i=0;i<line.length;i++){
+      var c = line[i];
+      if (c === '"'){
+        if (inQ && line[i+1] === '"'){ cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (c === ',' && !inQ){
+        out.push(cur); cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    out.push(cur);
+    return out;
+  }
+
+  function parseCSV(text){
+    var lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(function(l){ return l.length > 0; });
+    var rows = lines.map(parseCSVLine);
+    var header = rows[0];
+    return rows.slice(1).map(function(cols){
+      var row = {};
+      header.forEach(function(h, i){ row[h.trim()] = (cols[i] || '').trim(); });
+      return row;
+    });
+  }
+
+  function buildDeck(rows){
+    var deck = [];
+    rows.forEach(function(r){
+      var dia = parseInt(r['Dia'], 10);
+      var mes = parseInt(r['Mês'], 10);
+      var img = r['URL Imagem'];
+      var rua = r['Rua'];
+      var cidade = r['Cidade'];
+      var uf = r['UF'];
+      if (!img || isNaN(dia) || isNaN(mes) || !rua || !cidade) return;
+      deck.push({
+        dia: dia, mes: mes, rua: rua, cidade: cidade, uf: uf,
+        img: img, sign: zodiacFor(mes, dia)
+      });
+    });
+    return deck;
+  }
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i=a.length-1; i>0; i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t = a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  // ---------- starfield ----------
+  function buildSky(){
+    var sky = document.getElementById('sky');
+    var frag = document.createDocumentFragment();
+    for (var i=0;i<70;i++){
+      var s = document.createElement('div');
+      s.className = 'star';
+      var size = (Math.random()*2 + 1).toFixed(1);
+      s.style.width = size+'px';
+      s.style.height = size+'px';
+      s.style.left = (Math.random()*100)+'%';
+      s.style.top = (Math.random()*100)+'%';
+      s.style.animationDuration = (3.5 + Math.random()*4).toFixed(1)+'s';
+      s.style.animationDelay = (Math.random()*5).toFixed(1)+'s';
+      frag.appendChild(s);
+    }
+    sky.appendChild(frag);
+
+    var shapes = [
+      {pts:[[8,14],[16,10],[24,18],[19,27]], vb:[0,0,34,34], top:'6%', left:'4%', w:'150px'},
+      {pts:[[4,20],[14,6],[22,12],[30,4]],    vb:[0,0,34,26], top:'62%', left:'78%', w:'170px'},
+      {pts:[[6,6],[18,16],[12,28],[2,22]],    vb:[0,0,26,32], top:'18%', left:'82%', w:'110px'},
+      {pts:[[2,10],[12,2],[20,10],[16,22],[6,20]], vb:[0,0,24,26], top:'78%', left:'10%', w:'130px'}
+    ];
+    shapes.forEach(function(sh, idx){
+      var svgns = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(svgns, 'svg');
+      svg.setAttribute('viewBox', sh.vb.join(' '));
+      svg.classList.add('constellation');
+      svg.style.top = sh.top; svg.style.left = sh.left; svg.style.width = sh.w;
+      svg.style.animationDelay = (idx*1.3)+'s';
+      for (var i=0;i<sh.pts.length-1;i++){
+        var line = document.createElementNS(svgns, 'line');
+        line.setAttribute('x1', sh.pts[i][0]); line.setAttribute('y1', sh.pts[i][1]);
+        line.setAttribute('x2', sh.pts[i+1][0]); line.setAttribute('y2', sh.pts[i+1][1]);
+        svg.appendChild(line);
+      }
+      sh.pts.forEach(function(p){
+        var c = document.createElementNS(svgns, 'circle');
+        c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', 1.1);
+        svg.appendChild(c);
+      });
+      sky.appendChild(svg);
+    });
+  }
+
+  // ---------- game state ----------
+  var deck = [];
+  var round = [];
+  var idx = 0;
+  var score = 0;
+  var locked = false;
+
+  var els = {
+    loading: document.getElementById('loadingMsg'),
+    statusRow: document.getElementById('statusRow'),
+    roundLabel: document.getElementById('roundLabel'),
+    scoreLabel: document.getElementById('scoreLabel'),
+    arena: document.getElementById('arena'),
+    frame: document.getElementById('predinhoFrame'),
+    img: document.getElementById('predinhoImg'),
+    hint: document.getElementById('hint'),
+    feedback: document.getElementById('feedback'),
+    end: document.getElementById('end'),
+    endScore: document.getElementById('endScore'),
+    endMsg: document.getElementById('endMsg'),
+    playAgain: document.getElementById('playAgain')
+  };
+
+  function layoutWheel(){
+    var existing = document.querySelectorAll('.zodiac-btn');
+    existing.forEach(function(b){ b.remove(); });
+    SIGNS.forEach(function(sign, i){
+      var angle = (-90 + i*30) * Math.PI/180;
+      var radius = 44;
+      var x = 50 + radius*Math.cos(angle);
+      var y = 50 + radius*Math.sin(angle);
+      var btn = document.createElement('button');
+      btn.className = 'zodiac-btn';
+      btn.style.left = x+'%';
+      btn.style.top = y+'%';
+      btn.textContent = sign.symbol;
+      btn.setAttribute('aria-label', sign.name);
+      btn.dataset.sign = sign.id;
+      btn.addEventListener('click', function(){ onGuess(sign.id); });
+      els.arena.appendChild(btn);
+    });
+  }
+
+  function startGame(){
+    round = shuffle(deck).slice(0, ROUNDS);
+    idx = 0; score = 0; locked = false;
+    els.end.classList.remove('show');
+    els.statusRow.classList.remove('hidden');
+    els.arena.classList.remove('hidden');
+    els.hint.classList.remove('hidden');
+    showRound();
+  }
+
+  function showRound(){
+    els.feedback.classList.remove('show');
+    els.feedback.innerHTML = '';
+    els.hint.textContent = 'Toque no signo que você acha que é esse predinho';
+    els.frame.classList.remove('state-correct','state-wrong');
+    locked = false;
+
+    var p = round[idx];
+    els.img.src = p.img;
+    els.img.alt = 'Predinho de ' + p.dia + ' de ' + MONTHS[p.mes-1];
+    els.roundLabel.textContent = (idx+1) + '/' + ROUNDS;
+    els.scoreLabel.textContent = score;
+
+    document.querySelectorAll('.zodiac-btn').forEach(function(b){
+      b.disabled = false;
+      b.classList.remove('pick','correct','wrong','dim');
+    });
+  }
+
+  function onGuess(signId){
+    if (locked) return;
+    locked = true;
+    var p = round[idx];
+    var isCorrect = signId === p.sign;
+    if (isCorrect) score++;
+
+    document.querySelectorAll('.zodiac-btn').forEach(function(b){
+      b.disabled = true;
+      if (b.dataset.sign === p.sign) b.classList.add('correct');
+      else if (b.dataset.sign === signId) b.classList.add('wrong');
+      else b.classList.add('dim');
+    });
+
+    els.frame.classList.add(isCorrect ? 'state-correct' : 'state-wrong');
+    els.hint.textContent = '';
+    els.scoreLabel.textContent = score;
+
+    var correctSign = SIGN_BY_ID[p.sign];
+    var dateStr = p.dia + ' de ' + MONTHS[p.mes-1];
+    var placeStr = p.rua + ' — ' + p.cidade + (p.uf ? ', ' + p.uf : '');
+
+    els.feedback.innerHTML =
+      '<div class="verdict ' + (isCorrect ? 'ok' : 'no') + '">' +
+        (isCorrect ? 'Acertou!' : 'Não foi dessa vez') +
+      '</div>' +
+      '<div class="detail">Esse predinho é de <b>' + correctSign.symbol + ' ' + correctSign.name + '</b>, ' +
+        'pintado em <b>' + dateStr + '</b>, na <b>' + placeStr + '</b>.</div>' +
+      '<button id="nextBtn">' + (idx+1 < ROUNDS ? 'Próximo predinho' : 'Ver resultado') + '</button>';
+    els.feedback.classList.add('show');
+
+    document.getElementById('nextBtn').addEventListener('click', function(){
+      idx++;
+      if (idx >= ROUNDS) finishGame();
+      else showRound();
+    });
+  }
+
+  function finishGame(){
+    els.statusRow.classList.add('hidden');
+    els.arena.classList.add('hidden');
+    els.hint.classList.add('hidden');
+    els.feedback.classList.remove('show');
+
+    els.endScore.textContent = score;
+    var msg;
+    if (score === ROUNDS) msg = 'Cravou todos. Os astros e as fachadas estão alinhados hoje.';
+    else if (score >= 8) msg = 'Muito bom — seu olho pra fachada lê calendário também.';
+    else if (score >= 5) msg = 'Nada mal. Ainda dá pra apurar a mira entre os signos.';
+    else msg = 'Bem aleatório mesmo — o que é justo, já que os signos também são.';
+    els.endMsg.textContent = msg;
+    els.end.classList.add('show');
+  }
+
+  els.playAgain.addEventListener('click', startGame);
+
+  // ---------- boot ----------
+  buildSky();
+
+  fetch(CSV_URL + '&_=' + Date.now())
+    .then(function(res){
+      if (!res.ok) throw new Error('A planilha respondeu com status ' + res.status);
+      return res.text();
+    })
+    .then(function(text){
+      var rows = parseCSV(text);
+      deck = buildDeck(rows);
+      if (deck.length < ROUNDS) {
+        throw new Error('A planilha só trouxe ' + deck.length + ' predinhos com imagem — não dá pra montar uma rodada de ' + ROUNDS + '.');
+      }
+      els.loading.classList.add('hidden');
+      layoutWheel();
+      startGame();
+    })
+    .catch(function(err){
+      els.loading.classList.add('error');
+      els.loading.innerHTML = 'Não consegui carregar os predinhos da planilha.<br>' +
+        '<span style="opacity:.75">' + (err && err.message ? err.message : 'Erro desconhecido') + '</span>';
+      var retry = document.createElement('button');
+      retry.textContent = 'Tentar de novo';
+      retry.addEventListener('click', function(){ location.reload(); });
+      els.loading.appendChild(retry);
+    });
+
+})();
+</script>
+</body>
+</html>
