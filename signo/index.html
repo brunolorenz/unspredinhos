@@ -37,8 +37,10 @@
 
   /* ---------- starfield ---------- */
   #sky{
-    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+    position:fixed; inset:-6vmax; z-index:0; pointer-events:none; overflow:hidden;
+    will-change: transform;
   }
+  .sky-layer{ position:absolute; inset:0; }
   .star{
     position:absolute; border-radius:50%; background:var(--cream);
     animation:twinkle 5s ease-in-out infinite;
@@ -88,18 +90,30 @@
     aspect-ratio:1/1;
     margin: 18px 0 8px;
   }
+  .predinho-glow{
+    position:absolute; top:50%; left:50%;
+    width:68%; aspect-ratio:1/1; transform:translate(-50%,-50%);
+    border-radius:50%; z-index:0;
+    background: radial-gradient(circle, rgba(230,194,122,0.55) 0%, rgba(230,194,122,0.28) 38%, rgba(230,194,122,0) 72%);
+    filter: blur(6px);
+    animation: glow-breathe 5s ease-in-out infinite;
+  }
+  @keyframes glow-breathe{
+    0%,100%{ opacity:.75; transform:translate(-50%,-50%) scale(1); }
+    50%{ opacity:1; transform:translate(-50%,-50%) scale(1.06); }
+  }
   .predinho-frame{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:46%; aspect-ratio:1/1; border-radius:50%;
+    width:46%; aspect-ratio:1/1; border-radius:50%; z-index:1;
     overflow:hidden; background:#1a1f45;
-    box-shadow: 0 0 0 1px var(--card-line), 0 0 34px rgba(230,194,122,0.18), 0 12px 30px rgba(0,0,0,.5);
+    box-shadow: 0 0 0 1px var(--card-line), 0 12px 30px rgba(0,0,0,.55);
     transition: box-shadow .3s ease;
   }
-  .predinho-frame.state-correct{ box-shadow: 0 0 0 3px var(--correct), 0 0 34px rgba(111,191,139,.35); }
-  .predinho-frame.state-wrong{ box-shadow: 0 0 0 3px var(--wrong), 0 0 34px rgba(226,102,90,.35); }
+  .predinho-frame.state-correct{ box-shadow: 0 0 0 3px var(--correct); }
+  .predinho-frame.state-wrong{ box-shadow: 0 0 0 3px var(--wrong); }
   .predinho-frame img{
-    position:absolute; top:-18%; left:0;
-    width:100%; height:136%;
+    position:absolute; top:-5%; left:-21%;
+    width:142%; height:142%;
     object-fit:cover; object-position: top center;
   }
   .predinho-frame .ph{
@@ -185,12 +199,21 @@
     padding:9px 18px; border-radius:999px; cursor:pointer;
   }
 
+  .gyro-btn{
+    position:fixed; z-index:5;
+    top: calc(env(safe-area-inset-top,0px) + 14px); right:14px;
+    background:var(--card); border:1px solid var(--card-line); color:var(--gold);
+    font-family:inherit; font-size:.75rem; font-weight:600;
+    padding:8px 14px; border-radius:999px; cursor:pointer;
+  }
+
   .hidden{ display:none !important; }
 </style>
 </head>
 <body>
 
 <div id="sky"></div>
+<button id="gyroBtn" class="gyro-btn hidden" type="button">Ativar movimento</button>
 
 <div class="wrap">
   <header>
@@ -206,6 +229,7 @@
   <div id="loadingMsg" class="state-msg">Carregando os predinhos do céu…</div>
 
   <div id="arena" class="arena hidden">
+    <div class="predinho-glow" aria-hidden="true"></div>
     <div class="predinho-frame" id="predinhoFrame">
       <img id="predinhoImg" alt="">
     </div>
@@ -322,6 +346,11 @@
   // ---------- starfield ----------
   function buildSky(){
     var sky = document.getElementById('sky');
+    var starsLayer = document.createElement('div');
+    starsLayer.className = 'sky-layer layer-stars';
+    var constLayer = document.createElement('div');
+    constLayer.className = 'sky-layer layer-const';
+
     var frag = document.createDocumentFragment();
     for (var i=0;i<70;i++){
       var s = document.createElement('div');
@@ -335,7 +364,8 @@
       s.style.animationDelay = (Math.random()*5).toFixed(1)+'s';
       frag.appendChild(s);
     }
-    sky.appendChild(frag);
+    starsLayer.appendChild(frag);
+    sky.appendChild(starsLayer);
 
     var shapes = [
       {pts:[[8,14],[16,10],[24,18],[19,27]], vb:[0,0,34,34], top:'6%', left:'4%', w:'150px'},
@@ -361,8 +391,61 @@
         c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', 1.1);
         svg.appendChild(c);
       });
-      sky.appendChild(svg);
+      constLayer.appendChild(svg);
     });
+    sky.appendChild(constLayer);
+  }
+
+  // ---------- sky parallax (mouse / gyroscope) ----------
+  function initParallax(){
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var starsLayer = document.querySelector('.layer-stars');
+    var constLayer = document.querySelector('.layer-const');
+    if (!starsLayer || !constLayer) return;
+
+    var target = {x:0, y:0};
+    var current = {x:0, y:0};
+    var MAX = 16;
+
+    function setTarget(dx, dy){
+      target.x = Math.max(-1, Math.min(1, dx));
+      target.y = Math.max(-1, Math.min(1, dy));
+    }
+
+    function tick(){
+      current.x += (target.x - current.x) * 0.06;
+      current.y += (target.y - current.y) * 0.06;
+      starsLayer.style.transform = 'translate(' + (current.x*MAX*0.4) + 'px,' + (current.y*MAX*0.4) + 'px)';
+      constLayer.style.transform = 'translate(' + (current.x*MAX) + 'px,' + (current.y*MAX) + 'px)';
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    window.addEventListener('mousemove', function(e){
+      setTarget((e.clientX/window.innerWidth - 0.5)*2, (e.clientY/window.innerHeight - 0.5)*2);
+    });
+
+    function onOrientation(e){
+      if (e.beta === null || e.gamma === null) return;
+      setTarget(e.gamma/45, (e.beta-45)/45);
+    }
+
+    var DOE = window.DeviceOrientationEvent;
+    if (DOE && typeof DOE.requestPermission === 'function'){
+      var btn = document.getElementById('gyroBtn');
+      btn.classList.remove('hidden');
+      btn.addEventListener('click', function(){
+        DOE.requestPermission().then(function(state){
+          if (state === 'granted'){
+            window.addEventListener('deviceorientation', onOrientation);
+          }
+          btn.classList.add('hidden');
+        }).catch(function(){ btn.classList.add('hidden'); });
+      });
+    } else if (DOE) {
+      window.addEventListener('deviceorientation', onOrientation);
+    }
   }
 
   // ---------- game state ----------
@@ -495,6 +578,7 @@
 
   // ---------- boot ----------
   buildSky();
+  initParallax();
 
   fetch(CSV_URL + '&_=' + Date.now())
     .then(function(res){
