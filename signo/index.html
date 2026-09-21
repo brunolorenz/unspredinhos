@@ -86,13 +86,13 @@
   /* ---------- arena (predinho + zodiac wheel) ---------- */
   .arena{
     position:relative;
-    width:min(88vw, 420px);
+    width:min(92vw, 640px);
     aspect-ratio:1/1;
     margin: 18px 0 8px;
   }
   .predinho-glow{
     position:absolute; top:50%; left:50%;
-    width:68%; aspect-ratio:1/1; transform:translate(-50%,-50%);
+    width:72%; aspect-ratio:1/1; transform:translate(-50%,-50%);
     border-radius:50%; z-index:0;
     background: radial-gradient(circle, rgba(230,194,122,0.55) 0%, rgba(230,194,122,0.28) 38%, rgba(230,194,122,0) 72%);
     filter: blur(6px);
@@ -104,7 +104,7 @@
   }
   .predinho-frame{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:46%; aspect-ratio:1/1; border-radius:50%; z-index:1;
+    width:52%; aspect-ratio:1/1; border-radius:50%; z-index:1;
     overflow:hidden; background:#1a1f45;
     box-shadow: 0 0 0 1px var(--card-line), 0 12px 30px rgba(0,0,0,.55);
     transition: box-shadow .3s ease;
@@ -112,8 +112,8 @@
   .predinho-frame.state-correct{ box-shadow: 0 0 0 3px var(--correct); }
   .predinho-frame.state-wrong{ box-shadow: 0 0 0 3px var(--wrong); }
   .predinho-frame img{
-    position:absolute; top:-5%; left:-21%;
-    width:142%; height:142%;
+    position:absolute; top:-1%; left:-8%;
+    width:116%; height:116%;
     object-fit:cover; object-position: top center;
   }
   .predinho-frame .ph{
@@ -123,14 +123,14 @@
 
   .zodiac-btn{
     position:absolute;
-    width: clamp(40px, 10.5vw, 54px);
+    width: clamp(42px, 9.2vw, 64px);
     aspect-ratio:1/1;
     transform:translate(-50%,-50%);
     border-radius:50%;
     border:1px solid var(--card-line);
     background: var(--card);
     color:var(--gold);
-    font-size: clamp(1.1rem, 3.2vw, 1.4rem);
+    font-size: clamp(1.15rem, 3vw, 1.55rem);
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
     transition: transform .15s ease, background .15s ease, border-color .15s ease;
@@ -144,32 +144,69 @@
   .zodiac-btn.wrong{ background:var(--wrong); border-color:var(--wrong); color:var(--cream); }
   .zodiac-btn.dim[disabled]{ opacity:.35; }
 
+  .sign-label{
+    margin-top:16px; min-height:1.7em;
+    font-size:1rem; font-weight:600; color:var(--gold);
+    display:flex; align-items:center; gap:8px;
+    opacity:0; transform:translateY(4px) scale(.96);
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .sign-label.show{ opacity:1; transform:translateY(0) scale(1); }
+
   .hint{
-    margin-top:14px; font-size:.85rem; opacity:.55; text-align:center; min-height:1.2em;
+    margin-top:6px; font-size:.85rem; opacity:.55; text-align:center; min-height:1.2em;
   }
 
-  /* ---------- feedback card ---------- */
-  .feedback{
-    width:100%; max-width:420px; margin-top:18px;
-    background:var(--card); border:1px solid var(--card-line);
-    border-radius:18px; padding:18px 20px;
-    display:none; flex-direction:column; gap:10px;
-    animation: rise .35s ease;
+  /* ---------- feedback overlay ---------- */
+  .feedback-overlay{
+    position:fixed; inset:0; z-index:50;
+    display:none; align-items:center; justify-content:center;
+    padding: max(20px, env(safe-area-inset-top,0px)) 20px max(20px, env(safe-area-inset-bottom,0px));
   }
-  .feedback.show{ display:flex; }
-  @keyframes rise{ from{ opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-  .feedback .verdict{ font-weight:700; font-size:1.05rem; display:flex; align-items:center; gap:8px; }
-  .feedback .verdict.ok{ color:var(--correct); }
-  .feedback .verdict.no{ color:var(--wrong); }
-  .feedback .detail{ font-size:.92rem; line-height:1.55; opacity:.85; }
-  .feedback .detail b{ color:var(--gold); font-weight:600; }
-  .feedback button{
-    align-self:flex-start; margin-top:4px;
+  .feedback-overlay.show{ display:flex; }
+  .feedback-backdrop{
+    position:absolute; inset:0;
+    background: rgba(6,8,24,0.62);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    opacity:0; transition: opacity .3s ease;
+  }
+  .feedback-overlay.show .feedback-backdrop{ opacity:1; }
+  .feedback-card{
+    position:relative; z-index:1;
+    width:100%; max-width:420px;
+    background: var(--mid);
+    border:1px solid var(--card-line);
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow: 0 28px 70px rgba(0,0,0,.55);
+    transform: translateY(16px) scale(.96); opacity:0;
+    transition: transform .3s ease, opacity .3s ease;
+    max-height: 90vh; display:flex; flex-direction:column;
+  }
+  .feedback-overlay.show .feedback-card{ transform:translateY(0) scale(1); opacity:1; }
+  .feedback-card .art{
+    width:100%; height:min(48vh, 340px); flex-shrink:0;
+    background:#05071a;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .feedback-card .art img{ width:100%; height:100%; object-fit:contain; }
+  .feedback-card .body{
+    padding:18px 22px 22px; display:flex; flex-direction:column; gap:10px;
+    overflow-y:auto;
+  }
+  .feedback-card .verdict{ font-weight:700; font-size:1.15rem; display:flex; align-items:center; gap:8px; }
+  .feedback-card .verdict.ok{ color:var(--correct); }
+  .feedback-card .verdict.no{ color:var(--wrong); }
+  .feedback-card .detail{ font-size:.92rem; line-height:1.55; opacity:.85; }
+  .feedback-card .detail b{ color:var(--gold); font-weight:600; }
+  .feedback-card button{
+    align-self:flex-start; margin-top:6px;
     background:var(--gold); color:var(--deep); border:none;
     font-family:inherit; font-weight:700; font-size:.9rem;
-    padding:10px 20px; border-radius:999px; cursor:pointer;
+    padding:11px 22px; border-radius:999px; cursor:pointer;
   }
-  .feedback button:active{ transform:scale(.97); }
+  .feedback-card button:active{ transform:scale(.97); }
 
   /* ---------- end screen ---------- */
   .end{
@@ -235,9 +272,14 @@
     </div>
   </div>
 
+  <div id="signLabel" class="sign-label" aria-hidden="true"></div>
+
   <div id="hint" class="hint hidden">Toque no signo que você acha que é esse predinho</div>
 
-  <div id="feedback" class="feedback"></div>
+  <div id="feedback" class="feedback-overlay">
+    <div class="feedback-backdrop"></div>
+    <div class="feedback-card" id="feedbackCard"></div>
+  </div>
 
   <div id="end" class="end">
     <div class="score"><span id="endScore">0</span><span>/10</span></div>
@@ -464,12 +506,22 @@
     frame: document.getElementById('predinhoFrame'),
     img: document.getElementById('predinhoImg'),
     hint: document.getElementById('hint'),
+    signLabel: document.getElementById('signLabel'),
     feedback: document.getElementById('feedback'),
+    feedbackCard: document.getElementById('feedbackCard'),
     end: document.getElementById('end'),
     endScore: document.getElementById('endScore'),
     endMsg: document.getElementById('endMsg'),
     playAgain: document.getElementById('playAgain')
   };
+
+  function showSignLabel(sign){
+    els.signLabel.innerHTML = '<span>' + sign.symbol + '</span> ' + sign.name;
+    els.signLabel.classList.add('show');
+  }
+  function hideSignLabel(){
+    els.signLabel.classList.remove('show');
+  }
 
   function layoutWheel(){
     var existing = document.querySelectorAll('.zodiac-btn');
@@ -487,6 +539,10 @@
       btn.setAttribute('aria-label', sign.name);
       btn.dataset.sign = sign.id;
       btn.addEventListener('click', function(){ onGuess(sign.id); });
+      btn.addEventListener('pointerenter', function(){ showSignLabel(sign); });
+      btn.addEventListener('pointerleave', hideSignLabel);
+      btn.addEventListener('focus', function(){ showSignLabel(sign); });
+      btn.addEventListener('blur', hideSignLabel);
       els.arena.appendChild(btn);
     });
   }
@@ -503,7 +559,8 @@
 
   function showRound(){
     els.feedback.classList.remove('show');
-    els.feedback.innerHTML = '';
+    els.feedbackCard.innerHTML = '';
+    hideSignLabel();
     els.hint.textContent = 'Toque no signo que você acha que é esse predinho';
     els.frame.classList.remove('state-correct','state-wrong');
     locked = false;
@@ -535,6 +592,7 @@
     });
 
     els.frame.classList.add(isCorrect ? 'state-correct' : 'state-wrong');
+    hideSignLabel();
     els.hint.textContent = '';
     els.scoreLabel.textContent = score;
 
@@ -542,17 +600,21 @@
     var dateStr = p.dia + ' de ' + MONTHS[p.mes-1];
     var placeStr = p.rua + ' — ' + p.cidade + (p.uf ? ', ' + p.uf : '');
 
-    els.feedback.innerHTML =
-      '<div class="verdict ' + (isCorrect ? 'ok' : 'no') + '">' +
-        (isCorrect ? 'Acertou!' : 'Não foi dessa vez') +
-      '</div>' +
-      '<div class="detail">Esse predinho é de <b>' + correctSign.symbol + ' ' + correctSign.name + '</b>, ' +
-        'pintado em <b>' + dateStr + '</b>, na <b>' + placeStr + '</b>.</div>' +
-      '<button id="nextBtn">' + (idx+1 < ROUNDS ? 'Próximo predinho' : 'Ver resultado') + '</button>';
+    els.feedbackCard.innerHTML =
+      '<div class="art"><img src="' + p.img + '" alt="Predinho de ' + dateStr + '"></div>' +
+      '<div class="body">' +
+        '<div class="verdict ' + (isCorrect ? 'ok' : 'no') + '">' +
+          (isCorrect ? 'Acertou!' : 'Não foi dessa vez') +
+        '</div>' +
+        '<div class="detail">Esse predinho é de <b>' + correctSign.symbol + ' ' + correctSign.name + '</b>, ' +
+          'pintado em <b>' + dateStr + '</b>, na <b>' + placeStr + '</b>.</div>' +
+        '<button id="nextBtn">' + (idx+1 < ROUNDS ? 'Próximo predinho' : 'Ver resultado') + '</button>' +
+      '</div>';
     els.feedback.classList.add('show');
 
     document.getElementById('nextBtn').addEventListener('click', function(){
       idx++;
+      els.feedback.classList.remove('show');
       if (idx >= ROUNDS) finishGame();
       else showRound();
     });
