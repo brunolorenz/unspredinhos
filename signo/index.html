@@ -74,7 +74,7 @@
   }
 
   .status-row{
-    display:flex; gap:10px; margin: 22px 0 6px;
+    display:flex; gap:10px; margin: 22px 0 6px; flex-wrap:wrap; justify-content:center;
   }
   .pill{
     background:var(--card); border:1px solid var(--card-line);
@@ -82,38 +82,43 @@
     display:flex; align-items:center; gap:6px;
   }
   .pill b{ color:var(--gold); font-weight:700; }
+  .pill-btn{
+    font-family:inherit; color:var(--cream); cursor:pointer;
+    margin:0; -webkit-appearance:none; appearance:none;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .pill-btn:hover{ border-color:var(--gold); background:rgba(230,194,122,0.1); }
 
-  /* ---------- arena (predinho + zodiac wheel) ---------- */
+  /* ---------- arena (predinho) ---------- */
   .arena{
     position:relative;
-    width:min(92vw, 640px);
+    width:min(78vw, 380px);
     aspect-ratio:1/1;
-    margin: 18px 0 8px;
+    margin: 18px 0 4px;
   }
   .predinho-glow{
-    position:absolute; top:50%; left:50%;
-    width:72%; aspect-ratio:1/1; transform:translate(-50%,-50%);
-    border-radius:50%; z-index:0;
-    background: radial-gradient(circle, rgba(230,194,122,0.55) 0%, rgba(230,194,122,0.28) 38%, rgba(230,194,122,0) 72%);
-    filter: blur(6px);
+    position:absolute; inset:-7%;
+    border-radius:32px; z-index:0;
+    background: radial-gradient(circle, rgba(230,194,122,0.55) 0%, rgba(230,194,122,0.26) 42%, rgba(230,194,122,0) 74%);
+    filter: blur(10px);
     animation: glow-breathe 5s ease-in-out infinite;
   }
   @keyframes glow-breathe{
-    0%,100%{ opacity:.75; transform:translate(-50%,-50%) scale(1); }
-    50%{ opacity:1; transform:translate(-50%,-50%) scale(1.06); }
+    0%,100%{ opacity:.75; transform:scale(1); }
+    50%{ opacity:1; transform:scale(1.04); }
   }
   .predinho-frame{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:52%; aspect-ratio:1/1; border-radius:50%; z-index:1;
+    position:absolute; inset:0; z-index:1;
+    border-radius:24px;
     overflow:hidden; background:#1a1f45;
-    box-shadow: 0 0 0 1px var(--card-line), 0 12px 30px rgba(0,0,0,.55);
+    box-shadow: 0 0 0 1px var(--card-line), 0 16px 34px rgba(0,0,0,.55);
     transition: box-shadow .3s ease;
   }
   .predinho-frame.state-correct{ box-shadow: 0 0 0 3px var(--correct); }
   .predinho-frame.state-wrong{ box-shadow: 0 0 0 3px var(--wrong); }
   .predinho-frame img{
-    position:absolute; top:-1%; left:-8%;
-    width:116%; height:116%;
+    position:absolute; top:0; left:0;
+    width:100%; height:117.65%;
     object-fit:cover; object-position: top center;
   }
   .predinho-frame .ph{
@@ -121,57 +126,53 @@
     font-size:.75rem; color:var(--cream); opacity:.5; text-align:center; padding:10%;
   }
 
-  .zodiac-btn{
-    position:absolute;
-    width: clamp(42px, 9.2vw, 64px);
-    aspect-ratio:1/1;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
+  .options-row{
+    display:flex; gap:12px; flex-wrap:wrap; justify-content:center;
+    width:100%; max-width:460px; margin-top:22px;
+  }
+  .option-btn{
+    flex:1 1 120px; max-width:150px;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:16px 10px;
+    border-radius:18px;
     border:1px solid var(--card-line);
     background: var(--card);
-    color:var(--gold);
-    font-size: clamp(1.15rem, 3vw, 1.55rem);
-    display:flex; align-items:center; justify-content:center;
+    color:var(--cream);
+    font-family:inherit;
     cursor:pointer;
     transition: transform .15s ease, background .15s ease, border-color .15s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .zodiac-btn:hover{ background:rgba(230,194,122,0.14); border-color:var(--gold); }
-  .zodiac-btn:active{ transform:translate(-50%,-50%) scale(.92); }
-  .zodiac-btn[disabled]{ cursor:default; }
-  .zodiac-btn.pick{ background:var(--violet); border-color:var(--violet); color:var(--cream); }
-  .zodiac-btn.correct{ background:var(--correct); border-color:var(--correct); color:var(--deep); }
-  .zodiac-btn.wrong{ background:var(--wrong); border-color:var(--wrong); color:var(--cream); }
-  .zodiac-btn.dim[disabled]{ opacity:.35; }
-
-  .sign-label{
-    margin-top:16px; min-height:1.7em;
-    font-size:1rem; font-weight:600; color:var(--gold);
-    display:flex; align-items:center; gap:8px;
-    opacity:0; transform:translateY(4px) scale(.96);
-    transition: opacity .18s ease, transform .18s ease;
-  }
-  .sign-label.show{ opacity:1; transform:translateY(0) scale(1); }
+  .option-btn .sym{ font-size:1.9rem; color:var(--gold); line-height:1; }
+  .option-btn .nm{ font-size:.85rem; font-weight:600; text-align:center; }
+  .option-btn:hover{ background:rgba(230,194,122,0.14); border-color:var(--gold); }
+  .option-btn:active{ transform:scale(.96); }
+  .option-btn[disabled]{ cursor:default; }
+  .option-btn.correct{ background:var(--correct); border-color:var(--correct); color:var(--deep); }
+  .option-btn.correct .sym{ color:var(--deep); }
+  .option-btn.wrong{ background:var(--wrong); border-color:var(--wrong); color:var(--cream); }
+  .option-btn.wrong .sym{ color:var(--cream); }
+  .option-btn.dim[disabled]{ opacity:.35; }
 
   .hint{
-    margin-top:6px; font-size:.85rem; opacity:.55; text-align:center; min-height:1.2em;
+    margin-top:16px; font-size:.85rem; opacity:.55; text-align:center; min-height:1.2em;
   }
 
-  /* ---------- feedback overlay ---------- */
-  .feedback-overlay{
+  /* ---------- modal overlay (feedback + placar) ---------- */
+  .modal-overlay{
     position:fixed; inset:0; z-index:50;
     display:none; align-items:center; justify-content:center;
     padding: max(20px, env(safe-area-inset-top,0px)) 20px max(20px, env(safe-area-inset-bottom,0px));
   }
-  .feedback-overlay.show{ display:flex; }
-  .feedback-backdrop{
+  .modal-overlay.show{ display:flex; }
+  .modal-backdrop{
     position:absolute; inset:0;
     background: rgba(6,8,24,0.62);
     backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
     opacity:0; transition: opacity .3s ease;
   }
-  .feedback-overlay.show .feedback-backdrop{ opacity:1; }
-  .feedback-card{
+  .modal-overlay.show .modal-backdrop{ opacity:1; }
+  .modal-card{
     position:relative; z-index:1;
     width:100%; max-width:420px;
     background: var(--mid);
@@ -183,46 +184,69 @@
     transition: transform .3s ease, opacity .3s ease;
     max-height: 90vh; display:flex; flex-direction:column;
   }
-  .feedback-overlay.show .feedback-card{ transform:translateY(0) scale(1); opacity:1; }
-  .feedback-card .art{
+  .modal-overlay.show .modal-card{ transform:translateY(0) scale(1); opacity:1; }
+  .modal-card .art{
     width:100%; height:min(48vh, 340px); flex-shrink:0;
     background:#05071a;
     display:flex; align-items:center; justify-content:center;
     overflow:hidden;
   }
-  .feedback-card .art img{ width:100%; height:100%; object-fit:contain; }
-  .feedback-card .body{
-    padding:18px 22px 22px; display:flex; flex-direction:column; gap:10px;
+  .modal-card .art img{ width:100%; height:100%; object-fit:contain; }
+  .modal-card .body{
+    padding:20px 22px 22px; display:flex; flex-direction:column; gap:10px;
     overflow-y:auto;
   }
-  .feedback-card .verdict{ font-weight:700; font-size:1.15rem; display:flex; align-items:center; gap:8px; }
-  .feedback-card .verdict.ok{ color:var(--correct); }
-  .feedback-card .verdict.no{ color:var(--wrong); }
-  .feedback-card .detail{ font-size:.92rem; line-height:1.55; opacity:.85; }
-  .feedback-card .detail b{ color:var(--gold); font-weight:600; }
-  .feedback-card button{
+  .modal-card h2{ margin:0; font-size:1.1rem; font-weight:700; }
+  .modal-card .verdict{ font-weight:700; font-size:1.15rem; display:flex; align-items:center; gap:8px; }
+  .modal-card .verdict.ok{ color:var(--correct); }
+  .modal-card .verdict.no{ color:var(--wrong); }
+  .modal-card .detail{ font-size:.92rem; line-height:1.55; opacity:.85; }
+  .modal-card .detail b{ color:var(--gold); font-weight:600; }
+  .modal-card button.primary{
     align-self:flex-start; margin-top:6px;
     background:var(--gold); color:var(--deep); border:none;
     font-family:inherit; font-weight:700; font-size:.9rem;
     padding:11px 22px; border-radius:999px; cursor:pointer;
   }
-  .feedback-card button:active{ transform:scale(.97); }
+  .modal-card button.primary:active{ transform:scale(.97); }
+  .modal-card button.secondary{
+    align-self:flex-start; margin-top:2px;
+    background:transparent; color:var(--gold-dim); border:1px solid var(--card-line);
+    font-family:inherit; font-weight:600; font-size:.85rem;
+    padding:10px 20px; border-radius:999px; cursor:pointer;
+  }
 
-  /* ---------- end screen ---------- */
-  .end{
-    width:100%; max-width:420px; text-align:center;
-    display:none; flex-direction:column; align-items:center; gap:14px;
-    margin-top:10px;
+  .save-streak{
+    margin-top:6px; padding-top:14px; border-top:1px solid var(--card-line);
+    display:flex; flex-direction:column; gap:8px;
   }
-  .end.show{ display:flex; }
-  .end .score{ font-size:3rem; font-weight:700; color:var(--gold); line-height:1; }
-  .end .score span{ font-size:1.4rem; opacity:.6; font-weight:500; }
-  .end p{ margin:0; opacity:.75; font-size:.95rem; max-width:34ch; line-height:1.5; }
-  .end button{
-    background:var(--gold); color:var(--deep); border:none;
-    font-family:inherit; font-weight:700; font-size:.95rem;
-    padding:12px 26px; border-radius:999px; cursor:pointer; margin-top:6px;
+  .save-streak .row{ display:flex; gap:8px; }
+  .save-streak input{
+    flex:1; min-width:0;
+    background:rgba(244,239,226,0.08); border:1px solid var(--card-line);
+    border-radius:10px; padding:9px 12px; color:var(--cream);
+    font-family:inherit; font-size:.88rem;
   }
+  .save-streak input::placeholder{ color:rgba(244,239,226,0.4); }
+  .save-streak button{
+    background:var(--violet); color:var(--cream); border:none;
+    border-radius:10px; padding:9px 16px; font-family:inherit;
+    font-weight:700; font-size:.85rem; cursor:pointer; white-space:nowrap;
+  }
+  .save-streak .save-msg{ font-size:.8rem; opacity:.7; }
+
+  .lb-list{
+    list-style:none; margin:0; padding:0;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .lb-item{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:12px;
+    background:rgba(244,239,226,0.04);
+  }
+  .lb-item .rank{ color:var(--gold-dim); font-weight:700; width:1.8em; flex-shrink:0; }
+  .lb-item .name{ flex:1; font-size:.92rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lb-item .streak{ color:var(--gold); font-weight:700; font-size:.92rem; }
 
   /* ---------- loading / error ---------- */
   .state-msg{
@@ -259,8 +283,9 @@
   </header>
 
   <div id="statusRow" class="status-row hidden">
-    <div class="pill">Rodada <b id="roundLabel">1/10</b></div>
-    <div class="pill">Acertos <b id="scoreLabel">0</b></div>
+    <div class="pill">Sequência <b id="streakLabel">0</b></div>
+    <div class="pill">Recorde <b id="bestLabel">0</b></div>
+    <button id="leaderboardBtn" class="pill pill-btn" type="button">Ver placar</button>
   </div>
 
   <div id="loadingMsg" class="state-msg">Carregando os predinhos do céu…</div>
@@ -272,19 +297,18 @@
     </div>
   </div>
 
-  <div id="signLabel" class="sign-label" aria-hidden="true"></div>
+  <div id="options" class="options-row"></div>
 
   <div id="hint" class="hint hidden">Toque no signo que você acha que é esse predinho</div>
 
-  <div id="feedback" class="feedback-overlay">
-    <div class="feedback-backdrop"></div>
-    <div class="feedback-card" id="feedbackCard"></div>
+  <div id="feedback" class="modal-overlay">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card" id="feedbackCard"></div>
   </div>
 
-  <div id="end" class="end">
-    <div class="score"><span id="endScore">0</span><span>/10</span></div>
-    <p id="endMsg"></p>
-    <button id="playAgain">Jogar de novo</button>
+  <div id="leaderboardOverlay" class="modal-overlay">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card" id="leaderboardCard"></div>
   </div>
 </div>
 
@@ -292,7 +316,10 @@
 (function(){
 
   var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQJSnZh8lr-Jkgt4XUC63cu0Ml75_YiWK-Ltty_nlExm6tMUNQXMaI7htEbS1MJnAQbc_6huHlZD0Du/pub?gid=1029790880&single=true&output=csv";
-  var ROUNDS = 10;
+
+  // Depois de publicar o Apps Script (veja instruções em separado), troque a linha
+  // abaixo pela URL do deployment terminada em /exec.
+  var LEADERBOARD_URL = "https://script.google.com/macros/s/AKfycbzLpQ-dJ2VIl8oLj8ToLOwoyxfoOvVsRJFOjn92UmGXlWjIioEORIy_i1MLnY88_XDb/exec";
 
   var SIGNS = [
     {id:'aries',       name:'Áries',       symbol:'♈'},
@@ -492,65 +519,128 @@
 
   // ---------- game state ----------
   var deck = [];
-  var round = [];
-  var idx = 0;
-  var score = 0;
+  var queue = [];
+  var current = null;
+  var streak = 0;
+  var best = 0;
   var locked = false;
+  var leaderboardConfigured = LEADERBOARD_URL.indexOf('COLOQUE_AQUI') === -1;
 
   var els = {
     loading: document.getElementById('loadingMsg'),
     statusRow: document.getElementById('statusRow'),
-    roundLabel: document.getElementById('roundLabel'),
-    scoreLabel: document.getElementById('scoreLabel'),
+    streakLabel: document.getElementById('streakLabel'),
+    bestLabel: document.getElementById('bestLabel'),
+    leaderboardBtn: document.getElementById('leaderboardBtn'),
     arena: document.getElementById('arena'),
     frame: document.getElementById('predinhoFrame'),
     img: document.getElementById('predinhoImg'),
     hint: document.getElementById('hint'),
-    signLabel: document.getElementById('signLabel'),
+    options: document.getElementById('options'),
     feedback: document.getElementById('feedback'),
     feedbackCard: document.getElementById('feedbackCard'),
-    end: document.getElementById('end'),
-    endScore: document.getElementById('endScore'),
-    endMsg: document.getElementById('endMsg'),
-    playAgain: document.getElementById('playAgain')
+    leaderboardOverlay: document.getElementById('leaderboardOverlay'),
+    leaderboardCard: document.getElementById('leaderboardCard')
   };
 
-  function showSignLabel(sign){
-    els.signLabel.innerHTML = '<span>' + sign.symbol + '</span> ' + sign.name;
-    els.signLabel.classList.add('show');
-  }
-  function hideSignLabel(){
-    els.signLabel.classList.remove('show');
+  function pickOptionIds(correctId){
+    var others = SIGNS.filter(function(s){ return s.id !== correctId; });
+    var distractors = shuffle(others).slice(0, 2);
+    var ids = distractors.map(function(s){ return s.id; }).concat([correctId]);
+    return shuffle(ids);
   }
 
-  function layoutWheel(){
-    var existing = document.querySelectorAll('.zodiac-btn');
-    existing.forEach(function(b){ b.remove(); });
-    SIGNS.forEach(function(sign, i){
-      var angle = (-90 + i*30) * Math.PI/180;
-      var radius = 44;
-      var x = 50 + radius*Math.cos(angle);
-      var y = 50 + radius*Math.sin(angle);
+  function renderOptions(correctId){
+    els.options.innerHTML = '';
+    pickOptionIds(correctId).forEach(function(signId){
+      var sign = SIGN_BY_ID[signId];
       var btn = document.createElement('button');
-      btn.className = 'zodiac-btn';
-      btn.style.left = x+'%';
-      btn.style.top = y+'%';
-      btn.textContent = sign.symbol;
-      btn.setAttribute('aria-label', sign.name);
+      btn.className = 'option-btn';
       btn.dataset.sign = sign.id;
+      btn.innerHTML = '<span class="sym">' + sign.symbol + '</span><span class="nm">' + sign.name + '</span>';
       btn.addEventListener('click', function(){ onGuess(sign.id); });
-      btn.addEventListener('pointerenter', function(){ showSignLabel(sign); });
-      btn.addEventListener('pointerleave', hideSignLabel);
-      btn.addEventListener('focus', function(){ showSignLabel(sign); });
-      btn.addEventListener('blur', hideSignLabel);
-      els.arena.appendChild(btn);
+      els.options.appendChild(btn);
     });
   }
 
+  function nextPredinho(){
+    if (queue.length === 0) queue = shuffle(deck);
+    return queue.pop();
+  }
+
+  // ---------- placar compartilhado (Google Sheets via Apps Script) ----------
+  function postScore(name, streakValue){
+    return fetch(LEADERBOARD_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ name: name, streak: streakValue })
+    }).then(function(res){
+      if (!res.ok) throw new Error('status ' + res.status);
+      return res.json();
+    });
+  }
+
+  function fetchLeaderboard(){
+    return fetch(LEADERBOARD_URL + '?_=' + Date.now())
+      .then(function(res){
+        if (!res.ok) throw new Error('status ' + res.status);
+        return res.json();
+      });
+  }
+
+  function openLeaderboard(){
+    els.leaderboardOverlay.classList.add('show');
+    if (!leaderboardConfigured){
+      els.leaderboardCard.innerHTML =
+        '<div class="body">' +
+          '<h2>Placar</h2>' +
+          '<div class="detail">O placar compartilhado ainda não foi configurado — falta colar a URL do Apps Script no início do arquivo.</div>' +
+          '<button class="secondary" id="lbCloseBtn">Fechar</button>' +
+        '</div>';
+      document.getElementById('lbCloseBtn').addEventListener('click', closeLeaderboard);
+      return;
+    }
+    els.leaderboardCard.innerHTML =
+      '<div class="body"><h2>Placar</h2><div class="detail">Carregando…</div></div>';
+    fetchLeaderboard()
+      .then(function(data){
+        var entries = (data && data.leaderboard) || [];
+        var list = entries.length
+          ? '<ol class="lb-list">' + entries.map(function(e, i){
+              return '<li class="lb-item"><span class="rank">' + (i+1) + '</span>' +
+                '<span class="name">' + escapeHtml(e.name || 'Anônimo') + '</span>' +
+                '<span class="streak">' + e.streak + '</span></li>';
+            }).join('') + '</ol>'
+          : '<div class="detail">Ninguém salvou uma sequência ainda — seja a primeira pessoa.</div>';
+        els.leaderboardCard.innerHTML =
+          '<div class="body"><h2>Placar</h2>' + list + '<button class="secondary" id="lbCloseBtn">Fechar</button></div>';
+        document.getElementById('lbCloseBtn').addEventListener('click', closeLeaderboard);
+      })
+      .catch(function(err){
+        els.leaderboardCard.innerHTML =
+          '<div class="body"><h2>Placar</h2>' +
+          '<div class="detail">Não consegui carregar o placar.<br><span style="opacity:.75">' +
+          (err && err.message ? err.message : 'Erro desconhecido') + '</span></div>' +
+          '<button class="secondary" id="lbCloseBtn">Fechar</button></div>';
+        document.getElementById('lbCloseBtn').addEventListener('click', closeLeaderboard);
+      });
+  }
+
+  function closeLeaderboard(){
+    els.leaderboardOverlay.classList.remove('show');
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  els.leaderboardBtn.addEventListener('click', openLeaderboard);
+
   function startGame(){
-    round = shuffle(deck).slice(0, ROUNDS);
-    idx = 0; score = 0; locked = false;
-    els.end.classList.remove('show');
+    streak = 0; best = 0; locked = false;
+    queue = shuffle(deck);
     els.statusRow.classList.remove('hidden');
     els.arena.classList.remove('hidden');
     els.hint.classList.remove('hidden');
@@ -560,31 +650,34 @@
   function showRound(){
     els.feedback.classList.remove('show');
     els.feedbackCard.innerHTML = '';
-    hideSignLabel();
     els.hint.textContent = 'Toque no signo que você acha que é esse predinho';
     els.frame.classList.remove('state-correct','state-wrong');
     locked = false;
 
-    var p = round[idx];
-    els.img.src = p.img;
-    els.img.alt = 'Predinho de ' + p.dia + ' de ' + MONTHS[p.mes-1];
-    els.roundLabel.textContent = (idx+1) + '/' + ROUNDS;
-    els.scoreLabel.textContent = score;
+    current = nextPredinho();
+    els.img.src = current.img;
+    els.img.alt = 'Predinho de ' + current.dia + ' de ' + MONTHS[current.mes-1];
+    els.streakLabel.textContent = streak;
+    els.bestLabel.textContent = best;
 
-    document.querySelectorAll('.zodiac-btn').forEach(function(b){
-      b.disabled = false;
-      b.classList.remove('pick','correct','wrong','dim');
-    });
+    renderOptions(current.sign);
   }
 
   function onGuess(signId){
     if (locked) return;
     locked = true;
-    var p = round[idx];
+    var p = current;
     var isCorrect = signId === p.sign;
-    if (isCorrect) score++;
+    var endedStreak = streak;
 
-    document.querySelectorAll('.zodiac-btn').forEach(function(b){
+    if (isCorrect){
+      streak++;
+      if (streak > best) best = streak;
+    } else {
+      streak = 0;
+    }
+
+    document.querySelectorAll('.option-btn').forEach(function(b){
       b.disabled = true;
       if (b.dataset.sign === p.sign) b.classList.add('correct');
       else if (b.dataset.sign === signId) b.classList.add('wrong');
@@ -592,13 +685,26 @@
     });
 
     els.frame.classList.add(isCorrect ? 'state-correct' : 'state-wrong');
-    hideSignLabel();
     els.hint.textContent = '';
-    els.scoreLabel.textContent = score;
+    els.streakLabel.textContent = streak;
+    els.bestLabel.textContent = best;
 
     var correctSign = SIGN_BY_ID[p.sign];
     var dateStr = p.dia + ' de ' + MONTHS[p.mes-1];
     var placeStr = p.rua + ' — ' + p.cidade + (p.uf ? ', ' + p.uf : '');
+
+    var saveBlock = '';
+    if (!isCorrect && endedStreak > 0 && leaderboardConfigured){
+      saveBlock =
+        '<div class="save-streak" id="saveStreak">' +
+          '<div class="detail">Sua sequência foi de <b>' + endedStreak + '</b>. Salvar no placar?</div>' +
+          '<div class="row">' +
+            '<input type="text" id="saveNameInput" maxlength="24" placeholder="Seu nome">' +
+            '<button id="saveStreakBtn" type="button">Salvar</button>' +
+          '</div>' +
+          '<div class="save-msg" id="saveMsg"></div>' +
+        '</div>';
+    }
 
     els.feedbackCard.innerHTML =
       '<div class="art"><img src="' + p.img + '" alt="Predinho de ' + dateStr + '"></div>' +
@@ -608,35 +714,35 @@
         '</div>' +
         '<div class="detail">Esse predinho é de <b>' + correctSign.symbol + ' ' + correctSign.name + '</b>, ' +
           'pintado em <b>' + dateStr + '</b>, na <b>' + placeStr + '</b>.</div>' +
-        '<button id="nextBtn">' + (idx+1 < ROUNDS ? 'Próximo predinho' : 'Ver resultado') + '</button>' +
+        saveBlock +
+        '<button class="primary" id="nextBtn">Próximo predinho</button>' +
       '</div>';
     els.feedback.classList.add('show');
 
+    var saveBtn = document.getElementById('saveStreakBtn');
+    if (saveBtn){
+      saveBtn.addEventListener('click', function(){
+        var nameInput = document.getElementById('saveNameInput');
+        var msg = document.getElementById('saveMsg');
+        var name = (nameInput.value || 'Anônimo').trim().slice(0, 24) || 'Anônimo';
+        saveBtn.disabled = true;
+        nameInput.disabled = true;
+        msg.textContent = 'Salvando…';
+        postScore(name, endedStreak)
+          .then(function(){ msg.textContent = 'Salvo no placar!'; })
+          .catch(function(err){
+            msg.textContent = 'Não consegui salvar (' + (err && err.message ? err.message : 'erro') + ').';
+            saveBtn.disabled = false;
+            nameInput.disabled = false;
+          });
+      });
+    }
+
     document.getElementById('nextBtn').addEventListener('click', function(){
-      idx++;
       els.feedback.classList.remove('show');
-      if (idx >= ROUNDS) finishGame();
-      else showRound();
+      showRound();
     });
   }
-
-  function finishGame(){
-    els.statusRow.classList.add('hidden');
-    els.arena.classList.add('hidden');
-    els.hint.classList.add('hidden');
-    els.feedback.classList.remove('show');
-
-    els.endScore.textContent = score;
-    var msg;
-    if (score === ROUNDS) msg = 'Cravou todos. Os astros e as fachadas estão alinhados hoje.';
-    else if (score >= 8) msg = 'Muito bom — seu olho pra fachada lê calendário também.';
-    else if (score >= 5) msg = 'Nada mal. Ainda dá pra apurar a mira entre os signos.';
-    else msg = 'Bem aleatório mesmo — o que é justo, já que os signos também são.';
-    els.endMsg.textContent = msg;
-    els.end.classList.add('show');
-  }
-
-  els.playAgain.addEventListener('click', startGame);
 
   // ---------- boot ----------
   buildSky();
@@ -650,11 +756,10 @@
     .then(function(text){
       var rows = parseCSV(text);
       deck = buildDeck(rows);
-      if (deck.length < ROUNDS) {
-        throw new Error('A planilha só trouxe ' + deck.length + ' predinhos com imagem — não dá pra montar uma rodada de ' + ROUNDS + '.');
+      if (deck.length < 3) {
+        throw new Error('A planilha só trouxe ' + deck.length + ' predinhos com imagem — não dá pra montar nem uma rodada.');
       }
       els.loading.classList.add('hidden');
-      layoutWheel();
       startGame();
     })
     .catch(function(err){
