@@ -49,32 +49,31 @@
     0%,100%{opacity:.15;}
     50%{opacity:.9;}
   }
-  .constellation{position:absolute; opacity:.5; animation:constellation-glow 7s ease-in-out infinite;}
-  .constellation line{stroke:var(--gold-dim); stroke-width:1; opacity:.55;}
-  .constellation circle{fill:var(--gold);}
-  @keyframes constellation-glow{
-    0%,100%{opacity:.22;}
-    50%{opacity:.6;}
+  .constellation{ position:absolute; opacity:.45; }
+  .constellation line{ stroke:var(--gold-dim); stroke-width:1; opacity:.5; }
+  .constellation circle{
+    fill:var(--gold);
+    animation:twinkle 5s ease-in-out infinite;
   }
 
   /* ---------- layout ---------- */
   .wrap{
     position:relative; z-index:1; width:100%; max-width:560px;
-    padding:32px 20px 48px; display:flex; flex-direction:column; align-items:center;
+    padding:58px 20px 40px; display:flex; flex-direction:column; align-items:center;
   }
-  header{ text-align:center; margin-bottom:22px; }
+  header{ text-align:center; margin-bottom:14px; }
   h1{
-    font-size: clamp(1.5rem, 5vw, 2.1rem);
-    font-weight:700; margin:0 0 10px;
+    font-size: clamp(1.3rem, 5vw, 2.1rem);
+    font-weight:700; margin:0 0 8px;
     letter-spacing:-0.01em;
   }
   header p{
     margin:0; color:var(--cream); opacity:.65;
-    font-size:.95rem; line-height:1.5; max-width:38ch; margin:0 auto;
+    font-size:.88rem; line-height:1.45; max-width:36ch; margin:0 auto;
   }
 
   .status-row{
-    display:flex; gap:10px; margin: 22px 0 6px; flex-wrap:wrap; justify-content:center;
+    display:flex; gap:10px; margin: 14px 0 4px; flex-wrap:wrap; justify-content:center;
   }
   .pill{
     background:var(--card); border:1px solid var(--card-line);
@@ -92,9 +91,9 @@
   /* ---------- arena (predinho) ---------- */
   .arena{
     position:relative;
-    width:min(78vw, 380px);
+    width:min(58vw, 380px);
     aspect-ratio:1/1;
-    margin: 18px 0 4px;
+    margin: 14px 0 2px;
   }
   .predinho-glow{
     position:absolute; inset:-7%;
@@ -118,23 +117,37 @@
   .predinho-frame.state-wrong{ box-shadow: 0 0 0 3px var(--wrong); }
   .predinho-frame img{
     position:absolute; top:0; left:0;
-    width:100%; height:117.65%;
+    width:100%; height:130.9%;
     object-fit:cover; object-position: top center;
+    transition: height .7s cubic-bezier(.22,.8,.25,1);
   }
+  .predinho-frame.revealed img{ height:100%; }
   .predinho-frame .ph{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-size:.75rem; color:var(--cream); opacity:.5; text-align:center; padding:10%;
   }
+  .result-badge{
+    position:absolute; top:10px; right:10px; z-index:2;
+    width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.15rem; font-weight:700;
+    box-shadow: 0 6px 16px rgba(0,0,0,.4);
+    opacity:0; transform:scale(.5);
+    transition: opacity .3s ease .3s, transform .3s cubic-bezier(.22,1.4,.4,1) .3s;
+  }
+  .result-badge.show{ opacity:1; transform:scale(1); }
+  .result-badge.correct{ background:var(--correct); color:var(--deep); }
+  .result-badge.wrong{ background:var(--wrong); color:var(--cream); }
 
   .options-row{
-    display:flex; gap:12px; flex-wrap:wrap; justify-content:center;
-    width:100%; max-width:460px; margin-top:22px;
+    display:flex; gap:8px; flex-wrap:nowrap; justify-content:center;
+    width:100%; max-width:460px; margin-top:14px;
   }
   .option-btn{
-    flex:1 1 120px; max-width:150px;
-    display:flex; flex-direction:column; align-items:center; gap:6px;
-    padding:16px 10px;
-    border-radius:18px;
+    flex:1 1 0; min-width:0; max-width:170px;
+    display:flex; flex-direction:column; align-items:center; gap:5px;
+    padding:12px 6px;
+    border-radius:16px;
     border:1px solid var(--card-line);
     background: var(--card);
     color:var(--cream);
@@ -143,8 +156,8 @@
     transition: transform .15s ease, background .15s ease, border-color .15s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .option-btn .sym{ font-size:1.9rem; color:var(--gold); line-height:1; }
-  .option-btn .nm{ font-size:.85rem; font-weight:600; text-align:center; }
+  .option-btn .sym{ font-size:1.6rem; color:var(--gold); line-height:1; }
+  .option-btn .nm{ font-size:.76rem; font-weight:600; text-align:center; }
   .option-btn:hover{ background:rgba(230,194,122,0.14); border-color:var(--gold); }
   .option-btn:active{ transform:scale(.96); }
   .option-btn[disabled]{ cursor:default; }
@@ -155,8 +168,19 @@
   .option-btn.dim[disabled]{ opacity:.35; }
 
   .hint{
-    margin-top:16px; font-size:.85rem; opacity:.55; text-align:center; min-height:1.2em;
+    margin-top:12px; font-size:.85rem; opacity:.55; text-align:center; min-height:1.2em;
   }
+
+  .round-footer{
+    margin-top:10px; width:100%; max-width:380px;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .next-btn{
+    background:var(--gold); color:var(--deep); border:none;
+    font-family:inherit; font-weight:700; font-size:.9rem;
+    padding:11px 28px; border-radius:999px; cursor:pointer;
+  }
+  .next-btn:active{ transform:scale(.97); }
 
   /* ---------- modal overlay (feedback + placar) ---------- */
   .modal-overlay{
@@ -185,55 +209,19 @@
     max-height: 90vh; display:flex; flex-direction:column;
   }
   .modal-overlay.show .modal-card{ transform:translateY(0) scale(1); opacity:1; }
-  .modal-card .art{
-    width:100%; height:min(48vh, 340px); flex-shrink:0;
-    background:#05071a;
-    display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
-  }
-  .modal-card .art img{ width:100%; height:100%; object-fit:contain; }
   .modal-card .body{
     padding:20px 22px 22px; display:flex; flex-direction:column; gap:10px;
     overflow-y:auto;
   }
   .modal-card h2{ margin:0; font-size:1.1rem; font-weight:700; }
-  .modal-card .verdict{ font-weight:700; font-size:1.15rem; display:flex; align-items:center; gap:8px; }
-  .modal-card .verdict.ok{ color:var(--correct); }
-  .modal-card .verdict.no{ color:var(--wrong); }
   .modal-card .detail{ font-size:.92rem; line-height:1.55; opacity:.85; }
   .modal-card .detail b{ color:var(--gold); font-weight:600; }
-  .modal-card button.primary{
-    align-self:flex-start; margin-top:6px;
-    background:var(--gold); color:var(--deep); border:none;
-    font-family:inherit; font-weight:700; font-size:.9rem;
-    padding:11px 22px; border-radius:999px; cursor:pointer;
-  }
-  .modal-card button.primary:active{ transform:scale(.97); }
   .modal-card button.secondary{
     align-self:flex-start; margin-top:2px;
     background:transparent; color:var(--gold-dim); border:1px solid var(--card-line);
     font-family:inherit; font-weight:600; font-size:.85rem;
     padding:10px 20px; border-radius:999px; cursor:pointer;
   }
-
-  .save-streak{
-    margin-top:6px; padding-top:14px; border-top:1px solid var(--card-line);
-    display:flex; flex-direction:column; gap:8px;
-  }
-  .save-streak .row{ display:flex; gap:8px; }
-  .save-streak input{
-    flex:1; min-width:0;
-    background:rgba(244,239,226,0.08); border:1px solid var(--card-line);
-    border-radius:10px; padding:9px 12px; color:var(--cream);
-    font-family:inherit; font-size:.88rem;
-  }
-  .save-streak input::placeholder{ color:rgba(244,239,226,0.4); }
-  .save-streak button{
-    background:var(--violet); color:var(--cream); border:none;
-    border-radius:10px; padding:9px 16px; font-family:inherit;
-    font-weight:700; font-size:.85rem; cursor:pointer; white-space:nowrap;
-  }
-  .save-streak .save-msg{ font-size:.8rem; opacity:.7; }
 
   .lb-list{
     list-style:none; margin:0; padding:0;
@@ -248,6 +236,34 @@
   .lb-item .name{ flex:1; font-size:.92rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .lb-item .streak{ color:var(--gold); font-weight:700; font-size:.92rem; }
 
+  /* ---------- rodapé ---------- */
+  .site-footer{
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    margin-top:36px; padding-top:22px; border-top:1px solid var(--card-line);
+    width:100%;
+  }
+  .footer-credit{
+    margin:0; text-align:center; font-size:.82rem; opacity:.6; line-height:1.5; max-width:40ch;
+  }
+  .footer-credit a{ color:var(--gold); text-decoration:none; opacity:.9; }
+  .footer-credit a:hover{ text-decoration:underline; }
+  .footer-links{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+  }
+  .footer-pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 18px; border-radius:999px;
+    border:1px solid var(--card-line); background:var(--card);
+    color:var(--cream); text-decoration:none;
+    font-family:inherit; font-size:.85rem; font-weight:600;
+    transition: border-color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .footer-pill:hover{ border-color:var(--gold); background:rgba(230,194,122,0.1); }
+  .footer-pill:active{ transform:scale(.97); }
+  .footer-pill svg{ width:18px; height:18px; flex-shrink:0; }
+  .footer-pill.cta{ background:var(--gold); border-color:var(--gold); color:var(--deep); }
+  .footer-pill.cta:hover{ background:#f0d08c; border-color:#f0d08c; }
+
   /* ---------- loading / error ---------- */
   .state-msg{
     text-align:center; opacity:.7; font-size:.9rem; margin-top:40px; line-height:1.6;
@@ -259,6 +275,37 @@
     font-family:inherit; font-weight:600; font-size:.85rem;
     padding:9px 18px; border-radius:999px; cursor:pointer;
   }
+
+  .name-gate{
+    width:100%; max-width:380px; margin-top:14px;
+    background:var(--card); border:1px solid var(--card-line);
+    border-radius:20px; padding:20px 20px;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    text-align:center;
+  }
+  .name-gate h2{ margin:0; font-size:1.05rem; font-weight:700; }
+  .name-gate p{ margin:0; font-size:.85rem; opacity:.7; line-height:1.5; }
+  .name-gate input{
+    width:100%; background:rgba(244,239,226,0.08); border:1px solid var(--card-line);
+    border-radius:10px; padding:11px 14px; color:var(--cream);
+    font-family:inherit; font-size:.92rem; text-align:center;
+  }
+  .name-gate input::placeholder{ color:rgba(244,239,226,0.4); }
+  .name-gate button{
+    background:var(--gold); color:var(--deep); border:none;
+    font-family:inherit; font-weight:700; font-size:.92rem;
+    padding:11px 28px; border-radius:999px; cursor:pointer;
+  }
+  .name-gate button:active{ transform:scale(.97); }
+
+  .sync-dot{
+    display:inline-block; width:7px; height:7px; border-radius:50%;
+    margin-left:6px; vertical-align:middle;
+    background:var(--correct); opacity:0;
+    transition: opacity .3s ease;
+  }
+  .sync-dot.show{ opacity:1; }
+  .sync-dot.err{ background:var(--wrong); }
 
   .gyro-btn{
     position:fixed; z-index:5;
@@ -282,9 +329,16 @@
     <p>Cada predinho nasceu num dia do calendário — e todo dia tem um signo. Olhe pra fachada e tente adivinhar o dele.</p>
   </header>
 
+  <div id="nameGate" class="name-gate hidden">
+    <h2>Antes de começar</h2>
+    <p>Quer aparecer no placar? Digite um nome ou @ — fica só nesta sessão, o site não guarda mais nada além disso. Prefere jogar sem aparecer? Pode deixar em branco.</p>
+    <input id="nameInput" type="text" maxlength="24" placeholder="Seu nome ou @ (opcional)">
+    <button id="startGameBtn" type="button">Jogar</button>
+  </div>
+
   <div id="statusRow" class="status-row hidden">
     <div class="pill">Sequência <b id="streakLabel">0</b></div>
-    <div class="pill">Recorde <b id="bestLabel">0</b></div>
+    <div class="pill">Recorde <b id="bestLabel">0</b><span class="sync-dot" id="syncDot"></span></div>
     <button id="leaderboardBtn" class="pill pill-btn" type="button">Ver placar</button>
   </div>
 
@@ -294,6 +348,7 @@
     <div class="predinho-glow" aria-hidden="true"></div>
     <div class="predinho-frame" id="predinhoFrame">
       <img id="predinhoImg" alt="">
+      <div class="result-badge" id="resultBadge" aria-hidden="true"></div>
     </div>
   </div>
 
@@ -301,15 +356,32 @@
 
   <div id="hint" class="hint hidden">Toque no signo que você acha que é esse predinho</div>
 
-  <div id="feedback" class="modal-overlay">
-    <div class="modal-backdrop"></div>
-    <div class="modal-card" id="feedbackCard"></div>
-  </div>
+  <div id="roundFooter" class="round-footer"></div>
 
   <div id="leaderboardOverlay" class="modal-overlay">
     <div class="modal-backdrop"></div>
     <div class="modal-card" id="leaderboardCard"></div>
   </div>
+
+  <footer class="site-footer">
+    <p class="footer-credit">Essa brincadeira faz parte do <a href="https://brunolorenz.github.io/unspredinhos/" target="_blank" rel="noopener">Projeto Predinho do Dia</a>, por <a href="https://brunolorenz.com.br" target="_blank" rel="noopener">Bruno Lorenz</a>.</p>
+    <div class="footer-links">
+    <a class="footer-pill" href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+        <circle cx="12" cy="12" r="4"></circle>
+        <circle cx="17.3" cy="6.7" r="0.6" fill="currentColor" stroke="none"></circle>
+      </svg>
+      <span>@unspredinhos</span>
+    </a>
+    <a class="footer-pill cta" href="https://wa.me/5551993115340?text=Ol%C3%A1%20Bruno!%20Vim%20pelo%20Predinho%20do%20Dia%20e%20gostaria%20de%20or%C3%A7ar%20uma%20pintura." target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.11-1.34A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.2 14.3c-.22.62-1.28 1.19-1.78 1.24-.46.05-.9.23-3.02-.63-2.56-1.03-4.2-3.62-4.32-3.79-.13-.17-1.03-1.37-1.03-2.62s.66-1.86.9-2.11c.22-.24.5-.3.66-.3h.48c.16 0 .37-.03.58.44.22.5.75 1.73.82 1.86.07.13.1.28.02.46-.08.17-.13.28-.26.43-.13.15-.27.34-.39.46-.13.13-.26.27-.11.53.15.26.68 1.12 1.46 1.82.99.89 1.83 1.16 2.09 1.29.26.13.41.11.56-.07.15-.17.65-.76.82-1.02.17-.26.34-.22.57-.13.24.09 1.51.71 1.77.84.26.13.43.19.5.3.06.11.06.62-.16 1.24z"></path>
+      </svg>
+      <span>Orçar uma pintura</span>
+    </a>
+    </div>
+  </footer>
 </div>
 
 <script>
@@ -317,8 +389,7 @@
 
   var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQJSnZh8lr-Jkgt4XUC63cu0Ml75_YiWK-Ltty_nlExm6tMUNQXMaI7htEbS1MJnAQbc_6huHlZD0Du/pub?gid=1029790880&single=true&output=csv";
 
-  // Depois de publicar o Apps Script (veja instruções em separado), troque a linha
-  // abaixo pela URL do deployment terminada em /exec.
+  // Apps Script do placar compartilhado (Google Sheets).
   var LEADERBOARD_URL = "https://script.google.com/macros/s/AKfycbzLpQ-dJ2VIl8oLj8ToLOwoyxfoOvVsRJFOjn92UmGXlWjIioEORIy_i1MLnY88_XDb/exec";
 
   var SIGNS = [
@@ -448,7 +519,6 @@
       svg.setAttribute('viewBox', sh.vb.join(' '));
       svg.classList.add('constellation');
       svg.style.top = sh.top; svg.style.left = sh.left; svg.style.width = sh.w;
-      svg.style.animationDelay = (idx*1.3)+'s';
       for (var i=0;i<sh.pts.length-1;i++){
         var line = document.createElementNS(svgns, 'line');
         line.setAttribute('x1', sh.pts[i][0]); line.setAttribute('y1', sh.pts[i][1]);
@@ -458,6 +528,8 @@
       sh.pts.forEach(function(p){
         var c = document.createElementNS(svgns, 'circle');
         c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', 1.1);
+        c.style.animationDuration = (3.5 + Math.random()*4).toFixed(1)+'s';
+        c.style.animationDelay = (Math.random()*6).toFixed(1)+'s';
         svg.appendChild(c);
       });
       constLayer.appendChild(svg);
@@ -525,23 +597,34 @@
   var best = 0;
   var locked = false;
   var leaderboardConfigured = LEADERBOARD_URL.indexOf('COLOQUE_AQUI') === -1;
+  var playerName = '';
+  var sessionId = null;
 
   var els = {
     loading: document.getElementById('loadingMsg'),
+    nameGate: document.getElementById('nameGate'),
+    nameInput: document.getElementById('nameInput'),
+    startGameBtn: document.getElementById('startGameBtn'),
     statusRow: document.getElementById('statusRow'),
     streakLabel: document.getElementById('streakLabel'),
     bestLabel: document.getElementById('bestLabel'),
+    syncDot: document.getElementById('syncDot'),
     leaderboardBtn: document.getElementById('leaderboardBtn'),
     arena: document.getElementById('arena'),
     frame: document.getElementById('predinhoFrame'),
     img: document.getElementById('predinhoImg'),
+    badge: document.getElementById('resultBadge'),
     hint: document.getElementById('hint'),
     options: document.getElementById('options'),
-    feedback: document.getElementById('feedback'),
-    feedbackCard: document.getElementById('feedbackCard'),
+    roundFooter: document.getElementById('roundFooter'),
     leaderboardOverlay: document.getElementById('leaderboardOverlay'),
     leaderboardCard: document.getElementById('leaderboardCard')
   };
+
+  function generateSessionId(){
+    if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+    return 'sid-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+  }
 
   function pickOptionIds(correctId){
     var others = SIGNS.filter(function(s){ return s.id !== correctId; });
@@ -569,11 +652,13 @@
   }
 
   // ---------- placar compartilhado (Google Sheets via Apps Script) ----------
-  function postScore(name, streakValue){
+  // Salva (upsert) o melhor resultado da sessão atual, identificada por
+  // sessionId — não cria uma linha nova a cada acerto, atualiza a mesma.
+  function postScore(name, sid, streakValue){
     return fetch(LEADERBOARD_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ name: name, streak: streakValue })
+      body: JSON.stringify({ sessionId: sid, name: name, streak: streakValue })
     }).then(function(res){
       if (!res.ok) throw new Error('status ' + res.status);
       return res.json();
@@ -638,6 +723,39 @@
 
   els.leaderboardBtn.addEventListener('click', openLeaderboard);
 
+  function flashSync(ok){
+    els.syncDot.classList.remove('err');
+    if (!ok) els.syncDot.classList.add('err');
+    els.syncDot.classList.add('show');
+    setTimeout(function(){ els.syncDot.classList.remove('show'); }, 1400);
+  }
+
+  function syncBest(){
+    if (!playerName || !leaderboardConfigured) return;
+    postScore(playerName, sessionId, best)
+      .then(function(){ flashSync(true); })
+      .catch(function(){ flashSync(false); });
+  }
+
+  function showNameGate(){
+    els.loading.classList.add('hidden');
+    els.nameGate.classList.remove('hidden');
+    els.nameInput.focus();
+  }
+
+  function beginSession(){
+    var name = (els.nameInput.value || '').trim().slice(0, 24);
+    playerName = name;
+    sessionId = name ? generateSessionId() : null;
+    els.nameGate.classList.add('hidden');
+    startGame();
+  }
+
+  els.startGameBtn.addEventListener('click', beginSession);
+  els.nameInput.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') beginSession();
+  });
+
   function startGame(){
     streak = 0; best = 0; locked = false;
     queue = shuffle(deck);
@@ -648,10 +766,11 @@
   }
 
   function showRound(){
-    els.feedback.classList.remove('show');
-    els.feedbackCard.innerHTML = '';
+    els.roundFooter.innerHTML = '';
+    els.hint.classList.remove('hidden');
     els.hint.textContent = 'Toque no signo que você acha que é esse predinho';
-    els.frame.classList.remove('state-correct','state-wrong');
+    els.frame.classList.remove('state-correct','state-wrong','revealed');
+    els.badge.classList.remove('show','correct','wrong');
     locked = false;
 
     current = nextPredinho();
@@ -668,11 +787,13 @@
     locked = true;
     var p = current;
     var isCorrect = signId === p.sign;
-    var endedStreak = streak;
 
     if (isCorrect){
       streak++;
-      if (streak > best) best = streak;
+      if (streak > best){
+        best = streak;
+        syncBest();
+      }
     } else {
       streak = 0;
     }
@@ -684,64 +805,21 @@
       else b.classList.add('dim');
     });
 
-    els.frame.classList.add(isCorrect ? 'state-correct' : 'state-wrong');
-    els.hint.textContent = '';
+    els.frame.classList.add('revealed', isCorrect ? 'state-correct' : 'state-wrong');
+    els.badge.textContent = isCorrect ? '✓' : '✗';
+    els.badge.classList.add('show', isCorrect ? 'correct' : 'wrong');
     els.streakLabel.textContent = streak;
     els.bestLabel.textContent = best;
 
-    var correctSign = SIGN_BY_ID[p.sign];
-    var dateStr = p.dia + ' de ' + MONTHS[p.mes-1];
-    var placeStr = p.rua + ' — ' + p.cidade + (p.uf ? ', ' + p.uf : '');
+    els.hint.classList.add('hidden');
+    els.roundFooter.innerHTML = '';
 
-    var saveBlock = '';
-    if (!isCorrect && endedStreak > 0 && leaderboardConfigured){
-      saveBlock =
-        '<div class="save-streak" id="saveStreak">' +
-          '<div class="detail">Sua sequência foi de <b>' + endedStreak + '</b>. Salvar no placar?</div>' +
-          '<div class="row">' +
-            '<input type="text" id="saveNameInput" maxlength="24" placeholder="Seu nome">' +
-            '<button id="saveStreakBtn" type="button">Salvar</button>' +
-          '</div>' +
-          '<div class="save-msg" id="saveMsg"></div>' +
-        '</div>';
-    }
-
-    els.feedbackCard.innerHTML =
-      '<div class="art"><img src="' + p.img + '" alt="Predinho de ' + dateStr + '"></div>' +
-      '<div class="body">' +
-        '<div class="verdict ' + (isCorrect ? 'ok' : 'no') + '">' +
-          (isCorrect ? 'Acertou!' : 'Não foi dessa vez') +
-        '</div>' +
-        '<div class="detail">Esse predinho é de <b>' + correctSign.symbol + ' ' + correctSign.name + '</b>, ' +
-          'pintado em <b>' + dateStr + '</b>, na <b>' + placeStr + '</b>.</div>' +
-        saveBlock +
-        '<button class="primary" id="nextBtn">Próximo predinho</button>' +
-      '</div>';
-    els.feedback.classList.add('show');
-
-    var saveBtn = document.getElementById('saveStreakBtn');
-    if (saveBtn){
-      saveBtn.addEventListener('click', function(){
-        var nameInput = document.getElementById('saveNameInput');
-        var msg = document.getElementById('saveMsg');
-        var name = (nameInput.value || 'Anônimo').trim().slice(0, 24) || 'Anônimo';
-        saveBtn.disabled = true;
-        nameInput.disabled = true;
-        msg.textContent = 'Salvando…';
-        postScore(name, endedStreak)
-          .then(function(){ msg.textContent = 'Salvo no placar!'; })
-          .catch(function(err){
-            msg.textContent = 'Não consegui salvar (' + (err && err.message ? err.message : 'erro') + ').';
-            saveBtn.disabled = false;
-            nameInput.disabled = false;
-          });
-      });
-    }
-
-    document.getElementById('nextBtn').addEventListener('click', function(){
-      els.feedback.classList.remove('show');
-      showRound();
-    });
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'next-btn';
+    nextBtn.type = 'button';
+    nextBtn.textContent = 'Próximo predinho';
+    nextBtn.addEventListener('click', showRound);
+    els.roundFooter.appendChild(nextBtn);
   }
 
   // ---------- boot ----------
@@ -760,7 +838,7 @@
         throw new Error('A planilha só trouxe ' + deck.length + ' predinhos com imagem — não dá pra montar nem uma rodada.');
       }
       els.loading.classList.add('hidden');
-      startGame();
+      showNameGate();
     })
     .catch(function(err){
       els.loading.classList.add('error');
