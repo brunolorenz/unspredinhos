@@ -97,7 +97,7 @@
   }
   .predinho-glow{
     position:absolute; inset:-7%;
-    border-radius:32px; z-index:0;
+    border-radius:50%; z-index:0;
     background: radial-gradient(circle, rgba(230,194,122,0.55) 0%, rgba(230,194,122,0.26) 42%, rgba(230,194,122,0) 74%);
     filter: blur(10px);
     animation: glow-breathe 5s ease-in-out infinite;
@@ -108,7 +108,7 @@
   }
   .predinho-frame{
     position:absolute; inset:0; z-index:1;
-    border-radius:24px;
+    border-radius:50%;
     overflow:hidden; background:#1a1f45;
     box-shadow: 0 0 0 1px var(--card-line), 0 16px 34px rgba(0,0,0,.55);
     transition: box-shadow .3s ease;
@@ -127,7 +127,7 @@
     font-size:.75rem; color:var(--cream); opacity:.5; text-align:center; padding:10%;
   }
   .result-badge{
-    position:absolute; top:10px; right:10px; z-index:2;
+    position:absolute; top:4%; right:4%; z-index:2;
     width:38px; height:38px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     font-size:1.15rem; font-weight:700;
@@ -337,8 +337,7 @@
   </div>
 
   <div id="statusRow" class="status-row hidden">
-    <div class="pill">Sequência <b id="streakLabel">0</b></div>
-    <div class="pill">Recorde <b id="bestLabel">0</b><span class="sync-dot" id="syncDot"></span></div>
+    <div class="pill">Acertos <b id="scoreLabel">0</b><span class="sync-dot" id="syncDot"></span></div>
     <button id="leaderboardBtn" class="pill pill-btn" type="button">Ver placar</button>
   </div>
 
@@ -348,8 +347,8 @@
     <div class="predinho-glow" aria-hidden="true"></div>
     <div class="predinho-frame" id="predinhoFrame">
       <img id="predinhoImg" alt="">
-      <div class="result-badge" id="resultBadge" aria-hidden="true"></div>
     </div>
+    <div class="result-badge" id="resultBadge" aria-hidden="true"></div>
   </div>
 
   <div id="options" class="options-row"></div>
@@ -593,8 +592,7 @@
   var deck = [];
   var queue = [];
   var current = null;
-  var streak = 0;
-  var best = 0;
+  var score = 0; // total de acertos da sessão — nunca zera com um erro
   var locked = false;
   var leaderboardConfigured = LEADERBOARD_URL.indexOf('COLOQUE_AQUI') === -1;
   var playerName = '';
@@ -606,8 +604,7 @@
     nameInput: document.getElementById('nameInput'),
     startGameBtn: document.getElementById('startGameBtn'),
     statusRow: document.getElementById('statusRow'),
-    streakLabel: document.getElementById('streakLabel'),
-    bestLabel: document.getElementById('bestLabel'),
+    scoreLabel: document.getElementById('scoreLabel'),
     syncDot: document.getElementById('syncDot'),
     leaderboardBtn: document.getElementById('leaderboardBtn'),
     arena: document.getElementById('arena'),
@@ -696,7 +693,7 @@
                 '<span class="name">' + escapeHtml(e.name || 'Anônimo') + '</span>' +
                 '<span class="streak">' + e.streak + '</span></li>';
             }).join('') + '</ol>'
-          : '<div class="detail">Ninguém salvou uma sequência ainda — seja a primeira pessoa.</div>';
+          : '<div class="detail">Ninguém salvou pontos ainda — seja a primeira pessoa.</div>';
         els.leaderboardCard.innerHTML =
           '<div class="body"><h2>Placar</h2>' + list + '<button class="secondary" id="lbCloseBtn">Fechar</button></div>';
         document.getElementById('lbCloseBtn').addEventListener('click', closeLeaderboard);
@@ -732,7 +729,7 @@
 
   function syncBest(){
     if (!playerName || !leaderboardConfigured) return;
-    postScore(playerName, sessionId, best)
+    postScore(playerName, sessionId, score)
       .then(function(){ flashSync(true); })
       .catch(function(){ flashSync(false); });
   }
@@ -757,7 +754,7 @@
   });
 
   function startGame(){
-    streak = 0; best = 0; locked = false;
+    score = 0; locked = false;
     queue = shuffle(deck);
     els.statusRow.classList.remove('hidden');
     els.arena.classList.remove('hidden');
@@ -776,8 +773,7 @@
     current = nextPredinho();
     els.img.src = current.img;
     els.img.alt = 'Predinho de ' + current.dia + ' de ' + MONTHS[current.mes-1];
-    els.streakLabel.textContent = streak;
-    els.bestLabel.textContent = best;
+    els.scoreLabel.textContent = score;
 
     renderOptions(current.sign);
   }
@@ -789,13 +785,8 @@
     var isCorrect = signId === p.sign;
 
     if (isCorrect){
-      streak++;
-      if (streak > best){
-        best = streak;
-        syncBest();
-      }
-    } else {
-      streak = 0;
+      score++;
+      syncBest();
     }
 
     document.querySelectorAll('.option-btn').forEach(function(b){
@@ -808,8 +799,7 @@
     els.frame.classList.add('revealed', isCorrect ? 'state-correct' : 'state-wrong');
     els.badge.textContent = isCorrect ? '✓' : '✗';
     els.badge.classList.add('show', isCorrect ? 'correct' : 'wrong');
-    els.streakLabel.textContent = streak;
-    els.bestLabel.textContent = best;
+    els.scoreLabel.textContent = score;
 
     els.hint.classList.add('hidden');
     els.roundFooter.innerHTML = '';
