@@ -168,7 +168,22 @@
     font-size:1.5rem;
     margin:22px 4px 16px;
     display:flex; align-items:baseline; gap:10px;
+    flex-wrap:wrap;
   }
+  .poster-link{
+    margin-left:auto;
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'Space Mono', monospace;
+    font-size:11px; text-transform:uppercase; letter-spacing:0.03em;
+    color:var(--terracotta);
+    text-decoration:none;
+    border:1px solid var(--terracotta);
+    padding:7px 12px;
+    border-radius:999px;
+    transition:all .15s ease;
+  }
+  .poster-link:hover{ background:var(--terracotta); color:#fff; }
+  .poster-link svg{ width:13px; height:13px; }
   .month-section{
     padding-top:18px;
     border-top:1px dashed var(--line);
@@ -362,6 +377,21 @@
   .maps-link:hover{ background:var(--azulejo); color:#fff; }
   .maps-link svg{ width:14px; height:14px; }
   .maps-link.is-hidden{ display:none; }
+  .buy-link{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:14px; margin-left:8px;
+    font-family:'Space Mono', monospace;
+    font-size:11.5px; text-transform:uppercase; letter-spacing:0.03em;
+    color:#fff;
+    text-decoration:none;
+    background:var(--terracotta);
+    border:1px solid var(--terracotta);
+    padding:8px 12px;
+    border-radius:7px;
+    transition:all .15s ease;
+  }
+  .buy-link:hover{ background:#8A3F22; border-color:#8A3F22; }
+  .buy-link svg{ width:14px; height:14px; }
   .lightbox-close{
     position:fixed; top:22px; right:24px;
     width:38px; height:38px; border-radius:50%;
@@ -384,14 +414,51 @@
     font-family:'Fraunces', serif; font-style:italic; font-weight:600;
     font-size:18px; margin-bottom:8px;
   }
+  .topbar{
+    display:flex; justify-content:center; align-items:center;
+    gap:8px; flex-wrap:wrap;
+    padding:20px 16px 0;
+  }
+  .topbar a{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:'Inter'; font-weight:600; font-size:13px;
+    text-decoration:none;
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.55);
+    color:var(--ink);
+    transition:all .15s ease;
+  }
+  .topbar a:hover{ border-color:var(--ink); }
+  .topbar a svg{ width:16px; height:16px; }
+  .topbar a.cta{
+    background:var(--ink); color:var(--paper); border-color:var(--ink);
+  }
+  .topbar a.cta:hover{ background:#000; }
 </style>
 </head>
 <body>
 
+<div class="topbar">
+  <a href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+    @unspredinhos
+  </a>
+  <a href="https://www.brunolorenz.com.br" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>
+    brunolorenz.com
+  </a>
+  <a class="cta" href="https://wa.me/5551993115340?text=Ol%C3%A1%2C%20gostaria%20de%20or%C3%A7ar%20uma%20pintura" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.8 12.2l-.2.3.6 2.2-2.2-.6-.3.1A8 8 0 1 1 12 4Zm-3 3.9c-.2 0-.5 0-.7.3-.3.3-1 1-1 2.3s1 2.7 1.1 2.9c.1.1 2 3.1 4.8 4.2 2.4.9 2.8.7 3.3.7.5 0 1.6-.6 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.6-.4-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2.1-1.3-.8-.7-1.3-1.6-1.5-1.8-.1-.3 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.2 0-.3 0-.4-.1-.1-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5Z"/></svg>
+    Orçar uma pintura
+  </a>
+</div>
+
 <header class="hero">
   <span class="eyebrow">um prédio por dia</span>
   <h1>Predinho do Dia</h1>
-  <p class="lede">A cada dia do ano, uma aquarela de um prédio numa rua batizada com aquela data. Esta é a folhinha completa — clique num dia para virar a página e ver onde ele fica.</p>
+  <p class="lede">A cada dia do ano, uma aquarela de um prédio numa rua batizada com aquela data. Clique numa foto para ver onde ela fica.</p>
 </header>
 
 <div class="controls">
@@ -431,6 +498,10 @@
       <a class="maps-link" id="lightboxMapLink" href="#" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
         Ver no mapa
+      </a>
+      <a class="buy-link" href="https://www.brunolorenz.com.br/product-page/predinho-do-dia-reprodu%C3%A7%C3%A3o-individual" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Comprar reprodução
       </a>
     </div>
   </div>
@@ -627,7 +698,12 @@
 
     return (
       '<section class="month-section" id="mes-'+m+'">' +
-        '<h2 class="month-title">'+MESES[m]+' <small>'+items.length+' de '+total+' dias</small></h2>' +
+        '<h2 class="month-title">'+MESES[m]+' <small>'+items.length+' de '+total+' dias</small>' +
+          '<a class="poster-link" href="https://www.brunolorenz.com.br/product-page/p%C3%B4ster-do-m%C3%AAs-predinho-do-dia" target="_blank" rel="noopener">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l5-5 4 4 5-6 4 5"/></svg>' +
+            'Comprar pôster do mês' +
+          '</a>' +
+        '</h2>' +
         '<div class="weekday-row">' + DIAS_SEMANA.map(w => '<span>'+w+'</span>').join('') + '</div>' +
         '<div class="calendar">' + cells + '</div>' +
       '</section>'
