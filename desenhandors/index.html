@@ -1,522 +1,331 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Desenhando o RS · @unspredinhos</title>
-  <meta name="description" content="Um predinho para cada um dos 497 municípios do Rio Grande do Sul. Por Bruno Lorenz · @unspredinhos.">
-  <meta property="og:title" content="Desenhando o RS · @unspredinhos">
-  <meta property="og:description" content="Um predinho para cada um dos 497 municípios do Rio Grande do Sul.">
-  <meta property="og:type" content="website">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desenhando o RS · @unspredinhos</title>
+<meta name="description" content="Um predinho para cada um dos 497 municípios do Rio Grande do Sul. Por Bruno Lorenz · @unspredinhos.">
+<meta property="og:title" content="Desenhando o RS · @unspredinhos">
+<meta property="og:description" content="Um predinho para cada um dos 497 municípios do Rio Grande do Sul.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+  /* ═════════ Uns Predinhos · sistema visual compartilhado (igual em todas as páginas) ═════════ */
+  :root{
+    --fundo:#F8F6F0;
+    --papel:#FFFFFF;
+    --tinta:#111111;
+    --azul:#3B82F6;
+    --sol:#FFD93B;
+    --mudo:#52525B;
+    --tom:#EFE9D6;
+    --coral:#FF7A59;
+    --menta:#34D399;
+    --lilas:#A78BFA;
+    --wrap:1100px;
+    --nav-h:64px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;scroll-padding-top:5rem}
+  body{
+    background-color:var(--fundo);
+    color:var(--tinta);
+    font-family:'DM Sans', system-ui, sans-serif;
+    font-weight:400;
+    line-height:1.5;
+    overflow-x:hidden;
+    padding-top:var(--nav-h);
+  }
+  body::before{
+    content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.07;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  ::selection{background:var(--sol);color:var(--tinta)}
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible{outline:3px solid var(--azul);outline-offset:3px}
 
-    :root {
-      --orange:      #E85D30;
-      --orange-d:    #C44020;
-      --orange-pale: #FDF0EB;
-      --ink:         #1a1714;
-      --muted:       #6b6760;
-      --border:      rgba(26,23,20,.12);
-      --bg:          #faf8f5;
-      --card:        #ffffff;
-      --serif:       'Instrument Serif', Georgia, serif;
-      --sans:        'DM Sans', system-ui, sans-serif;
-    }
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(1.25rem,4vw,2rem)}
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --ink:         #ece8e2;
-        --muted:       #9c9891;
-        --border:      rgba(236,232,226,.12);
-        --bg:          #181614;
-        --card:        #222019;
-        --orange-pale: #2a1a12;
-      }
-    }
+  .sticker{
+    display:inline-block; padding:6px 14px; background:var(--sol);
+    border:2px solid var(--tinta); border-radius:999px; font-weight:600;
+    font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;
+    box-shadow:0 2px 0 var(--tinta);
+  }
 
-    html { scroll-behavior: smooth; }
+  /* Nav */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:100; height:var(--nav-h);
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:0 clamp(1.25rem,4vw,2rem);
+    background:rgba(248,246,240,.95); backdrop-filter:blur(8px);
+    border-bottom:2.5px solid var(--tinta);
+  }
+  .nav__mark{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.2rem; color:var(--tinta); text-decoration:none}
+  .nav__links{display:none; gap:1.5rem}
+  @media (min-width:768px){ .nav__links{display:flex} }
+  .nav__links a{font-family:'Bricolage Grotesque',sans-serif; font-weight:600; font-size:.9rem; color:var(--tinta); text-decoration:none; transition:color .2s}
+  .nav__links a:hover{color:var(--azul)}
+  .nav__cta{
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.9rem;
+    color:#fff; text-decoration:none; background:var(--azul);
+    border:2px solid var(--tinta); border-radius:100px; padding:.5rem 1.2rem;
+    box-shadow:0 3px 0 var(--tinta); transition:all .1s; white-space:nowrap;
+  }
+  .nav__cta:hover{transform:translateY(2px); box-shadow:0 1px 0 var(--tinta)}
 
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--ink);
-      min-height: 100vh;
-      line-height: 1.6;
-    }
+  /* Cabeçalho de página */
+  .page-hero{padding-top:clamp(2.2rem,5vw,3.5rem); padding-bottom:1.5rem}
+  h1{
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800;
+    font-size:clamp(2rem,4.4vw,3.2rem); line-height:1.12; letter-spacing:-.02em; margin:1rem 0 .9rem;
+  }
+  h1 span{white-space:nowrap; background:var(--sol); padding:0 .2em; border-radius:8px; display:inline-block; transform:rotate(-1deg); border:2px solid var(--tinta)}
+  .lead{font-size:1.15rem; line-height:1.5; max-width:52ch; color:var(--tinta)}
+  .lead--mudo{color:var(--mudo); font-size:1.05rem}
+  h2{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:clamp(1.6rem,3.2vw,2.3rem); line-height:1.1; margin:.9rem 0 1.2rem}
+  h2 em{font-style:normal; background:var(--sol); padding:0 .2em; border-radius:8px; border:2px solid var(--tinta)}
 
-    /* HEADER */
-    header {
-      padding: 48px 24px 28px;
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      opacity: 0;
-      animation: fadeUp .6s .05s forwards;
-    }
-    .brand {
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--orange);
-    }
-    h1 {
-      font-family: var(--serif);
-      font-size: clamp(32px, 6vw, 52px);
-      font-weight: 400;
-      line-height: 1.1;
-      color: var(--ink);
-    }
-    h1 em { font-style: italic; color: var(--orange); }
-    .tagline {
-      font-size: 15px;
-      color: var(--muted);
-      margin-top: 4px;
-      font-weight: 300;
-    }
+  /* Cards e botões */
+  .card{background:var(--papel); border:2.5px solid var(--tinta); border-radius:20px; box-shadow:0 5px 0 var(--tinta)}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:space-between; gap:.8rem;
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.05rem;
+    color:#fff; background:var(--azul); text-decoration:none;
+    padding:.7rem .7rem .7rem 1.4rem; border-radius:99px; border:2.5px solid var(--tinta);
+    box-shadow:0 6px 0 var(--tinta); transition:all .15s ease; cursor:pointer;
+  }
+  .btn svg{width:36px; height:36px; padding:7px; background:var(--tinta); border-radius:50%; transition:transform .2s; flex:none}
+  .btn:hover{transform:translateY(3px); box-shadow:0 3px 0 var(--tinta)}
+  .btn:hover svg{transform:translateX(4px)}
+  .btn:active{transform:translateY(6px); box-shadow:0 0 0 var(--tinta)}
+  .btn:disabled{opacity:.5; cursor:default; transform:none; box-shadow:0 6px 0 var(--tinta)}
+  .btn--escuro{background:var(--tinta); box-shadow:0 6px 0 var(--azul)}
+  .btn--escuro svg{background:var(--sol)}
+  .btn--escuro svg path{stroke:var(--tinta)}
+  .btn--sm{
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.85rem; line-height:1.1;
+    color:#fff; background:var(--azul); text-decoration:none;
+    padding:.6rem 1rem; border:2.5px solid var(--tinta); border-radius:99px;
+    box-shadow:0 4px 0 var(--tinta); transition:all .12s; cursor:pointer;
+  }
+  .btn--sm:hover{transform:translateY(2px); box-shadow:0 2px 0 var(--tinta)}
+  .btn--sm svg{width:15px; height:15px; flex:none}
+  .btn--claro{background:#fff; color:var(--tinta)}
+  .btn--sol{background:var(--sol); color:var(--tinta)}
 
-    /* STATS */
-    .stats {
-      display: flex;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 24px;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeUp .6s .15s forwards;
-    }
-    .stat {
-      flex: 1;
-      min-width: 100px;
-      padding: 14px 16px 14px 0;
-      border-top: 2px solid var(--border);
-    }
-    .stat:first-child { border-top-color: var(--orange); }
-    .stat-num {
-      font-family: var(--serif);
-      font-size: 34px;
-      line-height: 1;
-      color: var(--ink);
-    }
-    .stat-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 3px;
-      letter-spacing: .03em;
-    }
+  /* Chips (filtros, meses) */
+  .chip{
+    flex:0 0 auto; font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.85rem;
+    padding:.45rem 1rem; border:2px solid var(--tinta); border-radius:99px; background:#fff; color:var(--tinta);
+    box-shadow:0 3px 0 var(--tinta); cursor:pointer; transition:all .12s; white-space:nowrap;
+  }
+  .chip:hover{transform:translateY(1px); box-shadow:0 2px 0 var(--tinta)}
+  .chip.active{background:var(--sol)}
 
-    /* PROGRESS */
-    .progress-wrap {
-      max-width: 900px;
-      margin: 18px auto 0;
-      padding: 0 24px;
-      opacity: 0;
-      animation: fadeUp .6s .2s forwards;
-    }
-    .progress-track {
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--orange);
-      border-radius: 2px;
-      width: 0;
-      transition: width 1.2s cubic-bezier(.16,1,.3,1);
-    }
-    .progress-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 5px;
-      display: flex;
-      justify-content: space-between;
-    }
+  /* Campo de busca */
+  .busca{position:relative}
+  .busca input{
+    width:100%; font:inherit; font-size:1rem; color:var(--tinta);
+    padding:.7rem 1rem .7rem 2.7rem; background:#fff;
+    border:2.5px solid var(--tinta); border-radius:14px; box-shadow:0 4px 0 var(--tinta); outline:none;
+  }
+  .busca input::placeholder{color:var(--mudo)}
+  .busca input:focus{outline:3px solid var(--azul); outline-offset:2px}
+  .busca svg{position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; pointer-events:none; color:var(--tinta)}
 
-    /* SEARCH */
-    .search-wrap {
-      max-width: 900px;
-      margin: 20px auto 0;
-      padding: 0 24px;
-    }
-    .search-inner { position: relative; }
-    .search-input {
-      width: 100%;
-      padding: 10px 16px 10px 40px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font-family: var(--sans);
-      font-size: 14px;
-      background: var(--card);
-      color: var(--ink);
-      outline: none;
-      transition: border-color .15s;
-    }
-    .search-input:focus { border-color: var(--orange); }
-    .search-input::placeholder { color: var(--muted); }
-    .search-icon {
-      position: absolute;
-      left: 13px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      color: var(--muted);
-      width: 15px; height: 15px;
-    }
-    /* dropdown — appendado no body via JS, posição fixed */
-    #search-results {
-      display: none;
-      position: fixed;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow-y: auto;
-      z-index: 9999;
-      box-shadow: 0 8px 28px rgba(0,0,0,.18);
-      max-height: 260px;
-    }
-    .sr-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      font-size: 13px;
-      cursor: pointer;
-      border-bottom: 1px solid var(--border);
-      transition: background .1s;
-      gap: 8px;
-    }
-    .sr-item:last-child { border-bottom: none; }
-    .sr-item:hover { background: var(--orange-pale); }
-    .sr-name { font-weight: 500; color: var(--ink); flex: 1; }
-    .sr-badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    .sr-badge.done { background: var(--orange-pale); color: var(--orange-d); }
-    .sr-badge.todo { background: rgba(26,23,20,.06); color: var(--muted); }
+  /* Estados de carregamento */
+  .spin{width:26px; height:26px; margin:0 auto 14px; border:3px solid rgba(17,17,17,.15); border-top-color:var(--tinta); border-radius:50%; animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* MAP SECTION */
-    .map-section {
-      max-width: 900px;
-      margin: 20px auto 0;
-      padding: 0 24px;
-      opacity: 0;
-      animation: fadeUp .6s .3s forwards;
-    }
-    .map-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      position: relative;
-    }
-    #map-svg-wrap {
-      width: 100%;
-      position: relative;
-    }
-    #map-svg-wrap svg {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+  /* Rodapé */
+  .rodape{text-align:center; padding:2rem 0 2.5rem; font-weight:600; border-top:2.5px solid var(--tinta); margin-top:3rem}
+  .rodape p{font-size:.95rem}
+  .rodape a{color:var(--tinta); text-underline-offset:3px}
+  .rodape__links{display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem}
 
-    /* municípios */
-    .mun-path {
-      fill: #e8e5e0;
-      stroke: #fff;
-      stroke-width: .4;
-      cursor: default;
-      transition: fill .1s;
-    }
-    @media (prefers-color-scheme: dark) {
-      .mun-path { fill: #2e2b27; stroke: #181614; }
-    }
-    .mun-path:not(.mun-done):hover { fill: #d8d4ce; }
-    @media (prefers-color-scheme: dark) {
-      .mun-path:not(.mun-done):hover { fill: #3a3733; }
-    }
-    .mun-done {
-      fill: var(--orange);
-      stroke: #fff;
-      stroke-width: .4;
-      cursor: pointer;
-    }
-    .mun-done:hover { fill: var(--orange-d); }
-    .mun-highlight {
-      stroke: var(--orange-d) !important;
-      stroke-width: 1.5 !important;
-    }
-    .mun-path.mun-highlight:not(.mun-done) { fill: #f5c3b2 !important; }
-    .mun-done.mun-highlight               { fill: var(--orange-d) !important; }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important}
+  }
 
-    /* loading */
-    #map-loading {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      color: var(--muted);
-      background: var(--card);
-      gap: 8px;
-    }
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid var(--border);
-      border-top-color: var(--orange);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* tooltip hover */
-    #tooltip {
-      position: fixed;
-      pointer-events: none;
-      display: none;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 11px;
-      font-size: 13px;
-      color: var(--ink);
-      z-index: 90;
-      box-shadow: 0 4px 14px rgba(0,0,0,.1);
-      white-space: nowrap;
-    }
-    #tooltip .tt-city { font-weight: 500; }
-    #tooltip .tt-hint { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  /* ───────── Desenhando o RS ───────── */
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-top:1.8rem}
+  .stat{padding:1rem 1.1rem 1.1rem}
+  .stat:first-child{background:var(--sol)}
+  .stat-num{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:clamp(1.8rem,3.6vw,2.6rem); line-height:1}
+  .stat-label{font-size:.85rem; font-weight:600; color:var(--mudo); margin-top:.35rem}
+  .stat:first-child .stat-label{color:var(--tinta)}
+  @media (max-width:700px){ .stats{grid-template-columns:repeat(2,1fr)} }
 
-    /* MODAL sobre o mapa */
-    #modal-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: rgba(26,23,20,.6);
-      z-index: 80;
-      align-items: center;
-      justify-content: center;
-      border-radius: 16px;
-      padding: 16px;
-    }
-    #modal-overlay.open { display: flex; }
-    #modal {
-      background: var(--card);
-      border-radius: 14px;
-      width: 100%;
-      max-width: 640px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,.3);
-      animation: popIn .22s cubic-bezier(.16,1,.3,1);
-      position: relative;
-    }
-    @keyframes popIn {
-      from { transform: scale(.93); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
-    }
-    #modal-img-wrap {
-      width: 100%;
-      background: var(--orange-pale);
-      position: relative;
-      overflow: hidden;
-      /* altura dinâmica — cresce com a imagem, mínimo razoável */
-      min-height: 200px;
-      max-height: 75vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #modal-img {
-      width: 100%;
-      height: auto;
-      max-height: 75vh;
-      object-fit: contain;
-      display: none;
-      background: var(--orange-pale);
-    }
-    #modal-img-ph {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    #modal-body { padding: 16px 18px 20px; }
-    #modal-city {
-      font-family: var(--serif);
-      font-size: 22px;
-      font-weight: 400;
-      line-height: 1.2;
-      color: var(--ink);
-    }
-    #modal-num { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    #modal-close {
-      position: absolute;
-      top: 10px; right: 10px;
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: rgba(0,0,0,.38);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 14px;
-      z-index: 2;
-      line-height: 1;
-    }
-    #modal-close:hover { background: rgba(0,0,0,.58); }
+  .progress-wrap{margin-top:1.4rem}
+  .progress-track{height:20px; background:#fff; border:2.5px solid var(--tinta); border-radius:99px; overflow:hidden}
+  .progress-fill{height:100%; width:0; background:var(--azul); transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+  .progress-label{font-size:.85rem; font-weight:600; color:var(--mudo); margin-top:.45rem; display:flex; justify-content:space-between}
 
-    /* legend */
-    .legend {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      padding: 10px 16px;
-      border-top: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
-    .leg-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .leg-sq {
-      width: 12px; height: 12px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
+  .search-wrap{margin-top:1.8rem}
+  /* dropdown — appendado no body via JS, posição fixed */
+  #search-results{
+    display:none; position:fixed; background:#fff;
+    border:2.5px solid var(--tinta); border-radius:14px; overflow-y:auto; z-index:9999;
+    box-shadow:0 6px 0 var(--tinta); max-height:280px;
+  }
+  .sr-item{display:flex; align-items:center; justify-content:space-between; padding:.65rem .9rem; font-size:.95rem; cursor:pointer; border-bottom:1.5px solid var(--tinta); gap:.5rem}
+  .sr-item:last-child{border-bottom:none}
+  .sr-item:hover{background:var(--tom)}
+  .sr-name{font-weight:600; flex:1}
+  .sr-badge{font-size:.72rem; padding:2px 9px; border-radius:99px; font-weight:700; white-space:nowrap; border:1.5px solid var(--tinta); text-transform:uppercase; letter-spacing:.04em}
+  .sr-badge.done{background:var(--sol)}
+  .sr-badge.todo{background:#fff; color:var(--mudo)}
 
-    /* FOOTER */
-    footer {
-      max-width: 900px;
-      margin: 36px auto 48px;
-      padding: 24px 24px 0;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      opacity: 0;
-      animation: fadeUp .6s .4s forwards;
-    }
-    footer p { font-size: 12px; color: var(--muted); }
-    footer a { color: var(--orange); text-decoration: none; font-weight: 500; }
-    footer a:hover { text-decoration: underline; }
+  .map-section{margin-top:1.8rem}
+  .map-card{position:relative; overflow:hidden}
+  #map-svg-wrap{width:100%; position:relative; padding:.5rem}
+  #map-svg-wrap svg{width:100%; height:auto; display:block}
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+  /* municípios */
+  .mun-path{fill:#E4DFCF; stroke:var(--fundo); stroke-width:.4; cursor:default; transition:fill .1s}
+  .mun-path:not(.mun-done):hover{fill:#D3CDB7}
+  .mun-done{fill:var(--azul); stroke:#fff; stroke-width:.4; cursor:pointer}
+  .mun-done:hover{fill:#1D4ED8}
+  .mun-highlight{stroke:var(--tinta) !important; stroke-width:1.6 !important}
+  .mun-path.mun-highlight:not(.mun-done){fill:var(--sol) !important}
+  .mun-done.mun-highlight{fill:#1D4ED8 !important}
 
-    @media (max-width: 600px) {
-      .stat { min-width: 80px; }
-      .stat-num { font-size: 26px; }
-    }
-  </style>
+  #map-loading{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:600; color:var(--mudo); background:#fff; z-index:2}
+
+  #tooltip{
+    position:fixed; pointer-events:none; display:none; background:#fff;
+    border:2px solid var(--tinta); border-radius:10px; padding:.45rem .75rem;
+    font-size:.9rem; z-index:90; box-shadow:2px 3px 0 var(--tinta); white-space:nowrap;
+  }
+  #tooltip .tt-city{font-family:'Bricolage Grotesque',sans-serif; font-weight:800}
+  #tooltip .tt-hint{font-size:.78rem; color:var(--mudo)}
+
+  /* Modal sobre o mapa */
+  #modal-overlay{display:none; position:absolute; inset:0; background:rgba(17,17,17,.6); z-index:80; align-items:center; justify-content:center; padding:1rem}
+  #modal-overlay.open{display:flex}
+  #modal{
+    background:#fff; border:2.5px solid var(--tinta); border-radius:18px; box-shadow:0 6px 0 var(--tinta);
+    width:100%; max-width:560px; max-height:100%; overflow:auto; position:relative;
+    animation:popIn .22s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes popIn{from{transform:scale(.93); opacity:0} to{transform:scale(1); opacity:1}}
+  #modal-img-wrap{width:100%; background:var(--tom); position:relative; overflow:hidden; min-height:200px; max-height:70vh; display:flex; align-items:center; justify-content:center; border-bottom:2.5px solid var(--tinta)}
+  #modal-img{width:100%; height:auto; max-height:70vh; object-fit:contain; display:none; background:var(--tom)}
+  #modal-img-ph{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.9rem; color:var(--mudo)}
+  #modal-body{padding:1rem 1.2rem 1.3rem}
+  #modal-city{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.5rem; line-height:1.15}
+  #modal-num{display:inline-block; margin-top:.4rem; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; background:var(--sol); border:2px solid var(--tinta); border-radius:99px; padding:2px 10px}
+  #modal-num:empty{display:none}
+  #modal-close{
+    position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%;
+    background:var(--sol); border:2px solid var(--tinta); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    color:var(--tinta); font-size:1rem; font-weight:700; z-index:2; line-height:1; box-shadow:0 2px 0 var(--tinta);
+  }
+  #modal-close:hover{transform:translateY(1px); box-shadow:0 1px 0 var(--tinta)}
+
+  .legend{display:flex; gap:1.4rem; align-items:center; padding:.8rem 1.1rem; border-top:2.5px solid var(--tinta); flex-wrap:wrap; background:var(--tom)}
+  .leg-item{display:flex; align-items:center; gap:.5rem; font-size:.9rem; font-weight:500}
+  .leg-sq{width:16px; height:16px; border-radius:4px; border:2px solid var(--tinta); flex:none}
+</style>
 </head>
 <body>
 
-<header>
-  <div class="brand">@unspredinhos · Projeto 2026</div>
-  <h1>Desenhando <em>o RS</em></h1>
-  <p class="tagline">Um predinho em aquarela para cada um dos 497 municípios do Rio Grande do Sul.</p>
+<header class="nav">
+  <a href="https://instagram.com/unspredinhos" class="nav__mark" target="_blank" rel="noopener">Uns Predinhos</a>
+  <nav class="nav__links" aria-label="Links do projeto">
+    <a href="https://brunolorenz.github.io/unspredinhos/galeria/">Galeria</a>
+    <a href="https://www.brunolorenz.com.br" target="_blank" rel="noopener">Loja</a>
+    <a href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">Instagram</a>
+  </nav>
+  <a class="nav__cta" href="https://wa.me/5551993115340?text=Ol%C3%A1%2C%20gostaria%20de%20or%C3%A7ar%20uma%20pintura" target="_blank" rel="noopener">Orçar uma pintura</a>
 </header>
 
-<div class="stats">
-  <div class="stat">
-    <div class="stat-num" id="s-done">—</div>
-    <div class="stat-label">desenhados</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num" id="s-left">—</div>
-    <div class="stat-label">faltando</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num" id="s-pct">—</div>
-    <div class="stat-label">concluído</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">497</div>
-    <div class="stat-label">municípios no RS</div>
-  </div>
-</div>
+<main class="page-hero wrap">
+  <span class="sticker">Projeto 2026 · @unspredinhos</span>
+  <h1>Desenhando <span>o RS</span></h1>
+  <p class="lead">Um predinho em aquarela para cada um dos 497 municípios do Rio Grande do Sul.</p>
 
-<div class="progress-wrap">
-  <div class="progress-track">
-    <div class="progress-fill" id="prog-fill"></div>
+  <div class="stats">
+    <div class="card stat">
+      <div class="stat-num" id="s-done">—</div>
+      <div class="stat-label">desenhados</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-num" id="s-left">—</div>
+      <div class="stat-label">faltando</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-num" id="s-pct">—</div>
+      <div class="stat-label">concluído</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-num">497</div>
+      <div class="stat-label">municípios no RS</div>
+    </div>
   </div>
-  <div class="progress-label">
-    <span id="prog-label">carregando…</span>
-    <span>497</span>
+
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill"></div>
+    </div>
+    <div class="progress-label">
+      <span id="prog-label">carregando…</span>
+      <span>497</span>
+    </div>
   </div>
-</div>
 
-<div class="search-wrap">
-  <div class="search-inner">
-    <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-      <circle cx="6.5" cy="6.5" r="4.5"/>
-      <line x1="10.2" y1="10.2" x2="14" y2="14"/>
-    </svg>
-    <input id="search-input" class="search-input" type="text"
-      placeholder="Buscar município…" autocomplete="off" spellcheck="false">
+  <div class="search-wrap">
+    <div class="busca">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <circle cx="6.5" cy="6.5" r="4.5"/>
+        <line x1="10.2" y1="10.2" x2="14" y2="14"/>
+      </svg>
+      <input id="search-input" type="text" placeholder="Buscar município…" autocomplete="off" spellcheck="false" aria-label="Buscar município">
+    </div>
   </div>
-</div>
 
-<div class="map-section">
-  <div class="map-card">
+  <div class="map-section">
+    <div class="card map-card">
 
-    <div id="modal-overlay">
-      <div id="modal">
-        <div id="modal-img-wrap">
-          <button id="modal-close" aria-label="Fechar">✕</button>
-          <img id="modal-img" src="" alt="">
-          <div id="modal-img-ph">sem imagem</div>
+      <div id="modal-overlay">
+        <div id="modal">
+          <div id="modal-img-wrap">
+            <button id="modal-close" aria-label="Fechar">✕</button>
+            <img id="modal-img" src="" alt="">
+            <div id="modal-img-ph">sem imagem</div>
+          </div>
+          <div id="modal-body">
+            <div id="modal-city"></div>
+            <div id="modal-num"></div>
+          </div>
         </div>
-        <div id="modal-body">
-          <div id="modal-city"></div>
-          <div id="modal-num"></div>
+      </div>
+
+      <div id="map-svg-wrap">
+        <div id="map-loading"><div class="spin"></div> Carregando mapa…</div>
+      </div>
+
+      <div class="legend">
+        <div class="leg-item">
+          <div class="leg-sq" style="background:var(--azul)"></div>
+          <span>Predinho feito — clique para ver</span>
+        </div>
+        <div class="leg-item">
+          <div class="leg-sq" style="background:#E4DFCF"></div>
+          <span>Ainda por desenhar</span>
         </div>
       </div>
     </div>
-
-    <div id="map-svg-wrap">
-      <div id="map-loading"><div class="spinner"></div> Carregando mapa…</div>
-    </div>
-
-    <div class="legend">
-      <div class="leg-item">
-        <div class="leg-sq" style="background:var(--orange)"></div>
-        <span>Predinho feito — clique para ver</span>
-      </div>
-      <div class="leg-item">
-        <div class="leg-sq" style="background:#e8e5e0;border:1px solid #ccc"></div>
-        <span>Ainda por desenhar</span>
-      </div>
-    </div>
   </div>
-</div>
+</main>
 
-<footer>
-  <p>Aquarelas e desenhos: <a href="https://instagram.com/unspredinhos" target="_blank">Bruno Lorenz · @unspredinhos</a> · 2026</p>
-  <p><a href="https://wa.me/5551993115340" target="_blank">Encomendar um predinho</a></p>
+<footer class="rodape wrap">
+  <p>Aquarelas e desenhos: <a href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">Bruno Lorenz · @unspredinhos</a> · 2026</p>
+  <p style="margin-top:.4rem"><a href="https://wa.me/5551993115340" target="_blank" rel="noopener">Encomendar um predinho →</a></p>
 </footer>
 
 <div id="search-results"></div>
@@ -662,7 +471,7 @@
   function highlightByName(geoName) {
     clearHighlight();
     const el = wrap.querySelector(`path[data-geoname="${CSS.escape(geoName)}"]`);
-    if (el) { el.classList.add('mun-highlight'); hlPath = el; }
+    if (el) { el.parentNode.appendChild(el); el.classList.add('mun-highlight'); hlPath = el; }
   }
 
   /* desenha municípios — coloridos por match de nome */
@@ -723,7 +532,7 @@
       .slice(0, 12);
 
     if (!matches.length) {
-      searchResults.innerHTML = '<div class="sr-item"><span class="sr-name" style="color:var(--muted)">Nenhum município encontrado</span></div>';
+      searchResults.innerHTML = '<div class="sr-item"><span class="sr-name" style="color:var(--mudo)">Nenhum município encontrado</span></div>';
     } else {
       searchResults.innerHTML = matches.map(name => {
         const isDone = entryMap.has(norm(name));

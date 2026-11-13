@@ -3,131 +3,245 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wallpaper Predinho do Dia</title>
+<title>Wallpaper Predinho do Dia · Uns Predinhos</title>
+<meta name="description" content="Escolha o dia do seu aniversário e baixe o predinho daquele dia como papel de parede do celular.">
+<meta property="og:title" content="Wallpaper Predinho do Dia">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #fff6f0;
-    --ink: #2b241f;
-    --accent: #c96f4a;
-    --card: #ffffff;
+  /* ═════════ Uns Predinhos · sistema visual compartilhado (igual em todas as páginas) ═════════ */
+  :root{
+    --fundo:#F8F6F0;
+    --papel:#FFFFFF;
+    --tinta:#111111;
+    --azul:#3B82F6;
+    --sol:#FFD93B;
+    --mudo:#52525B;
+    --tom:#EFE9D6;
+    --coral:#FF7A59;
+    --menta:#34D399;
+    --lilas:#A78BFA;
+    --wrap:1100px;
+    --nav-h:64px;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex;
-    justify-content: center;
-    padding: 24px 16px 48px;
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;scroll-padding-top:5rem}
+  body{
+    background-color:var(--fundo);
+    color:var(--tinta);
+    font-family:'DM Sans', system-ui, sans-serif;
+    font-weight:400;
+    line-height:1.5;
+    overflow-x:hidden;
+    padding-top:var(--nav-h);
   }
-  .wrap { width: 100%; max-width: 420px; }
-  h1 {
-    font-size: 1.4rem;
-    margin: 0 0 4px;
+  body::before{
+    content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.07;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  p.sub {
-    margin: 0 0 24px;
-    opacity: 0.7;
-    font-size: 0.92rem;
+  ::selection{background:var(--sol);color:var(--tinta)}
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible{outline:3px solid var(--azul);outline-offset:3px}
+
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(1.25rem,4vw,2rem)}
+
+  .sticker{
+    display:inline-block; padding:6px 14px; background:var(--sol);
+    border:2px solid var(--tinta); border-radius:999px; font-weight:600;
+    font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;
+    box-shadow:0 2px 0 var(--tinta);
   }
-  .card {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    margin-bottom: 20px;
+
+  /* Nav */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:100; height:var(--nav-h);
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:0 clamp(1.25rem,4vw,2rem);
+    background:rgba(248,246,240,.95); backdrop-filter:blur(8px);
+    border-bottom:2.5px solid var(--tinta);
   }
-  label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-    margin-top: 14px;
+  .nav__mark{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.2rem; color:var(--tinta); text-decoration:none}
+  .nav__links{display:none; gap:1.5rem}
+  @media (min-width:768px){ .nav__links{display:flex} }
+  .nav__links a{font-family:'Bricolage Grotesque',sans-serif; font-weight:600; font-size:.9rem; color:var(--tinta); text-decoration:none; transition:color .2s}
+  .nav__links a:hover{color:var(--azul)}
+  .nav__cta{
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.9rem;
+    color:#fff; text-decoration:none; background:var(--azul);
+    border:2px solid var(--tinta); border-radius:100px; padding:.5rem 1.2rem;
+    box-shadow:0 3px 0 var(--tinta); transition:all .1s; white-space:nowrap;
   }
-  label:first-child { margin-top: 0; }
-  select {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid #e4d9d0;
-    background: #fffaf6;
-    font-size: 1rem;
-    color: var(--ink);
+  .nav__cta:hover{transform:translateY(2px); box-shadow:0 1px 0 var(--tinta)}
+
+  /* Cabeçalho de página */
+  .page-hero{padding-top:clamp(2.2rem,5vw,3.5rem); padding-bottom:1.5rem}
+  h1{
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800;
+    font-size:clamp(2rem,4.4vw,3.2rem); line-height:1.12; letter-spacing:-.02em; margin:1rem 0 .9rem;
   }
-  .row { display: flex; gap: 10px; }
-  .row > div { flex: 1; }
-  button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
+  h1 span{white-space:nowrap; background:var(--sol); padding:0 .2em; border-radius:8px; display:inline-block; transform:rotate(-1deg); border:2px solid var(--tinta)}
+  .lead{font-size:1.15rem; line-height:1.5; max-width:52ch; color:var(--tinta)}
+  .lead--mudo{color:var(--mudo); font-size:1.05rem}
+  h2{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:clamp(1.6rem,3.2vw,2.3rem); line-height:1.1; margin:.9rem 0 1.2rem}
+  h2 em{font-style:normal; background:var(--sol); padding:0 .2em; border-radius:8px; border:2px solid var(--tinta)}
+
+  /* Cards e botões */
+  .card{background:var(--papel); border:2.5px solid var(--tinta); border-radius:20px; box-shadow:0 5px 0 var(--tinta)}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:space-between; gap:.8rem;
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.05rem;
+    color:#fff; background:var(--azul); text-decoration:none;
+    padding:.7rem .7rem .7rem 1.4rem; border-radius:99px; border:2.5px solid var(--tinta);
+    box-shadow:0 6px 0 var(--tinta); transition:all .15s ease; cursor:pointer;
   }
-  button:disabled { opacity: 0.5; cursor: default; }
-  button.secondary {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
+  .btn svg{width:36px; height:36px; padding:7px; background:var(--tinta); border-radius:50%; transition:transform .2s; flex:none}
+  .btn:hover{transform:translateY(3px); box-shadow:0 3px 0 var(--tinta)}
+  .btn:hover svg{transform:translateX(4px)}
+  .btn:active{transform:translateY(6px); box-shadow:0 0 0 var(--tinta)}
+  .btn:disabled{opacity:.5; cursor:default; transform:none; box-shadow:0 6px 0 var(--tinta)}
+  .btn--escuro{background:var(--tinta); box-shadow:0 6px 0 var(--azul)}
+  .btn--escuro svg{background:var(--sol)}
+  .btn--escuro svg path{stroke:var(--tinta)}
+  .btn--sm{
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.85rem; line-height:1.1;
+    color:#fff; background:var(--azul); text-decoration:none;
+    padding:.6rem 1rem; border:2.5px solid var(--tinta); border-radius:99px;
+    box-shadow:0 4px 0 var(--tinta); transition:all .12s; cursor:pointer;
   }
-  #status {
-    font-size: 0.85rem;
-    margin-top: 12px;
-    min-height: 1.2em;
+  .btn--sm:hover{transform:translateY(2px); box-shadow:0 2px 0 var(--tinta)}
+  .btn--sm svg{width:15px; height:15px; flex:none}
+  .btn--claro{background:#fff; color:var(--tinta)}
+  .btn--sol{background:var(--sol); color:var(--tinta)}
+
+  /* Chips (filtros, meses) */
+  .chip{
+    flex:0 0 auto; font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.85rem;
+    padding:.45rem 1rem; border:2px solid var(--tinta); border-radius:99px; background:#fff; color:var(--tinta);
+    box-shadow:0 3px 0 var(--tinta); cursor:pointer; transition:all .12s; white-space:nowrap;
   }
-  #status.error { color: #b3392c; }
-  #status.ok { color: #4a7a4a; }
-  #previewBox {
-    display: none;
-    text-align: center;
+  .chip:hover{transform:translateY(1px); box-shadow:0 2px 0 var(--tinta)}
+  .chip.active{background:var(--sol)}
+
+  /* Campo de busca */
+  .busca{position:relative}
+  .busca input{
+    width:100%; font:inherit; font-size:1rem; color:var(--tinta);
+    padding:.7rem 1rem .7rem 2.7rem; background:#fff;
+    border:2.5px solid var(--tinta); border-radius:14px; box-shadow:0 4px 0 var(--tinta); outline:none;
   }
-  #previewBox canvas {
-    max-width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  .busca input::placeholder{color:var(--mudo)}
+  .busca input:focus{outline:3px solid var(--azul); outline-offset:2px}
+  .busca svg{position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; pointer-events:none; color:var(--tinta)}
+
+  /* Estados de carregamento */
+  .spin{width:26px; height:26px; margin:0 auto 14px; border:3px solid rgba(17,17,17,.15); border-top-color:var(--tinta); border-radius:50%; animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Rodapé */
+  .rodape{text-align:center; padding:2rem 0 2.5rem; font-weight:600; border-top:2.5px solid var(--tinta); margin-top:3rem}
+  .rodape p{font-size:.95rem}
+  .rodape a{color:var(--tinta); text-underline-offset:3px}
+  .rodape__links{display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important}
   }
-  .meta {
-    font-size: 0.82rem;
-    opacity: 0.75;
-    margin-top: 10px;
+
+
+  /* ───────── Wallpaper ───────── */
+  .layout{display:grid; grid-template-columns:minmax(280px,400px) 1fr; gap:2rem; align-items:start; margin-top:1.6rem}
+  @media (max-width:820px){ .layout{grid-template-columns:1fr} }
+
+  .form{padding:1.5rem}
+  .form label{display:block; font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.95rem; margin:1.1rem 0 .4rem}
+  .form label:first-child{margin-top:0}
+  .form .row{display:grid; grid-template-columns:1.6fr 1fr; gap:.8rem}
+  .form .row label{margin-top:0}
+  .form .row + label{margin-top:1.1rem}
+  .form select{
+    width:100%; font:inherit; font-size:1rem; font-weight:500; color:var(--tinta);
+    padding:.7rem 2.4rem .7rem 1rem; background-color:#fff;
+    border:2.5px solid var(--tinta); border-radius:14px; box-shadow:0 3px 0 var(--tinta);
+    appearance:none; -webkit-appearance:none; cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right .8rem center; background-size:18px;
   }
+  .form .btn{width:100%; margin-top:1.6rem}
+
+  #status{font-size:.9rem; font-weight:600; margin-top:1rem; min-height:1.3em}
+  #status.error{color:#B3261E}
+  #status.ok{color:#15803D}
+
+  .preview{padding:1.5rem; text-align:center}
+  #previewEmpty{
+    border:2.5px dashed rgba(17,17,17,.3); border-radius:16px; padding:3rem 1.5rem;
+    color:var(--mudo); font-weight:500; line-height:1.5;
+  }
+  #previewEmpty b{display:block; font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.2rem; color:var(--tinta); margin-bottom:.3rem}
+  #previewContent{display:none}
+  #previewContent canvas{
+    max-width:100%; max-height:70vh; width:auto; height:auto;
+    border:2.5px solid var(--tinta); border-radius:14px; box-shadow:0 6px 0 var(--tinta); background:#fff;
+  }
+  .meta{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.1rem; margin-top:1.1rem}
+  #previewContent .btn{margin-top:1.1rem}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🏠 Wallpaper do seu Predinho</h1>
-  <p class="sub">Escolha o dia do seu aniversário e baixe o predinho daquele dia como papel de parede do celular.</p>
 
-  <div class="card">
-    <label for="mes">Mês de aniversário</label>
-    <select id="mes"></select>
+<header class="nav">
+  <a href="https://instagram.com/unspredinhos" class="nav__mark" target="_blank" rel="noopener">Uns Predinhos</a>
+  <nav class="nav__links" aria-label="Links do projeto">
+    <a href="https://brunolorenz.github.io/unspredinhos/galeria/">Galeria</a>
+    <a href="https://www.brunolorenz.com.br" target="_blank" rel="noopener">Loja</a>
+    <a href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">Instagram</a>
+  </nav>
+  <a class="nav__cta" href="https://wa.me/5551993115340?text=Ol%C3%A1%2C%20gostaria%20de%20or%C3%A7ar%20uma%20pintura" target="_blank" rel="noopener">Orçar uma pintura</a>
+</header>
 
-    <label for="dia">Dia</label>
-    <select id="dia"></select>
+<main class="page-hero wrap">
+  <span class="sticker">Papel de parede</span>
+  <h1>Wallpaper do seu <span>Predinho</span></h1>
+  <p class="lead">Escolha o dia do seu aniversário e baixe o predinho daquele dia como papel de parede do celular.</p>
 
-    <label for="formato">Formato de tela</label>
-    <select id="formato">
-      <option value="1080x2340">Padrão (9:19.5 — iPhone/Android recentes)</option>
-      <option value="1080x2400">Android alongado (9:20)</option>
-      <option value="1080x1920">Formato clássico (9:16)</option>
-    </select>
+  <div class="layout">
+    <div class="card form">
+      <label for="mes">Mês de aniversário</label>
+      <select id="mes"></select>
 
-    <button id="gerarBtn">Gerar wallpaper</button>
-    <div id="status"></div>
+      <label for="dia" style="margin-top:1.1rem">Dia</label>
+      <select id="dia"></select>
+
+      <label for="formato">Formato de tela</label>
+      <select id="formato">
+        <option value="1080x2340">Padrão (9:19.5 — iPhone/Android recentes)</option>
+        <option value="1080x2400">Android alongado (9:20)</option>
+        <option value="1080x1920">Formato clássico (9:16)</option>
+      </select>
+
+      <button class="btn" id="gerarBtn" type="button"><span>Gerar wallpaper</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div id="status" role="status"></div>
+    </div>
+
+    <div class="card preview" id="previewBox">
+      <div id="previewEmpty">
+        <b>Seu wallpaper aparece aqui</b>
+        Escolha o dia e clique em “Gerar wallpaper”.
+      </div>
+      <div id="previewContent">
+        <canvas id="canvas"></canvas>
+        <div class="meta" id="metaInfo"></div>
+        <button class="btn btn--escuro" id="downloadBtn" type="button"><span>Baixar PNG</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
   </div>
+</main>
 
-  <div class="card" id="previewBox">
-    <canvas id="canvas"></canvas>
-    <div class="meta" id="metaInfo"></div>
-    <button class="secondary" id="downloadBtn">Baixar PNG</button>
-  </div>
-</div>
+<footer class="rodape wrap">
+  <p>© 2026 · Uns Predinhos, aquarelas de Bruno Lorenz</p>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
@@ -153,6 +267,12 @@ const formatoSelect = document.getElementById("formato");
 const gerarBtn = document.getElementById("gerarBtn");
 const statusEl = document.getElementById("status");
 const previewBox = document.getElementById("previewBox");
+const previewEmpty = document.getElementById("previewEmpty");
+const previewContent = document.getElementById("previewContent");
+function mostrarPreview(on) {
+  previewContent.style.display = on ? "block" : "none";
+  previewEmpty.style.display = on ? "none" : "block";
+}
 const canvas = document.getElementById("canvas");
 const metaInfo = document.getElementById("metaInfo");
 const downloadBtn = document.getElementById("downloadBtn");
@@ -243,7 +363,7 @@ async function gerarWallpaper() {
   const linha = encontrarLinha(dia, mes);
   if (!linha) {
     setStatus("Ainda não há predinho pintado para esse dia.", "error");
-    previewBox.style.display = "none";
+    mostrarPreview(false);
     return;
   }
 
@@ -275,7 +395,7 @@ async function gerarWallpaper() {
 
     ctx.drawImage(img, 0, offsetY, drawW, drawH);
 
-    previewBox.style.display = "block";
+    mostrarPreview(true);
     const rua = normalize(linha["Rua"]);
     const cidade = normalize(linha["Cidade"]);
     const uf = normalize(linha["UF"]);

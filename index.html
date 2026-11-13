@@ -4,307 +4,417 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Predinho do Dia · @unspredinhos 2026</title>
+<meta name="description" content="365 predinhos em 2026: um por dia, em ruas com o nome da data, espalhados por todo o Brasil. Mapa, calendário e números do projeto.">
+<meta property="og:title" content="Predinho do Dia · @unspredinhos 2026">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#fff;color:#1a1a18;padding:12px}
-@media(prefers-color-scheme:dark){body{background:#1a1a18;color:#e8e6df}}
-#app{max-width:960px;margin:0 auto}
+  /* ═════════ Uns Predinhos · sistema visual compartilhado (igual em todas as páginas) ═════════ */
+  :root{
+    --fundo:#F8F6F0;
+    --papel:#FFFFFF;
+    --tinta:#111111;
+    --azul:#3B82F6;
+    --sol:#FFD93B;
+    --mudo:#52525B;
+    --tom:#EFE9D6;
+    --coral:#FF7A59;
+    --menta:#34D399;
+    --lilas:#A78BFA;
+    --wrap:1100px;
+    --nav-h:64px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;scroll-padding-top:5rem}
+  body{
+    background-color:var(--fundo);
+    color:var(--tinta);
+    font-family:'DM Sans', system-ui, sans-serif;
+    font-weight:400;
+    line-height:1.5;
+    overflow-x:hidden;
+    padding-top:var(--nav-h);
+  }
+  body::before{
+    content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.07;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  ::selection{background:var(--sol);color:var(--tinta)}
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible{outline:3px solid var(--azul);outline-offset:3px}
 
-#status-bar{font-size:12px;color:#888780;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:8px;background:#f1efe8;transition:background 0.3s}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#888780;flex-shrink:0}
-.status-dot.ok{background:#5DCAA5}
-.status-dot.err{background:#E24B4A}
-.status-dot.loading{background:#EF9F27;animation:pulse 0.8s infinite}
-#status-bar.loading-state{background:#FFF8EC;color:#854F0B}
-#status-bar.ok-state{background:#F0FBF6;color:#0F6E56}
-#status-bar.err-state{background:#FEF2F2;color:#A32D2D}
-@keyframes spin{to{transform:rotate(360deg)}}
-.status-spinner{width:14px;height:14px;border:2px solid #FAC775;border-top-color:#854F0B;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;display:none}
-#status-bar.loading-state .status-spinner{display:block}
-#status-bar.loading-state .status-dot{display:none}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-#reload-btn{font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid #b4b2a9;background:transparent;color:#888780;cursor:pointer;margin-left:auto}
-#reload-btn:hover{background:#f1efe8}
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(1.25rem,4vw,2rem)}
 
-#controls{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
-.btn-filter{font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid transparent;cursor:pointer;transition:all 0.15s}
-.btn-filter[data-region="all"]{background:#e8e6e1;color:#444441}
-.btn-filter[data-region="Sul"]{background:#E1F5EE;color:#0F6E56;border-color:#9FE1CB}
-.btn-filter[data-region="Sudeste"]{background:#E6F1FB;color:#185FA5;border-color:#B5D4F4}
-.btn-filter[data-region="Nordeste"]{background:#FAECE7;color:#993C1D;border-color:#F5C4B3}
-.btn-filter[data-region="Centro Oeste"]{background:#FAEEDA;color:#854F0B;border-color:#FAC775}
-.btn-filter[data-region="Norte"]{background:#EEEDFE;color:#534AB7;border-color:#CECBF6}
-.btn-filter.active{color:#fff;border-color:transparent}
-.btn-filter[data-region="all"].active{background:#444441}
-.btn-filter[data-region="Sul"].active{background:#1D9E75}
-.btn-filter[data-region="Sudeste"].active{background:#185FA5}
-.btn-filter[data-region="Nordeste"].active{background:#993C1D}
-.btn-filter[data-region="Centro Oeste"].active{background:#854F0B}
-.btn-filter[data-region="Norte"].active{background:#534AB7}
+  .sticker{
+    display:inline-block; padding:6px 14px; background:var(--sol);
+    border:2px solid var(--tinta); border-radius:999px; font-weight:600;
+    font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;
+    box-shadow:0 2px 0 var(--tinta);
+  }
+
+  /* Nav */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:100; height:var(--nav-h);
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:0 clamp(1.25rem,4vw,2rem);
+    background:rgba(248,246,240,.95); backdrop-filter:blur(8px);
+    border-bottom:2.5px solid var(--tinta);
+  }
+  .nav__mark{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.2rem; color:var(--tinta); text-decoration:none}
+  .nav__links{display:none; gap:1.5rem}
+  @media (min-width:768px){ .nav__links{display:flex} }
+  .nav__links a{font-family:'Bricolage Grotesque',sans-serif; font-weight:600; font-size:.9rem; color:var(--tinta); text-decoration:none; transition:color .2s}
+  .nav__links a:hover{color:var(--azul)}
+  .nav__cta{
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.9rem;
+    color:#fff; text-decoration:none; background:var(--azul);
+    border:2px solid var(--tinta); border-radius:100px; padding:.5rem 1.2rem;
+    box-shadow:0 3px 0 var(--tinta); transition:all .1s; white-space:nowrap;
+  }
+  .nav__cta:hover{transform:translateY(2px); box-shadow:0 1px 0 var(--tinta)}
+
+  /* Cabeçalho de página */
+  .page-hero{padding-top:clamp(2.2rem,5vw,3.5rem); padding-bottom:1.5rem}
+  h1{
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800;
+    font-size:clamp(2rem,4.4vw,3.2rem); line-height:1.12; letter-spacing:-.02em; margin:1rem 0 .9rem;
+  }
+  h1 span{white-space:nowrap; background:var(--sol); padding:0 .2em; border-radius:8px; display:inline-block; transform:rotate(-1deg); border:2px solid var(--tinta)}
+  .lead{font-size:1.15rem; line-height:1.5; max-width:52ch; color:var(--tinta)}
+  .lead--mudo{color:var(--mudo); font-size:1.05rem}
+  h2{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:clamp(1.6rem,3.2vw,2.3rem); line-height:1.1; margin:.9rem 0 1.2rem}
+  h2 em{font-style:normal; background:var(--sol); padding:0 .2em; border-radius:8px; border:2px solid var(--tinta)}
+
+  /* Cards e botões */
+  .card{background:var(--papel); border:2.5px solid var(--tinta); border-radius:20px; box-shadow:0 5px 0 var(--tinta)}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:space-between; gap:.8rem;
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.05rem;
+    color:#fff; background:var(--azul); text-decoration:none;
+    padding:.7rem .7rem .7rem 1.4rem; border-radius:99px; border:2.5px solid var(--tinta);
+    box-shadow:0 6px 0 var(--tinta); transition:all .15s ease; cursor:pointer;
+  }
+  .btn svg{width:36px; height:36px; padding:7px; background:var(--tinta); border-radius:50%; transition:transform .2s; flex:none}
+  .btn:hover{transform:translateY(3px); box-shadow:0 3px 0 var(--tinta)}
+  .btn:hover svg{transform:translateX(4px)}
+  .btn:active{transform:translateY(6px); box-shadow:0 0 0 var(--tinta)}
+  .btn:disabled{opacity:.5; cursor:default; transform:none; box-shadow:0 6px 0 var(--tinta)}
+  .btn--escuro{background:var(--tinta); box-shadow:0 6px 0 var(--azul)}
+  .btn--escuro svg{background:var(--sol)}
+  .btn--escuro svg path{stroke:var(--tinta)}
+  .btn--sm{
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.85rem; line-height:1.1;
+    color:#fff; background:var(--azul); text-decoration:none;
+    padding:.6rem 1rem; border:2.5px solid var(--tinta); border-radius:99px;
+    box-shadow:0 4px 0 var(--tinta); transition:all .12s; cursor:pointer;
+  }
+  .btn--sm:hover{transform:translateY(2px); box-shadow:0 2px 0 var(--tinta)}
+  .btn--sm svg{width:15px; height:15px; flex:none}
+  .btn--claro{background:#fff; color:var(--tinta)}
+  .btn--sol{background:var(--sol); color:var(--tinta)}
+
+  /* Chips (filtros, meses) */
+  .chip{
+    flex:0 0 auto; font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.85rem;
+    padding:.45rem 1rem; border:2px solid var(--tinta); border-radius:99px; background:#fff; color:var(--tinta);
+    box-shadow:0 3px 0 var(--tinta); cursor:pointer; transition:all .12s; white-space:nowrap;
+  }
+  .chip:hover{transform:translateY(1px); box-shadow:0 2px 0 var(--tinta)}
+  .chip.active{background:var(--sol)}
+
+  /* Campo de busca */
+  .busca{position:relative}
+  .busca input{
+    width:100%; font:inherit; font-size:1rem; color:var(--tinta);
+    padding:.7rem 1rem .7rem 2.7rem; background:#fff;
+    border:2.5px solid var(--tinta); border-radius:14px; box-shadow:0 4px 0 var(--tinta); outline:none;
+  }
+  .busca input::placeholder{color:var(--mudo)}
+  .busca input:focus{outline:3px solid var(--azul); outline-offset:2px}
+  .busca svg{position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; pointer-events:none; color:var(--tinta)}
+
+  /* Estados de carregamento */
+  .spin{width:26px; height:26px; margin:0 auto 14px; border:3px solid rgba(17,17,17,.15); border-top-color:var(--tinta); border-radius:50%; animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Rodapé */
+  .rodape{text-align:center; padding:2rem 0 2.5rem; font-weight:600; border-top:2.5px solid var(--tinta); margin-top:3rem}
+  .rodape p{font-size:.95rem}
+  .rodape a{color:var(--tinta); text-underline-offset:3px}
+  .rodape__links{display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important}
+  }
 
 
-/* Desktop: mapa | calendário lado a lado */
-#layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  /* ───────── Mapa do Predinho do Dia ───────── */
+  /* barra de status */
+  #status-bar{
+    margin-top:1.6rem; display:flex; align-items:center; gap:.7rem; flex-wrap:wrap;
+    padding:.6rem .9rem .6rem 1.1rem; background:#fff; border:2.5px solid var(--tinta); border-radius:14px;
+    box-shadow:0 4px 0 var(--tinta); font-size:.9rem; font-weight:600; transition:background .3s;
+  }
+  #status-bar.loading-state{background:#FFF3B8}
+  #status-bar.ok-state{background:#D1FAE5}
+  #status-bar.err-state{background:#FFE1D9}
+  .status-dot{width:10px; height:10px; border-radius:50%; background:var(--tinta); border:2px solid var(--tinta); flex:none}
+  .status-dot.ok{background:var(--menta)}
+  .status-dot.err{background:var(--coral)}
+  .status-spinner{width:16px; height:16px; border:3px solid rgba(17,17,17,.2); border-top-color:var(--tinta); border-radius:50%; animation:spin .7s linear infinite; flex:none; display:none}
+  #status-bar.loading-state .status-spinner{display:block}
+  #status-bar.loading-state .status-dot{display:none}
+  #reload-btn{margin-left:auto}
 
-/* Mobile: calendário primeiro, mapa depois (mais natural no celular) */
-@media(max-width:640px){
-  body{padding:8px}
-  #layout{grid-template-columns:1fr;gap:12px}
-  #map-col{order:2}
-  #cal-col{order:1}
-  #controls{gap:4px}
-  .btn-filter{font-size:10px;padding:2px 8px}
-}
+  /* filtros por região */
+  #controls{display:flex; flex-wrap:wrap; gap:.6rem; margin:1.4rem 0 1.4rem}
+  .btn-filter{display:inline-flex; align-items:center; gap:.45rem}
+  .btn-filter::before{content:''; width:11px; height:11px; border-radius:50%; border:2px solid var(--tinta); background:var(--cor, #fff)}
+  .btn-filter[data-region="all"]::before{display:none}
+  .btn-filter[data-region="Sul"]{--cor:#3B82F6}
+  .btn-filter[data-region="Sudeste"]{--cor:#FFD93B}
+  .btn-filter[data-region="Nordeste"]{--cor:#FF7A59}
+  .btn-filter[data-region="Centro Oeste"]{--cor:#34D399}
+  .btn-filter[data-region="Norte"]{--cor:#A78BFA}
+  .btn-filter.active{background:var(--tinta); color:#fff}
+  .btn-filter.active::before{border-color:#fff}
 
-#map-wrap{position:relative}
-#map svg{width:100%;display:block;border-radius:8px}
+  /* mapa | calendário */
+  #layout{display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; align-items:start}
+  .painel{padding:1.1rem}
+  #map-wrap{position:relative}
+  #map svg{width:100%; display:block}
+  #map-tooltip{
+    display:none; position:absolute; background:#fff; border:2px solid var(--tinta); border-radius:10px;
+    padding:.5rem .75rem; font-size:.8rem; pointer-events:none; z-index:10; max-width:210px; line-height:1.4;
+    box-shadow:2px 3px 0 var(--tinta);
+  }
+  #map-tooltip strong{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.95rem; display:block}
+  #map-tooltip .meta{color:var(--mudo); font-size:.75rem}
 
-#map-tooltip{display:none;position:absolute;background:#fff;border:0.5px solid #b4b2a9;border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:10;max-width:180px;line-height:1.5}
-@media(prefers-color-scheme:dark){#map-tooltip{background:#2c2c2a}}
-#map-tooltip strong{font-weight:500;display:block}
-#map-tooltip .meta{color:#888780;font-size:10px}
+  #stats{display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; margin-top:1rem}
+  .stat{background:var(--tom); border:2px solid var(--tinta); border-radius:12px; padding:.55rem .4rem; text-align:center}
+  .stat-n{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.5rem; line-height:1.1}
+  .stat-l{font-size:.72rem; font-weight:600; color:var(--mudo)}
 
-#month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-#month-label{font-size:14px;font-weight:500}
-.nav-btn{background:transparent;border:0.5px solid #b4b2a9;border-radius:8px;padding:4px 12px;font-size:15px;cursor:pointer;color:#1a1a18;transition:background 0.15s;line-height:1}
-.nav-btn:hover{background:#f1efe8}
-@media(prefers-color-scheme:dark){.nav-btn{color:#e8e6df}}
+  #month-nav{display:flex; align-items:center; justify-content:space-between; margin-bottom:.9rem}
+  #month-label{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.35rem}
+  .nav-btn{
+    width:40px; height:40px; background:#fff; border:2.5px solid var(--tinta); border-radius:50%;
+    font-size:1.3rem; font-weight:800; line-height:1; cursor:pointer; color:var(--tinta);
+    box-shadow:0 3px 0 var(--tinta); transition:all .12s;
+  }
+  .nav-btn:hover{background:var(--sol); transform:translateY(1px); box-shadow:0 2px 0 var(--tinta)}
 
-#cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.cal-dow{font-size:10px;color:#b4b2a9;text-align:center;padding:2px 0;font-weight:500}
-.cal-day{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:0.5px solid transparent;transition:background 0.12s,border-color 0.12s,transform 0.12s;position:relative;cursor:default;user-select:none}
-.cal-day.has-predinho{cursor:pointer}
-.cal-day.hovered,.cal-day.selected{transform:scale(1.08)}
-.cal-day .day-num{font-size:11px;font-weight:500;line-height:1;pointer-events:none}
-.cal-day .day-dot{width:5px;height:5px;border-radius:50%;margin-top:3px;pointer-events:none}
-.cal-day.no-predinho .day-num{color:#b4b2a9;font-size:11px}
+  #cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:5px}
+  .cal-dow{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.75rem; color:var(--mudo); text-align:center; padding:2px 0 4px}
+  .cal-day{
+    aspect-ratio:1; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    border:1.5px dashed rgba(17,17,17,.2); transition:transform .12s, box-shadow .12s, background .12s;
+    cursor:default; user-select:none;
+  }
+  .cal-day.empty{border:none}
+  .cal-day.has-predinho{cursor:pointer; border:2px solid var(--tinta)}
+  .cal-day.hovered, .cal-day.selected{transform:translateY(-2px); box-shadow:0 3px 0 var(--tinta)}
+  .cal-day .day-num{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.85rem; line-height:1; pointer-events:none}
+  .cal-day.no-predinho .day-num{color:var(--mudo); font-weight:600}
 
-/* Painel de detalhe */
-#detail{margin-top:12px;padding:12px 14px;background:#f1efe8;border-radius:8px;min-height:60px;font-size:13px;display:flex;align-items:center;justify-content:center;color:#888780}
-@media(prefers-color-scheme:dark){#detail{background:#2c2c2a}}
-#detail.filled{display:block;color:#1a1a18}
-@media(prefers-color-scheme:dark){#detail.filled{color:#e8e6df}}
-.detail-city{font-weight:500;font-size:14px;margin-bottom:3px}
-.detail-sub{font-size:11px;color:#888780;line-height:1.6}
-.detail-region{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-top:6px;font-weight:500}
+  /* painel de detalhe */
+  #detail{margin-top:1rem; padding-top:1rem; border-top:2px dashed var(--tinta); font-size:.95rem; display:flex; align-items:center; justify-content:center; color:var(--mudo); min-height:56px; text-align:center}
+  #detail.filled{display:block; color:var(--tinta); text-align:left}
+  .detail-region{display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:2px 10px; border:2px solid var(--tinta); border-radius:99px; margin-bottom:.5rem}
+  .detail-city{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.3rem; line-height:1.15}
+  .detail-sub{font-size:.9rem; color:var(--mudo); margin-top:.15rem}
+  .detail-img-wrap{
+    margin-top:.9rem; width:100%; border:2.5px solid var(--tinta); border-radius:14px; box-shadow:0 4px 0 var(--tinta);
+    overflow:hidden; background:var(--tom); aspect-ratio:996/1280; display:flex; align-items:center; justify-content:center;
+  }
+  .detail-img-wrap img{width:100%; height:100%; object-fit:cover; display:block}
+  .detail-img-wrap.placeholder{font-size:.85rem; color:var(--mudo); font-style:italic}
 
-/* Imagem 996x1280 → proporção ~0.778 → aspect-ratio 39/50 */
-.detail-img-wrap{
-  margin-top:10px;
-  width:100%;
-  border-radius:8px;
-  overflow:hidden;
-  background:#f1efe8;
-  border:0.5px solid #d3d1c7;
-  aspect-ratio:996/1280;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-@media(prefers-color-scheme:dark){.detail-img-wrap{background:#2c2c2a;border-color:#5f5e5a}}
-.detail-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.detail-img-wrap.placeholder{font-size:11px;color:#b4b2a9;font-style:italic}
+  @media (max-width:640px){
+    #layout{grid-template-columns:1fr; gap:1.2rem}
+    #map-col{order:2}
+    #cal-col{order:1}
+    #stats{grid-template-columns:repeat(2,1fr)}
+  }
 
-/* No mobile, limita a altura da imagem para não ocupar a tela toda */
-@media(max-width:640px){
-  .detail-img-wrap{aspect-ratio:996/1280}
-}
+  /* insights */
+  .ins-section{margin-top:3.2rem}
+  .ins-section > .sticker{margin-bottom:1.1rem}
+  .ins-cards{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem}
+  @media (max-width:640px){ .ins-cards{grid-template-columns:repeat(2,1fr)} }
+  .ins-card{padding:1rem .8rem; text-align:center}
+  .ins-card:first-child{background:var(--sol)}
+  .ins-card-n{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:clamp(1.5rem,3vw,2.1rem); line-height:1.05; margin-bottom:.3rem}
+  .ins-card-l{font-size:.8rem; font-weight:600; color:var(--mudo); line-height:1.35}
+  .ins-card:first-child .ins-card-l{color:var(--tinta)}
+  .ins-prog-wrap{padding:1.1rem 1.2rem; margin-top:1.2rem}
+  .ins-prog-wrap .t{font-size:.85rem; font-weight:600; color:var(--mudo)}
+  .ins-prog-track{height:20px; background:#fff; border:2.5px solid var(--tinta); border-radius:99px; overflow:hidden; margin:.5rem 0 .4rem}
+  .ins-prog-fill{height:100%; background:var(--azul); transition:width 1.2s ease}
+  .ins-prog-labels{display:flex; justify-content:space-between; font-size:.8rem; font-weight:600; color:var(--mudo)}
+  .ins-two{display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; align-items:center}
+  @media (max-width:640px){ .ins-two{grid-template-columns:1fr} }
+  .ins-bar-list{display:flex; flex-direction:column; gap:.55rem}
+  .ins-bar-row{display:flex; align-items:center; gap:.6rem}
+  .ins-bar-label{min-width:108px; font-size:.85rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .ins-bar-track{flex:1; height:14px; background:#fff; border:2px solid var(--tinta); border-radius:99px; overflow:hidden}
+  .ins-bar-fill{height:100%; border-right:2px solid var(--tinta); transition:width .8s ease}
+  .ins-bar-count{min-width:26px; text-align:right; font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:.9rem}
+  .ins-icard{background:#fff; border:2.5px solid var(--tinta); border-radius:16px; box-shadow:0 4px 0 var(--tinta); padding:.9rem 1.1rem; margin-bottom:.9rem; display:flex; gap:.8rem; align-items:flex-start}
+  .ins-icard.warn{background:#FFF3B8}
+  .ins-icard.good{background:#D1FAE5}
+  .ins-icard.fun{background:#DBEAFE}
+  .ins-icard-title{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.05rem; margin-bottom:.15rem; line-height:1.25}
+  .ins-icard-body{color:var(--mudo); line-height:1.5; font-size:.92rem}
+  .ins-icon{font-size:1.6rem; flex:none; line-height:1.2}
+  .ins-pills{display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.6rem}
+  .ins-pill{font-size:.8rem; font-weight:600; padding:3px 11px; border:2px solid var(--tinta); border-radius:99px; background:#FFE1D9}
+  .ins-rec-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem}
+  @media (max-width:640px){ .ins-rec-grid{grid-template-columns:repeat(2,1fr)} }
+  .ins-rec-card{padding:.9rem .8rem; text-align:center}
+  .ins-rec-val{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.2rem; margin-bottom:.2rem; word-break:break-word; line-height:1.2}
+  .ins-rec-label{font-size:.78rem; font-weight:600; color:var(--mudo)}
+  .ins-sub{font-size:.85rem; font-weight:600; color:var(--mudo); margin:1.4rem 0 .4rem}
 
-#stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
-@media(max-width:640px){#stats{grid-template-columns:repeat(2,1fr)}}
-.stat{background:#f1efe8;border-radius:8px;padding:8px;text-align:center}
-@media(prefers-color-scheme:dark){.stat{background:#2c2c2a}}
-.stat-n{font-size:18px;font-weight:500}
-.stat-l{font-size:10px;color:#888780;margin-top:1px}
-
-/* Cabeçalho */
-#header{text-align:center;padding:24px 12px 20px;border-bottom:0.5px solid #d3d1c7;margin-bottom:16px}
-@media(prefers-color-scheme:dark){#header{border-color:#3d3d3a}}
-#header .tag{font-size:11px;letter-spacing:0.08em;color:#888780;text-transform:uppercase;margin-bottom:8px}
-#header h1{font-size:26px;font-weight:500;line-height:1.2;color:#1a1a18;margin-bottom:6px}
-@media(prefers-color-scheme:dark){#header h1{color:#e8e6df}}
-#header .sub{font-size:13px;color:#888780;line-height:1.5}
-@media(max-width:640px){#header{padding:16px 8px 14px}#header h1{font-size:20px}}
-/* Rodapé */
-#footer{margin-top:32px;padding:20px 12px 24px;border-top:0.5px solid #d3d1c7;text-align:center}
-@media(prefers-color-scheme:dark){#footer{border-color:#3d3d3a}}
-#footer .desc{font-size:12px;color:#888780;line-height:1.7;max-width:520px;margin:0 auto 16px}
-#footer .links{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-#footer a{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:7px 16px;border-radius:20px;text-decoration:none;transition:opacity 0.15s}
-#footer a:hover{opacity:0.8}
-#footer .btn-ig{background:#1a1a18;color:#fff}
-@media(prefers-color-scheme:dark){#footer .btn-ig{background:#e8e6df;color:#1a1a18}}
-#footer .btn-wa{background:#25D366;color:#fff}
-#footer .credit{margin-top:16px;font-size:10px;color:#b4b2a9}
-
-.ins-section{margin:32px 0}
-.ins-title{font-size:12px;font-weight:500;color:#888780;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:.5px solid #d3d1c7}
-.ins-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0}
-@media(max-width:640px){.ins-cards{grid-template-columns:repeat(2,1fr)}}
-.ins-card{background:#f1efe8;border-radius:10px;padding:14px 12px;text-align:center}
-.ins-card-n{font-size:24px;font-weight:500;line-height:1;margin-bottom:4px}
-.ins-card-l{font-size:11px;color:#888780;line-height:1.4}
-.ins-prog-wrap{background:#f1efe8;border-radius:10px;padding:16px;margin-bottom:0}
-.ins-prog-track{height:10px;background:#d3d1c7;border-radius:5px;overflow:hidden;margin:8px 0 5px}
-.ins-prog-fill{height:100%;border-radius:5px;background:#1D9E75;transition:width 1.2s ease}
-.ins-prog-labels{display:flex;justify-content:space-between;font-size:11px;color:#888780}
-.ins-two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
-@media(max-width:640px){.ins-two{grid-template-columns:1fr}}
-.ins-bar-list{display:flex;flex-direction:column;gap:7px}
-.ins-bar-row{display:flex;align-items:center;gap:8px;font-size:12px}
-.ins-bar-label{min-width:96px;color:#1a1a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
-.ins-bar-track{flex:1;height:7px;background:#d3d1c7;border-radius:4px;overflow:hidden}
-.ins-bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
-.ins-bar-count{min-width:24px;text-align:right;color:#888780;font-size:11px}
-.ins-icard{background:#f1efe8;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;font-size:12px}
-.ins-icard.warn{background:#FFF8EC}
-.ins-icard.good{background:#F0FBF6}
-.ins-icard.fun{background:#EEEDFE}
-.ins-icard-title{font-weight:500;margin-bottom:2px;font-size:12px}
-.ins-icard-body{color:#888780;line-height:1.6;font-size:11px}
-.ins-icon{font-size:18px;flex-shrink:0;margin-top:1px}
-.ins-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.ins-pill{font-size:10px;padding:3px 9px;border-radius:10px;background:#FAECE7;color:#993C1D}
-.ins-rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media(max-width:640px){.ins-rec-grid{grid-template-columns:repeat(2,1fr)}}
-.ins-rec-card{background:#f1efe8;border-radius:10px;padding:12px;text-align:center}
-.ins-rec-val{font-size:15px;font-weight:500;margin-bottom:3px;word-break:break-word;line-height:1.2}
-.ins-rec-label{font-size:10px;color:#888780}
-.ins-divider{border:none;border-top:.5px solid #d3d1c7;margin:32px 0}
+  /* rodapé desta página (com botões) */
+  .rodape .desc{font-weight:400; font-size:.95rem; color:var(--mudo); line-height:1.6; max-width:540px; margin:0 auto 1.2rem}
+  .rodape .btn--sm svg{width:16px; height:16px}
+  .rodape .credit{margin-top:1.2rem; font-size:.8rem; font-weight:500; color:var(--mudo)}
 </style>
 </head>
 <body>
-<div id="app">
-<header id="header">
-  <div class="tag">Projeto 365 · 2026</div>
-  <h1>Predinho do Dia</h1>
-  <div class="sub">365 predinhos em 2026 — um por dia, em ruas com o nome da data de hoje, espalhados por todo o Brasil. Por <a href="https://instagram.com/unspredinhos" target="_blank" rel="noopener" style="color:#888780;text-decoration:underline">@unspredinhos</a></div>
+
+<header class="nav">
+  <a href="https://instagram.com/unspredinhos" class="nav__mark" target="_blank" rel="noopener">Uns Predinhos</a>
+  <nav class="nav__links" aria-label="Links do projeto">
+    <a href="https://brunolorenz.github.io/unspredinhos/galeria/">Galeria</a>
+    <a href="https://www.brunolorenz.com.br" target="_blank" rel="noopener">Loja</a>
+    <a href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">Instagram</a>
+  </nav>
+  <a class="nav__cta" href="https://wa.me/5551993115340?text=Ol%C3%A1%2C%20gostaria%20de%20or%C3%A7ar%20uma%20pintura" target="_blank" rel="noopener">Orçar uma pintura</a>
 </header>
 
+<main class="page-hero wrap">
+  <span class="sticker">Projeto 365 · 2026</span>
+  <h1>Predinho <span>do Dia</span></h1>
+  <p class="lead">365 predinhos em 2026 — um por dia, em ruas com o nome da data de hoje, espalhados por todo o Brasil. Por <a href="https://instagram.com/unspredinhos" target="_blank" rel="noopener" style="color:inherit;font-weight:600;text-underline-offset:3px">@unspredinhos</a></p>
 
-<!-- =====================================================
-  CONFIGURAÇÃO — cole aqui a URL CSV da sua planilha
-
-  Como obter:
-  1. Abra a planilha no Google Sheets
-  2. Arquivo → Compartilhar → Publicar na web
-  3. Selecione aba "Predinhos 2026" e formato "CSV"
-  4. Clique em Publicar e copie o link gerado
-  5. Substitua o valor de SHEET_CSV_URL abaixo
-====================================================== -->
-<script>
-const SHEET_CSV_URL = 'https://script.google.com/macros/s/AKfycbzTnhTf2CH2Q6nVnla3YgJC-1mx7I804AsKIhASMYsCZrgWZwfyjAnZS-oIKu4xQnbXSg/exec';
-// Exemplo:
-// const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/SEU_ID_AQUI/pub?gid=0&single=true&output=csv';
-</script>
-
-  <div id="status-bar">
+  <div id="status-bar" class="loading-state">
     <span class="status-spinner" id="status-spinner"></span><span class="status-dot loading" id="status-dot"></span>
     <span id="status-text">Carregando...</span>
-    <button id="reload-btn" onclick="loadData()">↺ Atualizar</button>
+    <button class="btn--sm btn--claro" id="reload-btn" type="button" onclick="loadData()">↺ Atualizar</button>
   </div>
+
   <div id="controls">
-    <button class="btn-filter active" data-region="all">Todos</button>
-    <button class="btn-filter" data-region="Sul">Sul</button>
-    <button class="btn-filter" data-region="Sudeste">Sudeste</button>
-    <button class="btn-filter" data-region="Nordeste">Nordeste</button>
-    <button class="btn-filter" data-region="Centro Oeste">Centro-Oeste</button>
-    <button class="btn-filter" data-region="Norte">Norte</button>
+    <button class="chip btn-filter active" data-region="all">Todos</button>
+    <button class="chip btn-filter" data-region="Sul">Sul</button>
+    <button class="chip btn-filter" data-region="Sudeste">Sudeste</button>
+    <button class="chip btn-filter" data-region="Nordeste">Nordeste</button>
+    <button class="chip btn-filter" data-region="Centro Oeste">Centro-Oeste</button>
+    <button class="chip btn-filter" data-region="Norte">Norte</button>
   </div>
+
   <div id="layout">
     <div id="map-col">
-      <div id="map-wrap"><div id="map"></div><div id="map-tooltip"></div></div>
-      <div id="stats">
-        <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">predinhos</div></div>
-        <div class="stat"><div class="stat-n" id="s-estados">—</div><div class="stat-l">estados</div></div>
-        <div class="stat"><div class="stat-n" id="s-cidades">—</div><div class="stat-l">cidades</div></div>
-        <div class="stat"><div class="stat-n" id="s-regioes">—</div><div class="stat-l">regiões</div></div>
+      <div class="card painel">
+        <div id="map-wrap"><div id="map"></div><div id="map-tooltip"></div></div>
+        <div id="stats">
+          <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">predinhos</div></div>
+          <div class="stat"><div class="stat-n" id="s-estados">—</div><div class="stat-l">estados</div></div>
+          <div class="stat"><div class="stat-n" id="s-cidades">—</div><div class="stat-l">cidades</div></div>
+          <div class="stat"><div class="stat-n" id="s-regioes">—</div><div class="stat-l">regiões</div></div>
+        </div>
       </div>
     </div>
     <div id="cal-col">
-      <div id="month-nav">
-        <button class="nav-btn" id="prev-month">‹</button>
-        <span id="month-label"></span>
-        <button class="nav-btn" id="next-month">›</button>
+      <div class="card painel">
+        <div id="month-nav">
+          <button class="nav-btn" id="prev-month" aria-label="Mês anterior">‹</button>
+          <span id="month-label"></span>
+          <button class="nav-btn" id="next-month" aria-label="Próximo mês">›</button>
+        </div>
+        <div id="cal-grid"></div>
+        <div id="detail">Selecione um dia para ver o predinho</div>
       </div>
-      <div id="cal-grid"></div>
-      <div id="detail">Selecione um dia para ver o predinho</div>
     </div>
   </div>
 
-<hr class="ins-divider">
-
-<div class="ins-section">
-  <div class="ins-title">Progresso do ano</div>
-  <div class="ins-cards" style="margin-bottom:14px">
-    <div class="ins-card"><div class="ins-card-n" id="i-total">—</div><div class="ins-card-l">predinhos desenhados</div></div>
-    <div class="ins-card"><div class="ins-card-n" id="i-restam">—</div><div class="ins-card-l">ainda por desenhar</div></div>
-    <div class="ins-card"><div class="ins-card-n" id="i-pct">—</div><div class="ins-card-l">do ano concluído</div></div>
-    <div class="ins-card"><div class="ins-card-n" id="i-km">—</div><div class="ins-card-l">km percorridos virtualmente</div></div>
+  <div class="ins-section">
+    <span class="sticker">01 — Progresso do ano</span>
+    <div class="ins-cards">
+      <div class="card ins-card"><div class="ins-card-n" id="i-total">—</div><div class="ins-card-l">predinhos desenhados</div></div>
+      <div class="card ins-card"><div class="ins-card-n" id="i-restam">—</div><div class="ins-card-l">ainda por desenhar</div></div>
+      <div class="card ins-card"><div class="ins-card-n" id="i-pct">—</div><div class="ins-card-l">do ano concluído</div></div>
+      <div class="card ins-card"><div class="ins-card-n" id="i-km">—</div><div class="ins-card-l">km percorridos virtualmente</div></div>
+    </div>
+    <div class="card ins-prog-wrap">
+      <div class="t">Jornada de 365 predinhos</div>
+      <div class="ins-prog-track"><div class="ins-prog-fill" id="i-prog" style="width:0%"></div></div>
+      <div class="ins-prog-labels"><span id="i-prog-l">0 feitos</span><span>365 no total</span></div>
+    </div>
   </div>
-  <div class="ins-prog-wrap">
-    <div style="font-size:11px;color:#888780">Jornada de 365 predinhos</div>
-    <div class="ins-prog-track"><div class="ins-prog-fill" id="i-prog" style="width:0%"></div></div>
-    <div class="ins-prog-labels"><span id="i-prog-l">0 feitos</span><span>365 no total</span></div>
+
+  <div class="ins-section">
+    <span class="sticker">02 — Recordes e curiosidades</span>
+    <div class="ins-rec-grid" id="i-records"></div>
+    <div id="i-fun" style="margin-top:1.2rem"></div>
   </div>
-</div>
 
-<div class="ins-section">
-  <div class="ins-title">Recordes e curiosidades</div>
-  <div class="ins-rec-grid" id="i-records"></div>
-  <div id="i-fun" style="margin-top:12px"></div>
-</div>
-
-<div class="ins-section">
-  <div class="ins-title">Distribuição por região</div>
-  <div class="ins-two">
-    <div style="position:relative;height:200px"><canvas id="i-chart-reg"></canvas></div>
-    <div class="ins-bar-list" id="i-bar-reg"></div>
+  <div class="ins-section">
+    <span class="sticker">03 — Distribuição por região</span>
+    <div class="ins-two">
+      <div style="position:relative;height:220px"><canvas id="i-chart-reg"></canvas></div>
+      <div class="ins-bar-list" id="i-bar-reg"></div>
+    </div>
+    <div id="i-ins-reg" style="margin-top:1.4rem"></div>
   </div>
-  <div id="i-ins-reg" style="margin-top:12px"></div>
-</div>
 
-<div class="ins-section">
-  <div class="ins-title">Estados mais visitados</div>
-  <div class="ins-bar-list" id="i-bar-est" style="margin-bottom:14px"></div>
-  <div style="font-size:11px;color:#888780;margin-bottom:6px">Estados ainda não visitados</div>
-  <div class="ins-pills" id="i-missing"></div>
-</div>
+  <div class="ins-section">
+    <span class="sticker">04 — Estados mais visitados</span>
+    <div class="ins-bar-list" id="i-bar-est"></div>
+    <div class="ins-sub">Estados ainda não visitados</div>
+    <div class="ins-pills" id="i-missing"></div>
+  </div>
 
-<div class="ins-section">
-  <div class="ins-title">Predinhos por mês</div>
-  <div style="position:relative;height:160px"><canvas id="i-chart-mes"></canvas></div>
-  <div id="i-ins-mes" style="margin-top:12px"></div>
-</div>
+  <div class="ins-section">
+    <span class="sticker">05 — Predinhos por mês</span>
+    <div class="card painel"><div style="position:relative;height:180px"><canvas id="i-chart-mes"></canvas></div></div>
+    <div id="i-ins-mes" style="margin-top:1.2rem"></div>
+  </div>
+</main>
 
-<div class="ins-section">
-  <div class="ins-title">Próximos passos</div>
-  <div id="i-proximos"></div>
-</div>
-
-<footer id="footer">
+<footer class="rodape wrap">
   <div class="desc">
     Um projeto de Bruno Lorenz: 365 desenhos em aquarela, um por dia, de casas e edificações localizadas em ruas que levam o nome da data do desenho. Uma crônica afetiva da arquitetura popular brasileira.
   </div>
-  <div class="links">
-    <a class="btn-ig" href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+  <div class="rodape__links">
+    <a class="btn--sm btn--sol" href="https://instagram.com/unspredinhos" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
       @unspredinhos
     </a>
-    <a class="btn-wa" href="https://wa.me/5551993115340" target="_blank" rel="noopener">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <a class="btn--sm" href="https://wa.me/5551993115340" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       Fale comigo
     </a>
   </div>
   <div class="credit">Aquarelas e desenhos: Bruno Lorenz · @unspredinhos · 2026</div>
 </footer>
 
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const RC={'Sul':'#5DCAA5','Sudeste':'#85B7EB','Nordeste':'#F0997B','Centro Oeste':'#EF9F27','Norte':'#AFA9EC'};
+/* ═════ CONFIGURAÇÃO ═════
+   SHEET_CSV_URL: endereço (Apps Script) que devolve as linhas da planilha em JSON.
+   Se ficar vazio ou falhar, a página usa os dados locais (FALLBACK, no fim deste script). */
+const SHEET_CSV_URL = 'https://script.google.com/macros/s/AKfycbzTnhTf2CH2Q6nVnla3YgJC-1mx7I804AsKIhASMYsCZrgWZwfyjAnZS-oIKu4xQnbXSg/exec';
+
+/* Uma cor por região — as mesmas no mapa, no calendário e nos gráficos */
+const RC={'Sul':'#3B82F6','Sudeste':'#FFD93B','Nordeste':'#FF7A59','Centro Oeste':'#34D399','Norte':'#A78BFA'};
 const SR={'Rio Grande do Sul':'Sul','Santa Catarina':'Sul','Paraná':'Sul','São Paulo':'Sudeste','Rio de Janeiro':'Sudeste','Minas Gerais':'Sudeste','Espírito Santo':'Sudeste','Bahia':'Nordeste','Pernambuco':'Nordeste','Ceará':'Nordeste','Maranhão':'Nordeste','Rio Grande do Norte':'Nordeste','Paraíba':'Nordeste','Alagoas':'Nordeste','Sergipe':'Nordeste','Piauí':'Nordeste','Mato Grosso do Sul':'Centro Oeste','Mato Grosso':'Centro Oeste','Goiás':'Centro Oeste','Distrito Federal':'Centro Oeste','Pará':'Norte','Amazonas':'Norte','Acre':'Norte','Rondônia':'Norte','Roraima':'Norte','Amapá':'Norte','Tocantins':'Norte'};
 const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const DOWS=['D','S','T','Q','Q','S','S'];
@@ -312,7 +422,6 @@ const DOWS=['D','S','T','Q','Q','S','S'];
 let predinhos=[], byKey={};
 let activeRegion='all', curMonth=new Date().getMonth()+1, selectedKey=null, hoveredKey=null;
 let allDots, svgReady=false;
-const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
 
 function setStatus(state,text){
   const bar=document.getElementById('status-bar');
@@ -320,39 +429,6 @@ function setStatus(state,text){
   dot.className='status-dot '+state;
   bar.className=state+'-state';
   document.getElementById('status-text').textContent=text;
-}
-
-function parseCSV(text){
-  const lines=text.trim().split('\n');
-  if(!lines.length) return [];
-  const raw=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase());
-  const idx={};
-  raw.forEach((h,i)=>{ idx[h]=i; });
-  const get=(row,names)=>{
-    for(const n of names){ if(idx[n]!==undefined) return (row[idx[n]]||'').replace(/^"|"$/g,'').trim(); }
-    return '';
-  };
-  const rows=[];
-  for(let i=1;i<lines.length;i++){
-    const cols=lines[i].match(/("(?:[^"]|"")*"|[^,]*)/g)||[];
-    const d=parseInt(get(cols,['dia','d']));
-    const m=parseInt(get(cols,['mês','mes','m']));
-    const lat=parseFloat(String(get(cols,['latitude','lat'])).replace(',','.'));
-    const lng=parseFloat(String(get(cols,['longitude','lng'])).replace(',','.'));
-    if(!d||!m||isNaN(lat)||isNaN(lng)) continue;
-    const mm=String(m).padStart(2,'0'), dd=String(d).padStart(2,'0');
-    rows.push({
-      d, m,
-      dia: get(cols,['data (dd/mm)','data'])||`${dd}/${mm}`,
-      rua: get(cols,['rua']),
-      cidade: get(cols,['cidade']),
-      uf: get(cols,['uf']),
-      regiao: get(cols,['região','regiao']),
-      lat, lng,
-      img: get(cols,['url imagem','url_imagem','imagem','img']),
-    });
-  }
-  return rows;
 }
 
 function parseJSON(rows){
@@ -406,10 +482,12 @@ function boot(data){
   byKey={};
   predinhos.forEach(p=>{ byKey[`${p.d}-${p.m}`]=p; });
   curMonth=predinhos[predinhos.length-1]?.m||1;
+  selectedKey=null; hoveredKey=null;
   if(svgReady) renderDots();
   buildCalendar();
   updateStats();
   clearDetail();
+  renderInsights(data);
 }
 
 function daysInMonth(m){return m===2?29:[4,6,9,11].includes(m)?30:31;}
@@ -421,8 +499,8 @@ function updateDots(){
   const ad=getActiveDia();
   allDots.each(function(d){
     const el=d3.select(this), inF=activeRegion==='all'||d.regiao===activeRegion, act=d.dia===ad, c=RC[d.regiao]||'#888';
-    act ? el.attr('r',10).attr('fill',c).attr('stroke','#fff').attr('stroke-width',2.5).attr('opacity',1).style('filter',`drop-shadow(0 0 6px ${c})`)
-        : el.attr('r',5).attr('fill',c).attr('stroke','rgba(255,255,255,0.7)').attr('stroke-width',1).attr('opacity',inF?0.75:0.06).style('filter','none');
+    act ? el.attr('r',11).attr('fill',c).attr('stroke','#111').attr('stroke-width',3).attr('opacity',1).raise()
+        : el.attr('r',6).attr('fill',c).attr('stroke','#111').attr('stroke-width',1.3).attr('opacity',inF?1:0.12);
   });
 }
 
@@ -430,13 +508,13 @@ function styledCalDay(el,p,key){
   const inF=activeRegion==='all'||p.regiao===activeRegion;
   if(!inF){
     el.className='cal-day no-predinho';
-    el.style.cssText='background:#F1EFE8;border-color:transparent';
+    el.style.cssText='';
     el.innerHTML=`<div class="day-num">${p.d}</div>`; return;
   }
-  const sel=selectedKey===key, hov=hoveredKey===key, act=sel||hov, c=RC[p.regiao];
+  const sel=selectedKey===key, hov=hoveredKey===key, act=sel||hov, c=RC[p.regiao]||'#ccc';
   el.className='cal-day has-predinho'+(sel?' selected':'')+(hov&&!sel?' hovered':'');
-  el.style.cssText=`background:${c}${act?'38':'14'};border-color:${act?c:'transparent'};border-width:${act?'1.5px':'0.5px'}`;
-  el.innerHTML=`<div class="day-num" style="color:${c};filter:brightness(0.65)">${p.d}</div><div class="day-dot" style="background:${c}"></div>`;
+  el.style.cssText=`background:${act?c:c+'66'}`;
+  el.innerHTML=`<div class="day-num">${p.d}</div>`;
 }
 
 function buildCalendar(){
@@ -473,12 +551,12 @@ function patchCalDay(key){
 }
 
 function updateDetail(p){
-  const el=document.getElementById('detail'), c=RC[p.regiao];
+  const el=document.getElementById('detail'), c=RC[p.regiao]||'#ccc';
   el.className='filled';
   const imgHtml=p.img
     ?`<div class="detail-img-wrap"><img src="${p.img}" alt="Predinho de ${p.cidade}" onerror="this.parentElement.className='detail-img-wrap placeholder';this.parentElement.textContent='Imagem indisponível'"></div>`
     :`<div class="detail-img-wrap placeholder">imagem em breve</div>`;
-  el.innerHTML=`<div class="detail-city">${p.cidade} · ${p.uf}</div><div class="detail-sub">${p.dia}/2026<br>${p.rua}</div><span class="detail-region" style="background:${c}22;color:${c};filter:brightness(0.75)">${p.regiao}</span>${imgHtml}`;
+  el.innerHTML=`<span class="detail-region" style="background:${c}">${p.regiao}</span><div class="detail-city">${p.cidade} · ${p.uf}</div><div class="detail-sub">${p.dia}/2026 · ${p.rua}</div>${imgHtml}`;
 }
 
 function clearDetail(){
@@ -499,8 +577,8 @@ function renderDots(){
   allDots=svg.selectAll('.dot').data(predinhos).join('circle')
     .attr('class','dot')
     .attr('cx',d=>proj([d.lng,d.lat])[0]).attr('cy',d=>proj([d.lng,d.lat])[1])
-    .attr('r',5).attr('fill',d=>RC[d.regiao]||'#888')
-    .attr('stroke','rgba(255,255,255,0.7)').attr('stroke-width',1).attr('opacity',0.75).style('cursor','pointer')
+    .attr('r',6).attr('fill',d=>RC[d.regiao]||'#888')
+    .attr('stroke','#111').attr('stroke-width',1.3).attr('opacity',1).style('cursor','pointer')
     .on('mouseenter',(event,d)=>{
       const k=`${d.d}-${d.m}`; hoveredKey=k;
       if(d.m!==curMonth){curMonth=d.m;buildCalendar();}else patchCalDay(k);
@@ -509,13 +587,13 @@ function renderDots(){
       mtt.style.display='block';
       mtt.innerHTML=`<strong>${d.cidade} / ${d.uf}</strong><span class="meta">${d.dia}/2026 · ${d.rua}</span>`;
       const r=document.getElementById('map-wrap').getBoundingClientRect();
-      mtt.style.left=Math.min(event.clientX-r.left+10,r.width-205)+'px';
-      mtt.style.top=Math.max(event.clientY-r.top-50,4)+'px';
+      mtt.style.left=Math.min(event.clientX-r.left+10,r.width-215)+'px';
+      mtt.style.top=Math.max(event.clientY-r.top-56,4)+'px';
     })
     .on('mousemove',(event)=>{
       const r=document.getElementById('map-wrap').getBoundingClientRect(), mtt=document.getElementById('map-tooltip');
-      mtt.style.left=Math.min(event.clientX-r.left+10,r.width-205)+'px';
-      mtt.style.top=Math.max(event.clientY-r.top-50,4)+'px';
+      mtt.style.left=Math.min(event.clientX-r.left+10,r.width-215)+'px';
+      mtt.style.top=Math.max(event.clientY-r.top-56,4)+'px';
     })
     .on('mouseleave',()=>{ if(hoveredKey)patchCalDay(hoveredKey); hoveredKey=null; updateDots(); document.getElementById('map-tooltip').style.display='none'; })
     .on('click',(event,d)=>{
@@ -535,9 +613,14 @@ d3.json('https://cdn.jsdelivr.net/npm/datamaps@0.5.10/src/js/data/bra.topo.json'
   const features=topojson.feature(topo,topo.objects[key]).features;
   svg.selectAll('.sp').data(features).join('path').attr('class','sp')
     .attr('d',gp)
-    .attr('fill',d=>{const n=d.properties.name||d.properties.NAME||'';const r=SR[n];return r?RC[r]+'18':'#E8E6DF';})
-    .attr('stroke','#fff').attr('stroke-width',0.7);
+    .attr('fill',d=>{const n=d.properties.name||d.properties.NAME||'';const r=SR[n];return r?RC[r]+'55':'#EFE9D6';})
+    .attr('stroke','#111').attr('stroke-width',0.8).attr('stroke-linejoin','round');
   svgReady=true;
+  loadData();
+}).catch(err=>{
+  // se o mapa não carregar, o calendário e os números ainda funcionam
+  console.warn('Mapa não carregou:', err);
+  svgReady=false;
   loadData();
 });
 
@@ -550,6 +633,136 @@ document.querySelectorAll('.btn-filter').forEach(btn=>{
     buildCalendar(); updateDots(); updateStats();
   });
 });
+
+/* ═════ INSIGHTS (progresso, recordes, gráficos) ═════ */
+const ALL_UF=['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
+const UF_NOME={'AC':'Acre','AL':'Alagoas','AM':'Amazonas','AP':'Amapá','BA':'Bahia','CE':'Ceará','DF':'Distrito Federal','ES':'Espírito Santo','GO':'Goiás','MA':'Maranhão','MG':'Minas Gerais','MS':'Mato Grosso do Sul','MT':'Mato Grosso','PA':'Pará','PB':'Paraíba','PE':'Pernambuco','PI':'Piauí','PR':'Paraná','RJ':'Rio de Janeiro','RN':'Rio Grande do Norte','RO':'Rondônia','RR':'Roraima','RS':'Rio Grande do Sul','SC':'Santa Catarina','SE':'Sergipe','SP':'São Paulo','TO':'Tocantins'};
+const MONTHS_ABR=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+let chartReg=null, chartMes=null;
+
+function hav(a,b){
+  const R=6371,toR=Math.PI/180;
+  const dlat=(b[0]-a[0])*toR,dlon=(b[1]-a[1])*toR;
+  const h=Math.sin(dlat/2)**2+Math.cos(a[0]*toR)*Math.cos(b[0]*toR)*Math.sin(dlon/2)**2;
+  return R*2*Math.asin(Math.sqrt(h));
+}
+function icard(icon,title,body,cls=''){
+  return `<div class="ins-icard ${cls}"><div class="ins-icon">${icon}</div><div><div class="ins-icard-title">${title}</div><div class="ins-icard-body">${body}</div></div></div>`;
+}
+function brow(label,count,max,color){
+  return `<div class="ins-bar-row"><div class="ins-bar-label" title="${label}">${label}</div><div class="ins-bar-track"><div class="ins-bar-fill" style="width:${Math.round(count/max*100)}%;background:${color}"></div></div><div class="ins-bar-count">${count}</div></div>`;
+}
+
+function renderInsights(data){
+  if(!data||!data.length) return;
+  const total=data.length;
+  const hoje=new Date();
+  const dias=Math.round((hoje-new Date(2026,0,1))/(864e5))+1;
+
+  // km
+  const sorted=[...data].sort((a,b)=>{
+    if(a.m!==b.m) return a.m-b.m; return a.d-b.d;
+  });
+  let km=0;
+  for(let i=1;i<sorted.length;i++) km+=hav([sorted[i-1].lat,sorted[i-1].lng],[sorted[i].lat,sorted[i].lng]);
+  const kmFmt=Math.round(km).toLocaleString('pt-BR');
+
+  // progress
+  const pct=Math.round(total/365*100);
+  document.getElementById('i-total').textContent=total;
+  document.getElementById('i-restam').textContent=365-total;
+  document.getElementById('i-pct').textContent=pct+'%';
+  document.getElementById('i-km').textContent=kmFmt+' km';
+  document.getElementById('i-prog').style.width=pct+'%';
+  document.getElementById('i-prog-l').textContent=total+' feitos';
+
+  // cidades
+  const cidades=data.map(r=>r.cidade||'').filter(Boolean);
+  const maisLonga=[...cidades].sort((a,b)=>b.length-a.length)[0]||'—';
+  const maisCurta=[...cidades].sort((a,b)=>a.length-b.length)[0]||'—';
+
+  // maior salto
+  let maiorSalto=0,maiorPar=['',''];
+  for(let i=1;i<sorted.length;i++){
+    const d=hav([sorted[i-1].lat,sorted[i-1].lng],[sorted[i].lat,sorted[i].lng]);
+    if(d>maiorSalto){maiorSalto=d;maiorPar=[sorted[i-1].cidade,sorted[i].cidade];}
+  }
+
+  // estados
+  const estCount={};
+  data.forEach(r=>{const u=(r.uf||'').toUpperCase();if(u)estCount[u]=(estCount[u]||0)+1;});
+  const visitados=Object.keys(estCount);
+  const naoVisitados=ALL_UF.filter(u=>!visitados.includes(u));
+  const topUF=Object.entries(estCount).sort((a,b)=>b[1]-a[1])[0];
+
+  // regiões
+  const regCount={};
+  data.forEach(r=>{const g=(r.regiao||'').trim();if(g)regCount[g]=(regCount[g]||0)+1;});
+  const regioes=Object.entries(regCount).sort((a,b)=>b[1]-a[1]);
+  const topReg=regioes[0],botReg=regioes[regioes.length-1];
+
+  // meses
+  const mesCount={};
+  data.forEach(r=>{if(r.m)mesCount[r.m]=(mesCount[r.m]||0)+1;});
+
+  // records
+  const rec=(v,l)=>`<div class="card ins-rec-card"><div class="ins-rec-val">${v}</div><div class="ins-rec-label">${l}</div></div>`;
+  document.getElementById('i-records').innerHTML=
+    rec(kmFmt+' km','percurso virtual total')+
+    rec(Math.round(maiorSalto).toLocaleString('pt-BR')+' km',`maior salto (${maiorPar[0]} → ${maiorPar[1]})`)+
+    rec(Math.round(km/Math.max(sorted.length-1,1)).toLocaleString('pt-BR')+' km','média por salto')+
+    rec(maisLonga,'cidade com nome mais longo')+
+    rec(maisCurta,'cidade com nome mais curto')+
+    rec(topUF?topUF[0]+' ('+topUF[1]+'x)':'—','estado mais desenhado');
+
+  const voltas=Math.round(km/40075*10)/10;
+  const ritmo=Math.round(total/Math.max(dias,1)*10)/10;
+  const ritmoNec=Math.round((365-total)/Math.max(365-dias,1)*10)/10;
+  document.getElementById('i-fun').innerHTML=
+    icard('🌍',`${kmFmt} km — ${voltas} voltas ao redor da Terra`,`Em linha reta, de cidade em cidade, você já viajou o equivalente a ${voltas} circunferências terrestres. E ainda nem saiu de casa.`,'fun')+
+    icard('✏️',`Ritmo atual: ${ritmo} predinho/dia`,`Pra fechar o ano em dia, você precisa de ${ritmoNec}/dia. ${ritmoNec<=ritmo?'Estás adiantado — aproveita pra descansar a mão.':'Bora ligar o modo turbo.'}`,'');
+
+  // regiões chart
+  const rLab=regioes.map(r=>r[0]),rVal=regioes.map(r=>r[1]),rCol=rLab.map(r=>RC[r]||'#888');
+  if(typeof Chart!=='undefined'){
+    Chart.defaults.font.family="'DM Sans', system-ui, sans-serif";
+    Chart.defaults.color='#111';
+    if(chartReg) chartReg.destroy();
+    chartReg=new Chart(document.getElementById('i-chart-reg'),{
+      type:'doughnut',
+      data:{labels:rLab,datasets:[{data:rVal,backgroundColor:rCol,borderWidth:2.5,borderColor:'#111'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw} (${Math.round(c.raw/total*100)}%)`}}}}
+    });
+  }
+  const maxR=Math.max(...rVal,1);
+  document.getElementById('i-bar-reg').innerHTML=regioes.map(([r,n])=>brow(r,n,maxR,RC[r]||'#888')).join('');
+  document.getElementById('i-ins-reg').innerHTML=
+    (topReg?icard('📍',`${topReg[0]} lidera com ${topReg[1]} predinhos (${Math.round(topReg[1]/total*100)}%)`,`Faz sentido — é onde as raízes ficam.`,'good'):'')+
+    (botReg?icard('🗺️',`${botReg[0]} ainda é terra a explorar`,`Só ${botReg[1]} predinho${botReg[1]>1?'s':''} — tem muita rua com data esperando por lá.`,'warn'):'');
+
+  // estados
+  const estSort=Object.entries(estCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const maxE=estSort[0]?estSort[0][1]:1;
+  document.getElementById('i-bar-est').innerHTML=estSort.map(([u,n])=>brow(UF_NOME[u]||u,n,maxE,'#3B82F6')).join('');
+  document.getElementById('i-missing').innerHTML=naoVisitados.map(u=>`<span class="ins-pill">${UF_NOME[u]||u}</span>`).join('');
+
+  // meses chart
+  const mLab=[],mVal=[];
+  const mesAtual=new Date().getMonth()+1;
+  for(let m=1;m<=mesAtual;m++){mLab.push(MONTHS_ABR[m-1]);mVal.push(mesCount[m]||0);}
+  const mMax=Math.max(...mVal,1);
+  const mCol=mVal.map(v=>v===mMax?'#FFD93B':v===0?'#E4DFCF':'#3B82F6');
+  if(typeof Chart!=='undefined'){
+    if(chartMes) chartMes.destroy();
+    chartMes=new Chart(document.getElementById('i-chart-mes'),{
+      type:'bar',
+      data:{labels:mLab,datasets:[{data:mVal,backgroundColor:mCol,borderColor:'#111',borderWidth:2,borderRadius:6,borderSkipped:false}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:12,weight:'600'}}},y:{grid:{color:'rgba(17,17,17,.1)'},ticks:{font:{size:12},stepSize:1},beginAtZero:true}}}
+    });
+  }
+  const mesMais=Object.entries(mesCount).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('i-ins-mes').innerHTML=mesMais?icard('🌟',`${MONTHS_ABR[mesMais[0]-1]} foi o mês mais produtivo`,`${mesMais[1]} predinhos — provavelmente teve uma semana boa ou muita chuva que não deixou sair.`,'good'):'';
+}
 
 /* FALLBACK — dados locais usados quando SHEET_CSV_URL está vazio ou inacessível */
 const FALLBACK=[
@@ -636,147 +849,6 @@ const FALLBACK=[
   {d:20,m:3,dia:'20/03',rua:'Vinte de Março',cidade:'Gentil',uf:'RS',regiao:'Sul',lat:-28.431,lng:-52.441,img:''},
   {d:21,m:3,dia:'21/03',rua:'Vinte e Um de Março',cidade:'Potirendaba',uf:'SP',regiao:'Sudeste',lat:-21.043,lng:-49.374,img:''},
 ];
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script>
-(function(){
-const RC={'Sul':'#1D9E75','Sudeste':'#185FA5','Nordeste':'#993C1D','Centro Oeste':'#854F0B','Norte':'#534AB7'};
-const ALL_UF=['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
-const UF_NOME={'AC':'Acre','AL':'Alagoas','AM':'Amazonas','AP':'Amapá','BA':'Bahia','CE':'Ceará','DF':'Distrito Federal','ES':'Espírito Santo','GO':'Goiás','MA':'Maranhão','MG':'Minas Gerais','MS':'Mato Grosso do Sul','MT':'Mato Grosso','PA':'Pará','PB':'Paraíba','PE':'Pernambuco','PI':'Piauí','PR':'Paraná','RJ':'Rio de Janeiro','RN':'Rio Grande do Norte','RO':'Rondônia','RR':'Roraima','RS':'Rio Grande do Sul','SC':'Santa Catarina','SE':'Sergipe','SP':'São Paulo','TO':'Tocantins'};
-const MONTHS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-
-function hav(a,b){
-  const R=6371,toR=Math.PI/180;
-  const dlat=(b[0]-a[0])*toR,dlon=(b[1]-a[1])*toR;
-  const h=Math.sin(dlat/2)**2+Math.cos(a[0]*toR)*Math.cos(b[0]*toR)*Math.sin(dlon/2)**2;
-  return R*2*Math.asin(Math.sqrt(h));
-}
-
-function icard(icon,title,body,cls=''){
-  return `<div class="ins-icard ${cls}"><div class="ins-icon">${icon}</div><div><div class="ins-icard-title">${title}</div><div class="ins-icard-body">${body}</div></div></div>`;
-}
-
-function brow(label,count,max,color){
-  return `<div class="ins-bar-row"><div class="ins-bar-label" title="${label}">${label}</div><div class="ins-bar-track"><div class="ins-bar-fill" style="width:${Math.round(count/max*100)}%;background:${color}"></div></div><div class="ins-bar-count">${count}</div></div>`;
-}
-
-const origBoot = window.boot;
-window.boot = function(data){
-  if(origBoot) origBoot(data);
-  renderInsights(data);
-};
-
-function renderInsights(data){
-  if(!data||!data.length) return;
-  const total=data.length;
-  const hoje=new Date();
-  const dias=Math.round((hoje-new Date(2026,0,1))/(864e5))+1;
-
-  // km
-  const sorted=[...data].sort((a,b)=>{
-    if(a.m!==b.m) return a.m-b.m; return a.d-b.d;
-  });
-  let km=0;
-  for(let i=1;i<sorted.length;i++) km+=hav([sorted[i-1].lat,sorted[i-1].lng],[sorted[i].lat,sorted[i].lng]);
-  const kmFmt=Math.round(km).toLocaleString('pt-BR');
-
-  // progress
-  const pct=Math.round(total/365*100);
-  document.getElementById('i-total').textContent=total;
-  document.getElementById('i-restam').textContent=365-total;
-  document.getElementById('i-pct').textContent=pct+'%';
-  document.getElementById('i-km').textContent=kmFmt+' km';
-  document.getElementById('i-prog').style.width=pct+'%';
-  document.getElementById('i-prog-l').textContent=total+' feitos';
-
-  // cidades
-  const cidades=data.map(r=>r.cidade||'').filter(Boolean);
-  const maisLonga=[...cidades].sort((a,b)=>b.length-a.length)[0]||'—';
-  const maisCurta=[...cidades].sort((a,b)=>a.length-b.length)[0]||'—';
-
-  // maior salto
-  let maiorSalto=0,maiorPar=['',''];
-  for(let i=1;i<sorted.length;i++){
-    const d=hav([sorted[i-1].lat,sorted[i-1].lng],[sorted[i].lat,sorted[i].lng]);
-    if(d>maiorSalto){maiorSalto=d;maiorPar=[sorted[i-1].cidade,sorted[i].cidade];}
-  }
-
-  // estados
-  const estCount={};
-  data.forEach(r=>{const u=(r.uf||'').toUpperCase();if(u)estCount[u]=(estCount[u]||0)+1;});
-  const visitados=Object.keys(estCount);
-  const naoVisitados=ALL_UF.filter(u=>!visitados.includes(u));
-  const topUF=Object.entries(estCount).sort((a,b)=>b[1]-a[1])[0];
-
-  // regiões
-  const regCount={};
-  data.forEach(r=>{const g=(r.regiao||'').trim();if(g)regCount[g]=(regCount[g]||0)+1;});
-  const regioes=Object.entries(regCount).sort((a,b)=>b[1]-a[1]);
-  const topReg=regioes[0],botReg=regioes[regioes.length-1];
-
-  // meses
-  const mesCount={};
-  data.forEach(r=>{if(r.m)mesCount[r.m]=(mesCount[r.m]||0)+1;});
-
-  // records
-  document.getElementById('i-records').innerHTML=`
-    <div class="ins-rec-card"><div class="ins-rec-val">${kmFmt} km</div><div class="ins-rec-label">percurso virtual total</div></div>
-    <div class="ins-rec-card"><div class="ins-rec-val">${Math.round(maiorSalto).toLocaleString('pt-BR')} km</div><div class="ins-rec-label">maior salto (${maiorPar[0]} → ${maiorPar[1]})</div></div>
-    <div class="ins-rec-card"><div class="ins-rec-val">${Math.round(km/Math.max(sorted.length-1,1)).toLocaleString('pt-BR')} km</div><div class="ins-rec-label">média por salto</div></div>
-    <div class="ins-rec-card"><div class="ins-rec-val">${maisLonga}</div><div class="ins-rec-label">cidade com nome mais longo</div></div>
-    <div class="ins-rec-card"><div class="ins-rec-val">${maisCurta}</div><div class="ins-rec-label">cidade com nome mais curto</div></div>
-    <div class="ins-rec-card"><div class="ins-rec-val">${topUF?topUF[0]+' ('+topUF[1]+'x)':'—'}</div><div class="ins-rec-label">estado mais desenhado</div></div>
-  `;
-
-  const voltas=Math.round(km/40075*10)/10;
-  const ritmo=Math.round(total/Math.max(dias,1)*10)/10;
-  const ritmoNec=Math.round((365-total)/Math.max(365-dias,1)*10)/10;
-  document.getElementById('i-fun').innerHTML=
-    icard('🌍',`${kmFmt} km — ${voltas} voltas ao redor da Terra`,`Em linha reta, de cidade em cidade, você já viajou o equivalente a ${voltas} circunferências terrestres. E ainda nem saiu de casa.`,'fun')+
-    icard('✏️',`Ritmo atual: ${ritmo} predinho/dia`,`Pra fechar o ano em dia, você precisa de ${ritmoNec}/dia. ${ritmoNec<=ritmo?'Estás adiantado — aproveita pra descansar a mão.':'Bora ligar o modo turbo.'}`,'');
-
-  // regiões chart
-  const rLab=regioes.map(r=>r[0]),rVal=regioes.map(r=>r[1]),rCol=rLab.map(r=>RC[r]||'#888');
-  new Chart(document.getElementById('i-chart-reg'),{
-    type:'doughnut',
-    data:{labels:rLab,datasets:[{data:rVal,backgroundColor:rCol,borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw} (${Math.round(c.raw/total*100)}%)`}}}}
-  });
-  const maxR=Math.max(...rVal,1);
-  document.getElementById('i-bar-reg').innerHTML=regioes.map(([r,n])=>brow(r,n,maxR,RC[r]||'#888')).join('');
-  document.getElementById('i-ins-reg').innerHTML=
-    (topReg?icard('📍',`${topReg[0]} lidera com ${topReg[1]} predinhos (${Math.round(topReg[1]/total*100)}%)`,`Faz sentido — é onde as raízes ficam.`,'good'):'')+
-    (botReg?icard('🗺️',`${botReg[0]} ainda é terra a explorar`,`Só ${botReg[1]} predinho${botReg[1]>1?'s':''} — tem muita rua com data esperando por lá.`,'warn'):'');
-
-  // estados
-  const estSort=Object.entries(estCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const maxE=estSort[0]?estSort[0][1]:1;
-  document.getElementById('i-bar-est').innerHTML=estSort.map(([u,n])=>brow(UF_NOME[u]||u,n,maxE,'#1D9E75')).join('');
-  document.getElementById('i-missing').innerHTML=naoVisitados.map(u=>`<span class="ins-pill">${UF_NOME[u]||u}</span>`).join('');
-
-  // meses chart
-  const mLab=[],mVal=[];
-  const mesAtual=new Date().getMonth()+1;
-  for(let m=1;m<=mesAtual;m++){mLab.push(MONTHS[m-1]);mVal.push(mesCount[m]||0);}
-  const mMax=Math.max(...mVal,1);
-  const mCol=mVal.map(v=>v===mMax?'#1D9E75':v===0?'#d3d1c7':'#9FE1CB');
-  new Chart(document.getElementById('i-chart-mes'),{
-    type:'bar',
-    data:{labels:mLab,datasets:[{data:mVal,backgroundColor:mCol,borderRadius:4,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#888780',font:{size:11}}},y:{grid:{color:'#f1efe8'},ticks:{color:'#888780',font:{size:11},stepSize:1},beginAtZero:true}}}
-  });
-  const mesMais=Object.entries(mesCount).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('i-ins-mes').innerHTML=mesMais?icard('🌟',`${MONTHS[mesMais[0]-1]} foi o mês mais produtivo`,`${mesMais[1]} predinhos — provavelmente teve uma semana boa ou muita chuva que não deixou sair.`,'good'):'';
-
-  // próximos
-  //document.getElementById('i-proximos').innerHTML=
-    //(naoVisitados.length?icard('🎯','Conquiste novos estados',`Ainda faltam ${naoVisitados.length} estados. Os mais fáceis de encontrar ruas com datas tendem a ser cidades do interior. Já tem sugestão de algum seguidor?`,'warn'):'')+
-    //(botReg?icard('⚖️',`Reequilibre a ${botReg[0]}`,`Com apenas ${botReg[1]} predinho${botReg[1]>1?'s':''}, essa região merece mais atenção nas próximas semanas.`,'warn'):'')+
-    //icard('📸','Preenche as imagens que faltam na planilha','Predinhos com foto têm muito mais impacto — quem ver vai querer encomendar na hora.','')+
-    //icard('📢','Compartilha esses dados nos stories','Esses números contam uma história incrível. Um print do painel de progresso com o link já é conteúdo.','good');
-}
-})();
 </script>
 
 </body>
