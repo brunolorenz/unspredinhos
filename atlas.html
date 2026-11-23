@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas · Predinho do Dia 2026</title>
+<meta name="description" content="Mapa, calendário e galeria de todos os predinhos do projeto Predinho do Dia 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<style>
+  .page-hero{padding-top:clamp(2.2rem,5vw,3.5rem)}
+  h1{font-size:clamp(2rem,4.4vw,3.2rem)}
+  #controls{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.6rem 0 1.4rem}
+  .btn-filter{display:inline-flex;align-items:center;gap:.45rem}
+  .btn-filter::before{content:'';width:11px;height:11px;border-radius:50%;border:2px solid var(--tinta);background:var(--cor,#fff)}
+  .btn-filter[data-region="all"]::before{display:none}
+  .btn-filter.active::before{border-color:#fff}
+
+  #layout{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;align-items:start}
+  .painel{padding:1.1rem}
+  #map svg{width:100%;display:block}
+  #stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:1rem}
+  .stat{background:var(--tom);border:2px solid var(--tinta);border-radius:12px;padding:.55rem .4rem;text-align:center}
+  .stat-n{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.5rem;line-height:1.1}
+  .stat-l{font-size:.72rem;font-weight:600;color:var(--mudo)}
+
+  #month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+  #month-label{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.35rem}
+  .nav-btn{width:40px;height:40px;background:#fff;border:2.5px solid var(--tinta);border-radius:50%;font-size:1.3rem;font-weight:800;line-height:1;cursor:pointer;color:var(--tinta);box-shadow:0 3px 0 var(--tinta);transition:all .12s}
+  .nav-btn:hover{background:var(--sol);transform:translateY(1px);box-shadow:0 2px 0 var(--tinta)}
+  .nav-btn:disabled{opacity:.3;cursor:default}
+  #cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .cal-dow{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.75rem;color:var(--mudo);text-align:center;padding:2px 0 4px}
+  .cal-day{aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1.5px dashed rgba(17,17,17,.2);transition:transform .12s,box-shadow .12s,background .12s;user-select:none;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.85rem}
+  .cal-day.empty{border:none}
+  .cal-day.tem{cursor:pointer;border:2px solid var(--tinta)}
+  .cal-day.fora{color:var(--mudo);font-weight:600}
+  .cal-day.extra{border-style:dashed;border-color:var(--coral)}
+  .cal-day.tem:hover,.cal-day.sel{transform:translateY(-2px);box-shadow:0 3px 0 var(--tinta)}
+  #detail{margin-top:1rem;padding-top:1rem;border-top:2px dashed var(--tinta);font-size:.95rem;color:var(--mudo);min-height:56px;text-align:center}
+  #detail.filled{color:var(--tinta);text-align:left}
+  .detail-region{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 10px;border:2px solid var(--tinta);border-radius:99px;margin-bottom:.5rem}
+  .detail-city{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.3rem;line-height:1.15}
+  .detail-sub{font-size:.9rem;color:var(--mudo);margin-top:.15rem}
+  #detail .pic{margin-top:.9rem;border:2.5px solid var(--tinta);border-radius:14px;box-shadow:0 4px 0 var(--tinta)}
+  #detail .btn--sm{margin-top:1rem}
+  @media (max-width:700px){
+    #layout{grid-template-columns:1fr;gap:1.2rem}
+    #map-col{order:2}
+    #stats{grid-template-columns:repeat(2,1fr)}
+  }
+
+  /* Galeria */
+  .gal-topo{display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:1rem 0 1.2rem}
+  .busca{position:relative;flex:1;min-width:220px;max-width:380px}
+  .busca input{width:100%;font:inherit;font-size:1rem;padding:.7rem 1rem .7rem 2.7rem;background:#fff;border:2.5px solid var(--tinta);border-radius:14px;box-shadow:0 4px 0 var(--tinta);outline:none}
+  .busca svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;pointer-events:none}
+  .meses{display:flex;gap:.45rem;overflow-x:auto;padding:4px 2px 8px;margin-bottom:1rem}
+  .meses .chip{font-size:.8rem;padding:.35rem .8rem}
+  .galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem}
+  .gal-item{text-decoration:none;color:var(--tinta);display:block}
+  .gal-item .pic{border:2.5px solid var(--tinta);border-radius:14px;box-shadow:0 4px 0 var(--tinta);transition:transform .15s,box-shadow .15s}
+  .gal-item:hover .pic{transform:translateY(-4px) rotate(-.6deg);box-shadow:0 8px 0 var(--tinta)}
+  .gal-item b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.95rem;margin-top:.55rem}
+  .gal-item small{display:block;font-size:.8rem;color:var(--mudo);line-height:1.3}
+  .gal-vazio{grid-column:1/-1;text-align:center;color:var(--mudo);padding:2rem 0}
+  @media (max-width:500px){ .galeria{grid-template-columns:repeat(2,1fr);gap:.8rem} }
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<main class="page-hero wrap">
+  <span class="sticker">Atlas · 2026</span>
+  <h1>Todos os predinhos, <span>no mapa</span></h1>
+  <p class="lead">Navegue pelo calendário ou pelo mapa. Cada ponto é uma aquarela, numa rua com o nome do dia.</p>
+
+  <div id="controls">
+    <button class="chip btn-filter active" data-region="all">Todos</button>
+    <button class="chip btn-filter" data-region="Sul">Sul</button>
+    <button class="chip btn-filter" data-region="Sudeste">Sudeste</button>
+    <button class="chip btn-filter" data-region="Nordeste">Nordeste</button>
+    <button class="chip btn-filter" data-region="Centro Oeste">Centro-Oeste</button>
+    <button class="chip btn-filter" data-region="Norte">Norte</button>
+  </div>
+
+  <div id="layout">
+    <div id="map-col">
+      <div class="card painel">
+        <div id="map"><svg id="map-svg" role="img" aria-label="Mapa do Brasil com todos os predinhos"></svg></div>
+        <div id="stats">
+          <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">predinhos</div></div>
+          <div class="stat"><div class="stat-n" id="s-estados">—</div><div class="stat-l">estados</div></div>
+          <div class="stat"><div class="stat-n" id="s-cidades">—</div><div class="stat-l">cidades</div></div>
+          <div class="stat"><div class="stat-n" id="s-km">—</div><div class="stat-l">km de saltos</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="cal-col">
+      <div class="card painel">
+        <div id="month-nav">
+          <button class="nav-btn" id="prev-month" aria-label="Mês anterior">‹</button>
+          <span id="month-label"></span>
+          <button class="nav-btn" id="next-month" aria-label="Próximo mês">›</button>
+        </div>
+        <div id="cal-grid"></div>
+        <div id="detail">Selecione um dia para ver o predinho</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="secao" id="galeria-sec">
+    <span class="sticker sticker--branco">Galeria</span>
+    <div class="gal-topo">
+      <h2 style="margin:.6rem 0 0">As <em><span id="gal-n">—</span> aquarelas</em></h2>
+      <label class="busca"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#111" stroke-width="2.5"/><path d="M20 20l-4-4" stroke="#111" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <input id="busca" type="search" placeholder="Busque cidade, estado ou rua" aria-label="Buscar"></label>
+    </div>
+    <div class="meses" id="gal-meses"></div>
+    <div class="galeria" id="galeria"></div>
+  </section>
+</main>
+<div id="rodape"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+montarMoldura('atlas');
+document.querySelectorAll('.btn-filter').forEach(b => { if(RC[b.dataset.region]) b.style.setProperty('--cor', RC[b.dataset.region]); });
+
+let regiao = 'all', mes = 1, sel = null, dots;
+const noFiltro = p => regiao==='all' || p.regiao===regiao;
+const ultimoMes = P[P.length-1].m;
+{ const h = new Date(); mes = Math.min(h.getMonth()+1, ultimoMes); }
+
+/* ── Mapa ── */
+carregarBrasil().then(features => {
+  const svg = d3.select('#map-svg');
+  const proj = desenharBrasil(svg, features);
+  dots = svg.append('g').selectAll('circle').data(P).join('circle')
+    .attr('cx',p=>proj([p.lng,p.lat])[0]).attr('cy',p=>proj([p.lng,p.lat])[1])
+    .attr('fill',p=>RC[p.regiao]||'#888').attr('stroke','#111').style('cursor','pointer')
+    .on('mousemove',(e,p)=>mostrarTip(e,p)).on('mouseleave',esconderTip)
+    .on('click',(e,p)=>selecionar(p));
+  pintarPontos();
+}).catch(e => console.warn('Mapa não carregou', e));
+
+function pintarPontos(){
+  if(!dots) return;
+  dots.each(function(p){
+    const el = d3.select(this), ativo = sel===p, f = noFiltro(p);
+    el.attr('r', ativo?11:6).attr('stroke-width', ativo?3:1.3).attr('opacity', f ? (p.m===mes||ativo ? 1 : .55) : .08);
+    if(ativo) el.raise();
+  });
+}
+
+/* ── Calendário ── */
+function montarCalendario(){
+  const g = document.getElementById('cal-grid');
+  const dias = mes===2 ? 31 : [4,6,9,11].includes(mes) ? 30 : 31;
+  let h = ['D','S','T','Q','Q','S','S'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  h += '<div class="cal-day empty"></div>'.repeat(new Date(2026,mes-1,1).getDay());
+  for(let d=1; d<=dias; d++){
+    const p = BY[`${d}-${mes}`];
+    if(mes===2 && d>28 && !p) continue;
+    if(!p){ h += `<div class="cal-day fora">${d}</div>`; continue; }
+    const f = noFiltro(p), c = RC[p.regiao];
+    h += `<div class="cal-day ${f?'tem':'fora'} ${p.impossivel?'extra':''} ${sel===p?'sel':''}" data-key="${p.key}" style="${f?`background:${sel===p?c:c+'66'}`:''}" title="${p.impossivel?'Dia extra: não existe no calendário de 2026':''}">${d}</div>`;
+  }
+  g.innerHTML = h;
+  document.getElementById('month-label').textContent = `${MESES_T[mes-1]} 2026`;
+  document.getElementById('prev-month').disabled = mes===1;
+  document.getElementById('next-month').disabled = mes===12;
+}
+document.getElementById('cal-grid').addEventListener('click', e => {
+  const el = e.target.closest('.cal-day.tem'); if(!el) return;
+  const p = BY[el.dataset.key]; selecionar(sel===p ? null : p);
+});
+document.getElementById('cal-grid').addEventListener('mousemove', e => {
+  const el = e.target.closest('.cal-day.tem'); el ? mostrarTip(e, BY[el.dataset.key]) : esconderTip();
+});
+document.getElementById('cal-grid').addEventListener('mouseleave', esconderTip);
+
+function selecionar(p){
+  sel = p; if(p) mes = p.m;
+  montarCalendario(); pintarPontos(); detalhe();
+}
+function detalhe(){
+  const el = document.getElementById('detail');
+  if(!sel){ el.className=''; el.textContent='Selecione um dia para ver o predinho'; return; }
+  const p = sel;
+  el.className = 'filled';
+  el.innerHTML = `<span class="detail-region" style="background:${RC[p.regiao]}">${REG_NOME[p.regiao]||p.regiao}</span>
+    <div class="detail-city">${p.cidade} · ${p.uf}</div>
+    <div class="detail-sub">${dataExtenso(p)} · ${p.rua}</div>
+    <a href="${diaHref(p)}">${pic(p,800)}</a>
+    <a class="btn--sm" href="${diaHref(p)}">Abrir a página deste dia →</a>`;
+}
+
+function numeros(){
+  const L = P.filter(noFiltro), s = stats(L);
+  document.getElementById('s-total').textContent = s.total;
+  document.getElementById('s-estados').textContent = s.estados;
+  document.getElementById('s-cidades').textContent = s.cidades;
+  document.getElementById('s-km').textContent = s.km>=1000 ? Math.round(s.km/1000)+' mil' : fmt(s.km);
+}
+
+document.getElementById('prev-month').onclick = () => { if(mes>1){ mes--; sel=null; montarCalendario(); pintarPontos(); detalhe(); } };
+document.getElementById('next-month').onclick = () => { if(mes<12){ mes++; sel=null; montarCalendario(); pintarPontos(); detalhe(); } };
+document.querySelectorAll('.btn-filter').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.btn-filter').forEach(x => x.classList.toggle('active', x===b));
+  regiao = b.dataset.region; montarCalendario(); pintarPontos(); numeros(); galeria();
+});
+
+/* ── Galeria ── */
+let mesGal = 0;
+const semAcento = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+document.getElementById('gal-meses').innerHTML = ['Todos', ...MESES_ABR].map((m,i) => `<button class="chip ${i===0?'active':''}" data-m="${i}">${m}</button>`).join('');
+document.getElementById('gal-meses').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if(!b) return;
+  mesGal = +b.dataset.m;
+  document.querySelectorAll('#gal-meses .chip').forEach(x => x.classList.toggle('active', x===b));
+  galeria();
+});
+document.getElementById('busca').addEventListener('input', galeria);
+function galeria(){
+  const q = semAcento(document.getElementById('busca').value.trim());
+  const L = P.filter(p => noFiltro(p) && (!mesGal || p.m===mesGal) && (!q || semAcento(`${p.cidade} ${p.uf} ${UF_NOME[p.uf]} ${p.rua}`).includes(q)));
+  document.getElementById('gal-n').textContent = L.length;
+  document.getElementById('galeria').innerHTML = L.length
+    ? L.map(p => `<a class="gal-item" href="${diaHref(p)}">${pic(p,400)}<b>${dataExtenso(p)}</b><small>${p.cidade} · ${p.uf}</small></a>`).join('')
+    : `<div class="gal-vazio">Nenhum predinho encontrado com essa busca.</div>`;
+}
+
+montarCalendario(); numeros(); galeria();
+</script>
+</body>
+</html>

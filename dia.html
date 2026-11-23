@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predinho do Dia · um dia do projeto</title>
+<meta name="description" content="Um dos predinhos do projeto Predinho do Dia 2026, de @unspredinhos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<style>
+  .topo-dia{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-top:1.6rem;flex-wrap:wrap}
+  .setas{display:flex;gap:.6rem}
+  .seta{display:inline-flex;align-items:center;gap:.4rem;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.9rem;text-decoration:none;color:var(--tinta);background:#fff;border:2.5px solid var(--tinta);border-radius:99px;padding:.45rem .9rem;box-shadow:0 3px 0 var(--tinta);transition:all .12s}
+  .seta:hover{background:var(--sol);transform:translateY(1px);box-shadow:0 2px 0 var(--tinta)}
+  .seta[aria-disabled="true"]{opacity:.35;pointer-events:none}
+
+  .dia{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(1.5rem,4vw,3rem);margin-top:1.4rem;align-items:start}
+  .dia__img .pic{border:2.5px solid var(--tinta);border-radius:20px;box-shadow:0 6px 0 var(--tinta)}
+  .dia__info h1{font-size:clamp(2.4rem,5.5vw,4rem);margin:.7rem 0 .2rem}
+  .dia__semana{font-size:1.05rem;color:var(--mudo);font-weight:600}
+  .placa{display:inline-flex;flex-direction:column;align-items:center;background:#1f5fbf;color:#fff;border:3px solid #fff;outline:2.5px solid var(--tinta);border-radius:8px;padding:.45rem 1.2rem .5rem;font-weight:700;box-shadow:0 5px 0 var(--tinta);transform:rotate(-1.5deg);margin:1.4rem 0 1.2rem}
+  .placa small{font-size:.66rem;font-weight:600;opacity:.85;text-transform:uppercase;letter-spacing:.1em}
+  .placa span{font-size:clamp(1rem,2.2vw,1.3rem);text-transform:uppercase;letter-spacing:.02em;text-align:center}
+  .linha-info{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem}
+  .linha-info span{font-size:.85rem;font-weight:600;border:2px solid var(--tinta);border-radius:99px;padding:.2rem .8rem;background:#fff}
+  .mini-mapa{padding:.8rem;margin-top:.4rem}
+  .mini-mapa svg{width:100%;display:block;max-height:300px}
+  .mini-mapa p{font-size:.88rem;color:var(--mudo);margin-top:.5rem;text-align:center}
+  .mini-mapa p b{color:var(--tinta)}
+  .acoes{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.4rem}
+  .nota{font-family:'Lora',serif;font-style:italic;font-size:1.1rem;border-left:4px solid var(--sol);padding-left:.9rem;margin:1.2rem 0 0}
+  .imp-aviso{background:#FFE1D9;border:2px solid var(--tinta);border-radius:14px;padding:.7rem .9rem;font-size:.92rem;margin-bottom:1rem}
+
+  .semana{margin-top:3.5rem}
+  .semana__fila{display:grid;grid-template-columns:repeat(7,1fr);gap:.7rem;margin-top:1rem}
+  .semana__fila a{display:block;text-decoration:none;color:var(--tinta);text-align:center;font-size:.78rem;font-weight:600}
+  .semana__fila a .pic{border:2px solid var(--tinta);border-radius:10px;box-shadow:0 3px 0 var(--tinta);margin-bottom:.35rem;transition:transform .15s}
+  .semana__fila a:hover .pic{transform:translateY(-3px)}
+  .semana__fila a.atual .pic{outline:4px solid var(--sol);outline-offset:2px}
+  .aviso-copia{font-size:.85rem;font-weight:600;color:var(--mudo);align-self:center}
+  @media (max-width:760px){
+    .dia{grid-template-columns:1fr}
+    .semana__fila{grid-template-columns:repeat(4,1fr)}
+    .semana__fila a:nth-child(n+5){display:none}
+  }
+</style>
+</head>
+<body>
+<div id="nav"></div>
+<main class="wrap">
+  <div class="topo-dia">
+    <a class="seta" href="atlas.html">← Atlas</a>
+    <div class="setas"><a class="seta" id="ant" href="#">‹ Dia anterior</a><a class="seta" id="prox" href="#">Próximo dia ›</a></div>
+  </div>
+  <article class="dia" id="dia"></article>
+  <section class="semana">
+    <span class="sticker sticker--branco">Os dias em volta</span>
+    <div class="semana__fila" id="semana"></div>
+  </section>
+</main>
+<div id="rodape"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+/* Endereço de cada dia: dia.html#15-11  (dia-mês) */
+montarMoldura('');
+let features;
+carregarBrasil().then(f => { features = f; desenharMini(); }).catch(()=>{});
+
+function atual(){
+  const k = location.hash.slice(1);
+  if(BY[k]) return BY[k];
+  const h = new Date(); return BY[`${h.getDate()}-${h.getMonth()+1}`] || P[0];
+}
+
+function render(){
+  const p = atual(), ant = P[p.i-1], prox = P[p.i+1];
+  document.title = `${dataExtenso(p)} · ${p.cidade}/${p.uf} · Predinho do Dia`;
+  const waTxt = encodeURIComponent(`Olá! Quero uma reprodução do Predinho do Dia de ${dataExtenso(p)} (${p.rua}, ${p.cidade}/${p.uf}).`);
+  document.getElementById('dia').innerHTML = `
+    <div class="dia__img">${pic(p,1200)}</div>
+    <div class="dia__info">
+      <span class="sticker">Dia ${p.n} de ${P.length}</span>
+      <h1>${dataExtenso(p)}</h1>
+      <div class="dia__semana">${p.impossivel ? 'um dia que não existe em 2026' : diaSemana(p)+', 2026'}</div>
+      <div class="placa"><small>${p.cidade} · ${p.uf}</small><span>${p.rua.replace(/,.*$/,'')}</span></div>
+      ${p.impossivel ? `<div class="imp-aviso">2026 não é bissexto: fevereiro termina no dia 28. Mas esta rua existe, e entrou no projeto como dia extra.</div>` : ''}
+      <div class="linha-info">
+        <span>${p.cidade}</span><span>${UF_NOME[p.uf]}</span>
+        <span style="background:${RC[p.regiao]}">${REG_NOME[p.regiao]||p.regiao}</span>
+        ${p.tecnica ? `<span>${p.tecnica}</span>` : ''}
+      </div>
+      <div class="card mini-mapa"><svg id="mini"></svg>
+        <p>${ant ? `A <b>${fmt(p.salto)} km</b> do dia anterior, em ${ant.cidade} (${ant.uf}).` : 'O primeiro predinho do ano.'}</p>
+      </div>
+      <div class="acoes">
+        <a class="btn--sm" href="https://wa.me/${LINKS.whats}?text=${waTxt}" target="_blank" rel="noopener">Quero uma reprodução deste dia</a>
+        <button class="btn--sm btn--branco" id="copiar" type="button">Copiar link</button>
+        <span class="aviso-copia" id="copiado" hidden>Link copiado ✓</span>
+      </div>
+    </div>`;
+  const setLink = (el, q) => { el.href = q ? '#'+q.key : '#'; el.setAttribute('aria-disabled', q ? 'false' : 'true'); };
+  setLink(document.getElementById('ant'), ant); setLink(document.getElementById('prox'), prox);
+  document.getElementById('copiar').onclick = () => {
+    navigator.clipboard.writeText(location.href).then(() => { document.getElementById('copiado').hidden = false; }).catch(()=>{});
+  };
+  const viz = P.slice(Math.max(0, p.i-3), Math.max(0, p.i-3) + 7);
+  document.getElementById('semana').innerHTML = viz.map(q => `<a href="#${q.key}" class="${q===p?'atual':''}">${pic(q,300)}${q.dia} · ${q.cidade}</a>`).join('');
+  desenharMini();
+  scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+}
+
+function desenharMini(){
+  const svgEl = document.getElementById('mini'); if(!svgEl || !features) return;
+  const p = atual(), svg = d3.select(svgEl); svg.selectAll('*').remove();
+  const proj = desenharBrasil(svg, features, {tinta:false});
+  const pt = q => proj([q.lng,q.lat]);
+  const viz = [P[p.i-1], p, P[p.i+1]].filter(Boolean);
+  svg.append('path').attr('d', d3.line()(viz.map(pt))).attr('fill','none').attr('stroke','#111').attr('stroke-width',1.6).attr('stroke-dasharray','5 4').attr('opacity',.7);
+  viz.filter(q => q!==p).forEach(q => svg.append('circle').attr('cx',pt(q)[0]).attr('cy',pt(q)[1]).attr('r',5).attr('fill','#fff').attr('stroke','#111').attr('stroke-width',1.5));
+  const [x,y] = pt(p);
+  svg.append('circle').attr('cx',x).attr('cy',y).attr('r',20).attr('fill',RC[p.regiao]).attr('opacity',.35);
+  svg.append('circle').attr('cx',x).attr('cy',y).attr('r',9).attr('fill',RC[p.regiao]).attr('stroke','#111').attr('stroke-width',2.5);
+}
+
+addEventListener('hashchange', render);
+addEventListener('keydown', e => {
+  if(e.target.closest('input,select,textarea')) return;
+  const p = atual();
+  if(e.key==='ArrowLeft' && P[p.i-1]) location.hash = P[p.i-1].key;
+  if(e.key==='ArrowRight' && P[p.i+1]) location.hash = P[p.i+1].key;
+});
+render();
+</script>
+</body>
+</html>

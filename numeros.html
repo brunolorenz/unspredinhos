@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Números · Predinho do Dia 2026</title>
+<meta name="description" content="O tamanho do esforço do projeto Predinho do Dia 2026: quilômetros, estados, recordes e curiosidades.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<style>
+  .page-hero{padding-top:clamp(2.2rem,5vw,3.5rem)}
+  .grandes{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-top:2rem}
+  .grandes .card{padding:1.2rem .8rem;text-align:center}
+  .grandes .card:first-child{background:var(--sol)}
+  .grandes b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.7rem,3.6vw,2.6rem);line-height:1}
+  .grandes small{font-size:.82rem;font-weight:600;color:var(--mudo)}
+  @media (max-width:800px){ .grandes{grid-template-columns:repeat(2,1fr)} .grandes .card:first-child{grid-column:1/-1} }
+
+  .esforco{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+  .esforco .card{padding:1.2rem 1.1rem}
+  .esforco b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:2rem;line-height:1.05}
+  .esforco small{font-weight:600;color:var(--mudo);font-size:.9rem}
+  .esforco .falta{border-style:dashed;box-shadow:none;background:transparent}
+  .esforco .falta b{color:#bbb}
+  @media (max-width:760px){ .esforco{grid-template-columns:1fr 1fr} }
+
+  .conquista{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+  .linha-tempo{list-style:none;position:relative;padding-left:1.6rem}
+  .linha-tempo::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:3px;background:var(--tinta);border-radius:3px}
+  .linha-tempo li{position:relative;padding:.3rem 0 .45rem;display:flex;gap:.7rem;align-items:baseline;flex-wrap:wrap}
+  .linha-tempo li::before{content:'';position:absolute;left:-1.6rem;top:.6rem;width:15px;height:15px;border-radius:50%;border:2.5px solid var(--tinta);background:var(--c,#fff)}
+  .linha-tempo .n{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.8rem;color:var(--mudo);min-width:1.6rem}
+  .linha-tempo .uf{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.05rem}
+  .linha-tempo .q{font-size:.85rem;color:var(--mudo)}
+  .linha-tempo a{color:inherit;text-decoration:none}
+  .linha-tempo a:hover .uf{text-decoration:underline}
+  .destaque{padding:1.4rem;position:sticky;top:calc(var(--nav-h) + 1rem)}
+  .destaque b.big{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:3.4rem;line-height:1}
+  .destaque p{color:var(--mudo);margin-top:.6rem}
+  @media (max-width:760px){ .conquista{grid-template-columns:1fr} .destaque{position:static} }
+
+  .barras{display:flex;flex-direction:column;gap:.5rem}
+  .barra{display:grid;grid-template-columns:150px 1fr 42px;gap:.7rem;align-items:center}
+  .barra span{font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .barra .trilho{height:16px;background:#fff;border:2px solid var(--tinta);border-radius:99px;overflow:hidden}
+  .barra .cheio{height:100%;border-right:2px solid var(--tinta);width:0;transition:width 1s ease}
+  .barra b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;text-align:right}
+  .duas{display:grid;grid-template-columns:1fr 1fr;gap:2.4rem}
+  @media (max-width:760px){ .duas{grid-template-columns:1fr} .barra{grid-template-columns:110px 1fr 36px} }
+
+  .colunas{display:grid;grid-template-columns:repeat(12,1fr);gap:.5rem;align-items:end;height:220px;padding:1rem 1rem .4rem}
+  .coluna{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:.3rem}
+  .coluna i{display:block;width:100%;background:var(--azul);border:2px solid var(--tinta);border-radius:8px 8px 3px 3px;height:0;transition:height 1s ease}
+  .coluna.max i{background:var(--sol)}
+  .coluna small{font-size:.72rem;font-weight:700}
+  .coluna em{font-style:normal;font-size:.68rem;font-weight:600;color:var(--mudo)}
+  @media (max-width:560px){ .coluna em{display:none} }
+
+  .recordes{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+  .recorde{padding:1.1rem 1rem}
+  .recorde .r-v{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.35rem;line-height:1.15;word-break:break-word}
+  .recorde .r-l{font-size:.82rem;font-weight:600;color:var(--mudo);margin-top:.25rem}
+  .recorde a{color:inherit}
+  @media (max-width:760px){ .recordes{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+<div id="nav"></div>
+<main class="page-hero wrap">
+  <span class="sticker">Números · 2026</span>
+  <h1>O tamanho do <span>esforço</span></h1>
+  <p class="lead">Um desenho por dia parece pouco, até você somar um ano inteiro deles.</p>
+  <div class="grandes" id="grandes"></div>
+
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">Da mesa de desenho</span><h2>O que não aparece <em>no mapa</em></h2></div>
+    <div class="esforco" id="esforco"></div>
+  </section>
+
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">A conquista dos estados</span><h2>Do primeiro ao <em>27º estado</em></h2></div>
+    <div class="conquista">
+      <ol class="linha-tempo" id="linha-tempo"></ol>
+      <div class="card destaque" id="destaque"></div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">Para onde foram os predinhos</span><h2>Regiões e <em>estados</em></h2></div>
+    <div class="duas">
+      <div><h3 style="margin-bottom:1rem">Por região</h3><div class="barras" id="b-reg"></div></div>
+      <div><h3 style="margin-bottom:1rem">Por estado</h3><div class="barras" id="b-uf"></div></div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">Mês a mês</span><h2>Quilômetros <em>por mês</em></h2><p class="mudo">A soma dos saltos de um dia para o outro em cada mês. Quanto mais alta a barra, mais o mapa foi cruzado.</p></div>
+    <div class="card colunas" id="colunas"></div>
+  </section>
+
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">Recordes e curiosidades</span><h2>Os <em>extremos</em> do ano</h2></div>
+    <div class="recordes" id="recordes"></div>
+  </section>
+</main>
+<div id="rodape"></div>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+/* ═════ NÚMEROS DA MESA DE DESENHO ═════
+   Preencha com os seus dados. null = aparece tracejado como "a preencher". */
+const ESFORCO = [
+  {v:null, sufixo:' h', l:'pintando'},
+  {v:null, sufixo:' h', l:'procurando ruas no mapa e no Street View'},
+  {v:null, sufixo:'',   l:'folhas de papel de aquarela'},
+  {v:null, sufixo:'',   l:'cadernos ou blocos completos'},
+  {v:null, sufixo:'',   l:'pincéis gastos'},
+  {v:null, sufixo:'',   l:'dias desenhando atrasado (e recuperando)'},
+];
+
+montarMoldura('numeros');
+const link = p => `<a href="${diaHref(p)}">${p.cidade} (${p.uf})</a>`;
+
+document.getElementById('grandes').innerHTML = [
+  [P.length,'aquarelas'], [TOTAL.cidades,'cidades'], [TOTAL.estados,'estados'],
+  [Math.round(TOTAL.km/1000)+' mil','km de saltos'], [(TOTAL.km/40075).toLocaleString('pt-BR',{maximumFractionDigits:1}),'voltas na Terra'],
+].map(([v,l]) => `<div class="card"><b>${v}</b><small>${l}</small></div>`).join('');
+
+document.getElementById('esforco').innerHTML = ESFORCO.map(e =>
+  `<div class="card ${e.v==null?'falta':''}"><b>${e.v==null ? '—' : e.v.toLocaleString('pt-BR')+e.sufixo}</b><small>${e.l}${e.v==null?' · a preencher':''}</small></div>`).join('');
+
+/* Conquista dos estados */
+const primeira = {};
+P.forEach(p => { if(!primeira[p.uf]) primeira[p.uf] = p; });
+const ordem = Object.values(primeira);
+document.getElementById('linha-tempo').innerHTML = ordem.map((p,i) =>
+  `<li style="--c:${RC[p.regiao]}"><span class="n">${i+1}º</span><a href="${diaHref(p)}"><span class="uf">${UF_NOME[p.uf]}</span></a><span class="q">${dataExtenso(p)} · ${p.cidade}</span></li>`).join('');
+const ult = ordem[ordem.length-1];
+document.getElementById('destaque').innerHTML = `
+  <span class="sticker" style="font-size:.72rem">O último a entrar</span>
+  <b class="big" style="margin-top:.8rem">Dia ${ult.n}</b>
+  <h3 style="margin-top:.3rem">${UF_NOME[ult.uf]}, em ${dataExtenso(ult)}</h3>
+  <p>Com ${ult.rua}, em ${ult.cidade}, o mapa completou os ${ordem.length} estados. ${ordem.length>9 ? `Os dez primeiros já estavam no mapa em ${dataExtenso(ordem[9])}.` : ''}</p>
+  <a href="${diaHref(ult)}" style="display:block;margin-top:1rem;border:2.5px solid var(--tinta);border-radius:14px;overflow:hidden;box-shadow:0 4px 0 var(--tinta)">${pic(ult,600)}</a>`;
+
+/* Barras */
+const conta = f => { const c = {}; P.forEach(p => c[f(p)] = (c[f(p)]||0)+1); return Object.entries(c).sort((a,b)=>b[1]-a[1]); };
+const barras = (id, lista, cor, nome) => {
+  const max = lista[0][1];
+  document.getElementById(id).innerHTML = lista.map(([k,n]) => `<div class="barra"><span title="${nome(k)}">${nome(k)}</span><div class="trilho"><div class="cheio" data-w="${n/max*100}" style="background:${cor(k)}"></div></div><b>${n}</b></div>`).join('');
+};
+barras('b-reg', conta(p=>p.regiao), k=>RC[k], k=>REG_NOME[k]||k);
+barras('b-uf', conta(p=>p.uf), k=>RC[SR[UF_NOME[k]]], k=>UF_NOME[k]);
+
+/* Km por mês */
+const kmMes = Array(12).fill(0); P.forEach(p => kmMes[p.m-1] += p.salto);
+const maxK = Math.max(...kmMes);
+document.getElementById('colunas').innerHTML = kmMes.map((k,i) =>
+  `<div class="coluna ${k===maxK?'max':''}" title="${MESES_T[i]}: ${fmt(k)} km"><em>${Math.round(k/1000)}k</em><i data-h="${k/maxK*100}"></i><small>${MESES_ABR[i]}</small></div>`).join('');
+
+/* Recordes */
+const saltos = P.slice(1).filter(p => p.salto > 0.5);
+const menor = saltos.reduce((a,b) => b.salto < a.salto ? b : a);
+const ext = (f, cmp) => P.reduce((a,b) => cmp(f(b), f(a)) ? b : a);
+const norte = ext(p=>p.lat,(x,y)=>x>y), sul = ext(p=>p.lat,(x,y)=>x<y), leste = ext(p=>p.lng,(x,y)=>x>y), oeste = ext(p=>p.lng,(x,y)=>x<y);
+const cid = conta(p=>p.cidade+'|'+p.uf)[0];
+const nomes = [...new Set(P.map(p=>p.cidade))];
+const longo = nomes.reduce((a,b)=>b.length>a.length?b:a), curto = nomes.reduce((a,b)=>b.length<a.length?b:a);
+const algarismo = P.filter(p => /\d+ de /i.test(p.rua.replace(/,.*$/,''))).length;
+const tipos = conta(p => p.rua.split(' ')[0]);
+const rec = (v,l) => `<div class="card recorde"><div class="r-v">${v}</div><div class="r-l">${l}</div></div>`;
+document.getElementById('recordes').innerHTML =
+  rec(`${fmt(TOTAL.maior.d)} km`, `maior salto: ${link(TOTAL.maior.de)} → ${link(TOTAL.maior.para)}`) +
+  rec(`${menor.salto<10 ? menor.salto.toLocaleString('pt-BR',{maximumFractionDigits:1}) : fmt(menor.salto)} km`, `menor salto: ${link(P[menor.i-1])} → ${link(menor)}`) +
+  rec(`${cid[0].split('|')[0]}`, `cidade mais visitada: ${cid[1]} predinhos`) +
+  rec(norte.cidade, `ponto mais ao norte (${norte.uf}, ${dataExtenso(norte)})`) +
+  rec(sul.cidade, `ponto mais ao sul (${sul.uf}, ${dataExtenso(sul)})`) +
+  rec(`${leste.cidade} ↔ ${oeste.cidade}`, `extremos leste (${leste.uf}) e oeste (${oeste.uf})`) +
+  rec(longo, `nome de cidade mais longo (${longo.length} letras)`) +
+  rec(curto, `nome de cidade mais curto`) +
+  rec(`${P.length-algarismo} × ${algarismo}`, `ruas com a data por extenso × em algarismos`) +
+  rec(tipos.map(([t,n])=>`${n} ${t.toLowerCase()}${n>1?'s':''}`).join(' · '), `ruas, avenidas e travessas`);
+
+/* anima as barras quando aparecem */
+const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){
+  e.target.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w+'%');
+  e.target.querySelectorAll('[data-h]').forEach(b => b.style.height = b.dataset.h+'%');
+  io.unobserve(e.target);
+}}), {threshold:.2});
+['b-reg','b-uf','colunas'].forEach(id => io.observe(document.getElementById(id)));
+</script>
+</body>
+</html>

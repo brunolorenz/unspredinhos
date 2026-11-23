@@ -1,0 +1,88 @@
+/* ═════════ Uns Predinhos · sistema visual (o mesmo da index do mapa) ═════════ */
+:root{
+  --fundo:#F8F6F0; --papel:#FFFFFF; --tinta:#111111; --azul:#3B82F6; --sol:#FFD93B;
+  --mudo:#52525B; --tom:#EFE9D6; --coral:#FF7A59; --menta:#34D399; --lilas:#A78BFA;
+  --wrap:1100px; --nav-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;scroll-padding-top:5rem}
+body{background:var(--fundo);color:var(--tinta);font-family:'DM Sans',system-ui,sans-serif;line-height:1.5;overflow-x:hidden;padding-top:var(--nav-h)}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.07;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+::selection{background:var(--sol);color:var(--tinta)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--azul);outline-offset:3px}
+img{max-width:100%}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(1.25rem,4vw,2rem)}
+
+.sticker{display:inline-block;padding:6px 14px;background:var(--sol);border:2px solid var(--tinta);border-radius:999px;font-weight:600;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;box-shadow:0 2px 0 var(--tinta)}
+.sticker--branco{background:#fff}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 clamp(1rem,4vw,2rem);background:rgba(248,246,240,.95);backdrop-filter:blur(8px);border-bottom:2.5px solid var(--tinta)}
+.nav__mark{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.15rem;color:var(--tinta);text-decoration:none;white-space:nowrap}
+.nav__links{display:flex;gap:1.3rem}
+.nav__links a{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:.92rem;color:var(--tinta);text-decoration:none;padding:.2rem 0;border-bottom:2.5px solid transparent}
+.nav__links a:hover{color:var(--azul)}
+.nav__links a.on{border-bottom-color:var(--tinta)}
+.nav__cta{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.9rem;color:#fff;text-decoration:none;background:var(--azul);border:2px solid var(--tinta);border-radius:100px;padding:.5rem 1.2rem;box-shadow:0 3px 0 var(--tinta);transition:all .1s;white-space:nowrap}
+.nav__cta:hover{transform:translateY(2px);box-shadow:0 1px 0 var(--tinta)}
+@media (max-width:767px){
+  .nav__cta{display:none}
+  .nav__links{gap:.9rem}
+  .nav__links a{font-size:.85rem}
+  .nav__mark{font-size:1rem}
+}
+@media (max-width:420px){ .nav__mark span{display:none} }
+
+/* Tipografia */
+h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2.3rem,6vw,4.4rem);line-height:1.04;letter-spacing:-.025em;margin:1rem 0 1rem}
+h1 span,h2 em{white-space:nowrap;background:var(--sol);padding:0 .18em;border-radius:10px;display:inline-block;transform:rotate(-1.2deg);border:2.5px solid var(--tinta);font-style:normal}
+h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.7rem,3.6vw,2.6rem);line-height:1.08;letter-spacing:-.015em;margin:.9rem 0 1rem}
+h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.25rem;line-height:1.2}
+.lead{font-size:clamp(1.08rem,1.6vw,1.25rem);line-height:1.55;max-width:56ch}
+.mudo{color:var(--mudo)}
+.serif{font-family:'Lora',serif;font-style:italic}
+p + p{margin-top:.9rem}
+
+/* Cards e botões */
+.card{background:var(--papel);border:2.5px solid var(--tinta);border-radius:20px;box-shadow:0 5px 0 var(--tinta)}
+.btn{display:inline-flex;align-items:center;gap:.8rem;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;background:var(--azul);text-decoration:none;padding:.7rem .7rem .7rem 1.4rem;border-radius:99px;border:2.5px solid var(--tinta);box-shadow:0 6px 0 var(--tinta);transition:all .15s ease;cursor:pointer}
+.btn svg{width:36px;height:36px;padding:7px;background:var(--tinta);border-radius:50%;transition:transform .2s;flex:none}
+.btn:hover{transform:translateY(3px);box-shadow:0 3px 0 var(--tinta)}
+.btn:hover svg{transform:translateX(4px)}
+.btn--claro{background:#fff;color:var(--tinta)}
+.btn--claro svg{background:var(--sol)}
+.btn--claro svg path{stroke:var(--tinta)}
+.btn--sm{display:inline-flex;align-items:center;gap:.5rem;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.85rem;line-height:1.1;color:#fff;background:var(--azul);text-decoration:none;padding:.6rem 1rem;border:2.5px solid var(--tinta);border-radius:99px;box-shadow:0 4px 0 var(--tinta);transition:all .12s;cursor:pointer}
+.btn--sm:hover{transform:translateY(2px);box-shadow:0 2px 0 var(--tinta)}
+.btn--sm svg{width:15px;height:15px;flex:none}
+.btn--branco{background:#fff;color:var(--tinta)}
+.btn--sol{background:var(--sol);color:var(--tinta)}
+.chip{flex:0 0 auto;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.85rem;padding:.45rem 1rem;border:2px solid var(--tinta);border-radius:99px;background:#fff;color:var(--tinta);box-shadow:0 3px 0 var(--tinta);cursor:pointer;transition:all .12s;white-space:nowrap}
+.chip:hover{transform:translateY(1px);box-shadow:0 2px 0 var(--tinta)}
+.chip.active{background:var(--tinta);color:#fff}
+
+/* Seções */
+.secao{padding:clamp(3.5rem,8vw,6rem) 0 0}
+.secao__topo{max-width:720px;margin-bottom:2rem}
+
+/* Imagem de predinho: desenho-provisório por baixo, aquarela real por cima */
+.pic{position:relative;overflow:hidden;background:var(--tom);aspect-ratio:996/1280;display:block}
+.pic > svg{position:absolute;inset:0;width:100%;height:100%}
+.pic > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s}
+.pic.ok > img{opacity:1}
+
+/* Rodapé */
+.rodape{text-align:center;padding:2.5rem 0 2.8rem;font-weight:600;border-top:2.5px solid var(--tinta);margin-top:5rem}
+.rodape .desc{font-weight:400;font-size:.95rem;color:var(--mudo);line-height:1.6;max-width:540px;margin:0 auto 1.2rem}
+.rodape__links{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.rodape .credit{margin-top:1.2rem;font-size:.8rem;font-weight:500;color:var(--mudo)}
+
+/* Tooltip */
+.tip{display:none;position:fixed;z-index:200;background:#fff;border:2px solid var(--tinta);border-radius:10px;padding:.45rem .7rem;font-size:.8rem;pointer-events:none;max-width:230px;line-height:1.35;box-shadow:2px 3px 0 var(--tinta)}
+.tip strong{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.95rem;display:block}
+.tip span{color:var(--mudo)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
