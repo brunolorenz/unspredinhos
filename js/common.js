@@ -147,7 +147,7 @@ function montarMoldura(ativa){
       <a href="index.html" class="${ativa==='inicio'?'on':''}">História</a>
       <a href="atlas.html" class="${ativa==='atlas'?'on':''}">Atlas</a>
       <a href="numeros.html" class="${ativa==='numeros'?'on':''}">Números</a>
-      <a href="index.html#artista">O artista</a>
+      <a href="artista.html" class="${ativa==='artista'?'on':''}">O artista</a>
     </nav>
     <a class="nav__cta" href="${LINKS.calendario}" target="_blank" rel="noopener">Calendário 2026</a>
   </header>`;

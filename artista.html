@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bruno Lorenz · o artista do Predinho do Dia</title>
+<meta name="description" content="Bruno Lorenz é artista visual, designer e educador em Porto Alegre. Pinta em aquarela a arquitetura popular brasileira como @unspredinhos e dá oficinas de desenho.">
+<meta property="og:title" content="Bruno Lorenz · @unspredinhos">
+<meta property="og:type" content="profile">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<style>
+  /* ── Abertura ── */
+  .apres{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(2rem,6vw,4.5rem);align-items:center;padding-top:clamp(2.5rem,6vw,4rem)}
+  .retrato{position:relative;max-width:420px;justify-self:center;width:100%}
+  .retrato__foto{background:#fff;border:2.5px solid var(--tinta);border-radius:20px;box-shadow:0 6px 0 var(--tinta);padding:12px 12px 52px;transform:rotate(-2.5deg)}
+  .retrato__foto img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:2px solid var(--tinta)}
+  .retrato__foto figcaption{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-family:'Lora',serif;font-style:italic;font-size:1.05rem}
+  .retrato .sticker{position:absolute;top:-14px;right:4px;z-index:2;transform:rotate(6deg);background:var(--coral)}
+  .retrato__selo{position:absolute;width:84px;border:2.5px solid var(--tinta);border-radius:10px;overflow:hidden;box-shadow:0 4px 0 var(--tinta);display:block}
+  .retrato__selo.s1{left:-24px;bottom:80px;transform:rotate(-8deg)}
+  .retrato__selo.s2{right:-20px;bottom:150px;transform:rotate(7deg)}
+  .apres h1{margin-top:.8rem}
+  .apres__cargo{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.15rem;color:var(--mudo);margin-bottom:1.2rem}
+  .apres p.lead + p.lead{margin-top:1rem}
+  .apres__acoes{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.8rem}
+  @media (max-width:800px){
+    .apres{grid-template-columns:1fr}
+    .retrato{max-width:320px}
+    .retrato__selo{width:66px}
+    .retrato__selo.s1{left:-10px}
+    .retrato__selo.s2{right:-8px}
+  }
+
+  /* ── O que eu faço ── */
+  .faco{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+  .faco .card{padding:1.4rem}
+  .faco .card:nth-child(1){background:#DBEAFE}
+  .faco .card:nth-child(2){background:#FFF3B8}
+  .faco .card:nth-child(3){background:#D1FAE5}
+  .faco .ic{width:46px;height:46px;border:2.5px solid var(--tinta);border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:.9rem;box-shadow:0 3px 0 var(--tinta)}
+  .faco p{margin-top:.5rem;line-height:1.6}
+  @media (max-width:760px){ .faco{grid-template-columns:1fr} }
+
+  /* ── Projetos ── */
+  .projetos{display:grid;grid-template-columns:1.2fr 1fr;gap:1.2rem}
+  .projeto{padding:1.4rem;display:flex;flex-direction:column;gap:.6rem;text-decoration:none;color:inherit}
+  .projeto p{color:var(--mudo)}
+  .projeto__num{display:flex;gap:.5rem;flex-wrap:wrap;margin:.3rem 0}
+  .projeto__num span{font-size:.82rem;font-weight:700;border:2px solid var(--tinta);border-radius:99px;padding:.15rem .7rem;background:var(--tom)}
+  .projeto__fotos{display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem;margin-top:.4rem}
+  .projeto__fotos .pic{border:2px solid var(--tinta);border-radius:9px}
+  .projeto.grande{grid-row:span 2;background:var(--sol)}
+  .projeto.grande .projeto__num span{background:#fff}
+  .projeto .btn--sm{align-self:flex-start;margin-top:auto}
+  @media (max-width:760px){ .projetos{grid-template-columns:1fr} .projeto.grande{grid-row:auto} }
+
+  /* ── Na estrada ── */
+  .estrada{list-style:none;position:relative;padding-left:2rem;max-width:760px}
+  .estrada::before{content:'';position:absolute;left:9px;top:10px;bottom:10px;width:3px;background:var(--tinta);border-radius:3px}
+  .estrada li{position:relative;margin-bottom:1rem}
+  .estrada li::before{content:'';position:absolute;left:-2rem;top:1.15rem;width:19px;height:19px;border-radius:50%;border:2.5px solid var(--tinta);background:var(--c,#fff)}
+  .estrada .card{padding:1rem 1.2rem}
+  .estrada .ano{font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:2px solid var(--tinta);border-radius:99px;padding:1px 9px;background:#fff;margin-right:.4rem}
+  .estrada h3{font-size:1.15rem;display:inline}
+  .estrada p{color:var(--mudo);margin-top:.35rem;font-size:.95rem}
+  .convite{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:1.2rem 1.4rem;margin-top:1.6rem;background:#D1FAE5;max-width:760px}
+  .convite p{font-weight:600;max-width:46ch}
+
+  /* ── Interesses ── */
+  .interesses{display:flex;flex-wrap:wrap;gap:.6rem}
+  .interesses span{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1rem;border:2.5px solid var(--tinta);border-radius:99px;padding:.45rem 1.1rem;background:#fff;box-shadow:0 3px 0 var(--tinta)}
+  .interesses span:nth-child(3n+1){transform:rotate(-1.5deg)}
+  .interesses span:nth-child(3n+2){transform:rotate(1deg);background:#FFE1D9}
+  .interesses span:nth-child(4n){background:#DBEAFE}
+
+  /* ── Contato ── */
+  .contato{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+  .contato a{padding:1.2rem;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:.4rem;transition:transform .15s,box-shadow .15s}
+  .contato a:hover{transform:translateY(-3px);box-shadow:0 8px 0 var(--tinta)}
+  .contato a p{color:var(--mudo);font-size:.92rem;flex:1}
+  .contato .vai{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.9rem}
+  .contato a:nth-child(1){background:var(--sol)}
+  @media (max-width:860px){ .contato{grid-template-columns:1fr 1fr} }
+  @media (max-width:480px){ .contato{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<main class="wrap">
+  <!-- ═════ APRESENTAÇÃO ═════ -->
+  <section class="apres">
+    <figure class="retrato">
+      <span class="sticker">Oi!</span>
+      <div class="retrato__foto"><img src="img/bruno.jpg" alt="Retrato de Bruno Lorenz, sorrindo, de camiseta preta"><figcaption>Bruno Lorenz, Porto Alegre</figcaption></div>
+      <a class="retrato__selo s1" id="selo1" href="#"></a>
+      <a class="retrato__selo s2" id="selo2" href="#"></a>
+    </figure>
+    <div>
+      <span class="sticker">O artista</span>
+      <h1>Bruno <span>Lorenz</span></h1>
+      <div class="apres__cargo">Artista visual, designer e educador · Porto Alegre, RS</div>
+      <p class="lead">Pinto em aquarela a arquitetura de todo dia: predinhos, casas de esquina e fachadas que contam a história de quem mora nelas. Meu trabalho é uma espécie de documentação afetiva da arquitetura popular brasileira, e publico tudo como <a href="" data-link="instagram" target="_blank" rel="noopener" style="color:inherit;font-weight:700">@unspredinhos</a>.</p>
+      <p class="lead">Além de pintar, ensino. Dou aulas de Processos Criativos e oficinas de desenho para crianças, jovens e adultos.</p>
+      <div class="apres__acoes">
+        <a class="btn" href="" data-link="orcamento" target="_blank" rel="noopener">Encomendar uma pintura ${ARROW}</a>
+        <a class="btn btn--claro" href="#contato">Falar comigo ${ARROW}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════ O QUE EU FAÇO ═════ -->
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">O que eu faço</span><h2>Pintar, ensinar e <em>andar pela cidade</em></h2></div>
+    <div class="faco">
+      <div class="card"><div class="ic">🖌️</div><h3>Aquarela</h3><p>Pinturas originais e reproduções de predinhos, casas e prédios históricos. Também pinto sob encomenda: a casa de alguém, o prédio de uma família, a esquina de um bairro.</p></div>
+      <div class="card"><div class="ic">🗺️</div><h3>Projetos de longo fôlego</h3><p>Séries que duram meses ou anos e cobrem um território inteiro: um predinho por dia durante 2026, um predinho para cada município do Rio Grande do Sul.</p></div>
+      <div class="card"><div class="ic">✏️</div><h3>Educação</h3><p>Aulas de Processos Criativos e oficinas de desenho de observação em escolas, feiras, museus e cidades do interior, com pessoas de todas as idades.</p></div>
+    </div>
+  </section>
+
+  <!-- ═════ PROJETOS ═════ -->
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">Projetos</span><h2>Séries que viraram <em>mapa</em></h2></div>
+    <div class="projetos">
+      <a class="card projeto grande" href="index.html">
+        <h3 style="font-size:1.6rem">Predinho do Dia · 2026</h3>
+        <div class="projeto__num"><span><b data-n="total">—</b> aquarelas</span><span><b data-n="cidades">—</b> cidades</span><span><b data-n="estados">—</b> estados</span></div>
+        <p style="color:var(--tinta)">Um predinho por dia, durante um ano, sempre numa rua com o nome daquela data. Do Rio Grande do Sul ao Acre, um zigue-zague de <span data-n="milkm">—</span> mil km pelo calendário.</p>
+        <div class="projeto__fotos" id="fotos-pd"></div>
+        <span class="btn--sm" style="margin-top:1rem">Conhecer o projeto</span>
+      </a>
+      <div class="card projeto">
+        <h3>Desenhando o RS</h3>
+        <div class="projeto__num"><span>497 municípios</span><span>1 predinho por cidade</span></div>
+        <p>Um predinho em aquarela para cada um dos 497 municípios gaúchos, com um mapa interativo que vai se completando. O projeto me levou a escolas, feiras e exposições pelo interior do estado.</p>
+      </div>
+      <a class="card projeto" href="" data-link="galeria" target="_blank" rel="noopener">
+        <h3>Galeria Uns Predinhos</h3>
+        <p>Todas as aquarelas num lugar só, para olhar com calma e escolher a sua.</p>
+        <span class="btn--sm btn--branco">Ver a galeria</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═════ NA ESTRADA ═════ -->
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">Na estrada</span><h2>Oficinas e <em>exposições</em></h2><p class="lead mudo">Cada projeto acaba virando conversa com quem mora nos lugares pintados.</p></div>
+    <ol class="estrada">
+      <li style="--c:var(--azul)"><div class="card"><span class="ano">2025</span><h3>Veranópolis</h3><p>Dois dias na Feira do Livro, com mesas abertas de aquarela e desenho para crianças e pais.</p></div></li>
+      <li style="--c:var(--azul)"><div class="card"><span class="ano">2025</span><h3>Restinga Seca</h3><p>Apresentação do Desenhando o RS e uma oficina de desenho de cerca de duas horas.</p></div></li>
+      <li style="--c:var(--sol)"><div class="card"><span class="ano">2026</span><h3>Rolante</h3><p>Exposição com dez aquarelas da cidade e oficinas pela manhã e à tarde com alunos da rede pública.</p></div></li>
+      <li style="--c:var(--sol)"><div class="card"><span class="ano">2026</span><h3>Dois Irmãos</h3><p>Oficina com estudantes de escola pública no Dia do Patrimônio.</p></div></li>
+      <li style="--c:var(--coral)"><div class="card"><span class="ano">2026</span><h3>Porto Alegre · Fundação Iberê Camargo</h3><p>Desenhando no Museu: um encontro para desenhar juntos no Iberê.</p></div></li>
+    </ol>
+    <div class="card convite">
+      <p>Quer levar uma oficina para a sua escola, feira ou cidade? Dá para pintar a cidade e conversar com crianças e jovens sobre memória, patrimônio e o lugar onde vivem.</p>
+      <a class="btn--sm" href="" data-link="oficina" target="_blank" rel="noopener">Convidar para uma oficina</a>
+    </div>
+  </section>
+
+  <!-- ═════ INTERESSES ═════ -->
+  <section class="secao">
+    <div class="secao__topo"><span class="sticker sticker--branco">Também me interessam</span><h2>Fora da <em>aquarela</em></h2></div>
+    <div class="interesses">
+      <span>Pintura ao ar livre</span><span>Urban sketching</span><span>Xilogravura</span><span>Fotografia analógica</span><span>Teoria da cor</span><span>Desenho de observação</span><span>História da criatividade</span><span>Arquitetura popular</span>
+    </div>
+  </section>
+
+  <!-- ═════ CONTATO ═════ -->
+  <section class="secao" id="contato">
+    <div class="secao__topo"><span class="sticker sticker--branco">Vamos conversar</span><h2>Como podemos <em>trabalhar juntos</em></h2></div>
+    <div class="contato">
+      <a class="card" href="" data-link="orcamento" target="_blank" rel="noopener"><h3>Encomendar uma pintura</h3><p>Monte o seu orçamento on-line, com tamanho e detalhes.</p><span class="vai">Fazer orçamento →</span></a>
+      <a class="card" href="" data-link="oficina" target="_blank" rel="noopener"><h3>Oficinas e palestras</h3><p>Para escolas, feiras, museus, empresas e prefeituras.</p><span class="vai">Chamar no WhatsApp →</span></a>
+      <a class="card" href="" data-link="imprensa" target="_blank" rel="noopener"><h3>Imprensa e parcerias</h3><p>Entrevistas, curadoria, editais e projetos com marcas.</p><span class="vai">Chamar no WhatsApp →</span></a>
+      <a class="card" href="" data-link="instagram" target="_blank" rel="noopener"><h3>Instagram</h3><p>Os predinhos novos, os bastidores e as lives de desenho.</p><span class="vai">@unspredinhos →</span></a>
+    </div>
+  </section>
+</main>
+
+<div id="rodape"></div>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+montarMoldura('artista');
+document.querySelectorAll('a').forEach(a => { if(a.innerHTML.includes('${ARROW}')) a.innerHTML = a.innerHTML.replace('${ARROW}', ARROW); });
+const wa = t => `https://wa.me/${LINKS.whats}?text=${encodeURIComponent(t)}`;
+const LK = {
+  instagram:LINKS.instagram, orcamento:LINKS.orcamento, galeria:LINKS.galeria,
+  oficina:wa('Olá, Bruno! Gostaria de conversar sobre uma oficina de desenho.'),
+  imprensa:wa('Olá! Gostaria de conversar sobre uma entrevista ou parceria.'),
+};
+document.querySelectorAll('[data-link]').forEach(a => a.href = LK[a.dataset.link]);
+preencherNumeros();
+
+/* selinhos ao lado do retrato: o primeiro e o último predinho do ano */
+[['selo1', P[0]], ['selo2', P[P.length-1]]].forEach(([id,p]) => { const a = document.getElementById(id); a.href = diaHref(p); a.innerHTML = pic(p,200); a.title = `${dataExtenso(p)} · ${p.cidade}/${p.uf}`; });
+
+/* cinco predinhos espalhados pelo ano */
+document.getElementById('fotos-pd').innerHTML = [0,.25,.5,.75,.999].map(f => pic(P[Math.floor(f*(P.length-1))],200)).join('');
+</script>
+</body>
+</html>
