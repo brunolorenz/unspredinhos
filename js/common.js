@@ -6,6 +6,9 @@ const LINKS = {
   loja: 'https://www.brunolorenz.com.br',
   whats: '5551993115340',
   galeria: 'https://brunolorenz.github.io/unspredinhos/galeria/',
+  calendario: 'https://www.brunolorenz.com.br/product-page/calend%C3%A1rio-2026-predinho-do-dia',
+  reproducao: 'https://www.brunolorenz.com.br/product-page/predinho-do-dia-reprodu%C3%A7%C3%A3o-individual',
+  orcamento: 'https://brunolorenz.github.io/orcamento/',
 };
 
 const RC = {'Sul':'#3B82F6','Sudeste':'#FFD93B','Nordeste':'#FF7A59','Centro Oeste':'#34D399','Norte':'#A78BFA'};
@@ -144,8 +147,9 @@ function montarMoldura(ativa){
       <a href="index.html" class="${ativa==='inicio'?'on':''}">História</a>
       <a href="atlas.html" class="${ativa==='atlas'?'on':''}">Atlas</a>
       <a href="numeros.html" class="${ativa==='numeros'?'on':''}">Números</a>
+      <a href="index.html#artista">O artista</a>
     </nav>
-    <a class="nav__cta" href="${LINKS.loja}" target="_blank" rel="noopener">Calendário 2026</a>
+    <a class="nav__cta" href="${LINKS.calendario}" target="_blank" rel="noopener">Calendário 2026</a>
   </header>`;
   const rod = document.getElementById('rodape');
   if(rod) rod.outerHTML = `

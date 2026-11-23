@@ -140,6 +140,25 @@
   .seudia__res .acoes{display:flex;gap:.5rem;flex-wrap:wrap}
   @media (max-width:760px){ .seudia{grid-template-columns:1fr} .seudia__res{grid-template-columns:110px 1fr} }
 
+  /* ── O artista ── */
+  .artista{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(2rem,5vw,4rem);align-items:center}
+  .retrato{position:relative;max-width:400px;justify-self:center;width:100%}
+  .retrato__foto{background:#fff;border:2.5px solid var(--tinta);border-radius:20px;box-shadow:0 6px 0 var(--tinta);padding:12px 12px 52px;transform:rotate(-2.5deg)}
+  .retrato__foto img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:2px solid var(--tinta)}
+  .retrato__foto figcaption{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-family:'Lora',serif;font-style:italic;font-size:1.05rem}
+  .retrato .sticker{position:absolute;top:-14px;right:4px;z-index:2;transform:rotate(6deg);background:var(--coral)}
+  .retrato__selo{position:absolute;left:-22px;bottom:70px;width:86px;transform:rotate(-8deg);border:2.5px solid var(--tinta);border-radius:10px;overflow:hidden;box-shadow:0 4px 0 var(--tinta)}
+  .artista__texto p{font-size:1.08rem;line-height:1.65}
+  .artista__texto p + p{margin-top:1rem}
+  .fatos{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.4rem 0 1.6rem}
+  .fatos span{font-size:.85rem;font-weight:700;border:2px solid var(--tinta);border-radius:99px;padding:.25rem .85rem;background:#fff}
+  .fatos span:nth-child(1){background:#DBEAFE}
+  .fatos span:nth-child(2){background:#FFF3B8}
+  .fatos span:nth-child(3){background:#FFE1D9}
+  .fatos span:nth-child(4){background:#D1FAE5}
+  .artista__acoes{display:flex;gap:.7rem;flex-wrap:wrap}
+  @media (max-width:760px){ .artista{grid-template-columns:1fr} .retrato{max-width:300px} .retrato__selo{left:-12px;width:70px} }
+
   /* ── Leve pra casa ── */
   .ofertas{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
   .oferta{padding:1.4rem;display:flex;flex-direction:column;gap:.5rem}
@@ -270,16 +289,39 @@
     </div>
   </section>
 
-  <!-- ═════ 08 · LEVE PRA CASA ═════ -->
+  <!-- ═════ 08 · O ARTISTA ═════ -->
+  <section class="secao wrap" id="artista">
+    <div class="artista">
+      <figure class="retrato">
+        <span class="sticker">Oi!</span>
+        <div class="retrato__foto"><img src="img/bruno.jpg" alt="Retrato de Bruno Lorenz, sorrindo, de camiseta preta" loading="lazy"><figcaption>Bruno Lorenz, Porto Alegre</figcaption></div>
+        <a class="retrato__selo" id="selo-artista" href="#" aria-label="Primeiro predinho do projeto"></a>
+      </figure>
+      <div class="artista__texto">
+        <span class="sticker sticker--branco">08 — Quem desenhou</span>
+        <h2>Prazer, eu sou o <em>Bruno</em></h2>
+        <p>Sou artista visual, designer e educador, de Porto Alegre. Pinto em aquarela a arquitetura de todo dia: predinhos, casas de esquina e fachadas que contam a história de quem mora nelas. Publico tudo como <a href="" data-link="instagram" target="_blank" rel="noopener" style="color:inherit;font-weight:700">@unspredinhos</a>.</p>
+        <p>Além de pintar, dou aulas de Processos Criativos e oficinas de desenho para gente de todas as idades. Desenhar, para mim, é um jeito de prestar mais atenção na cidade e nas memórias que ela guarda.</p>
+        <p>Antes do Predinho do Dia veio o <b>Desenhando o RS</b>, com um predinho para cada um dos 497 municípios gaúchos. Esse projeto já virou exposição e oficina em escolas e feiras de cidades como Rolante, Veranópolis e Dois Irmãos.</p>
+        <div class="fatos"><span>Aquarela</span><span>Arquitetura popular</span><span>Oficinas de desenho</span><span>Memória e patrimônio</span></div>
+        <div class="artista__acoes">
+          <a class="btn--sm btn--sol" href="" data-link="instagram" target="_blank" rel="noopener">Seguir no Instagram</a>
+          <a class="btn--sm btn--branco" href="" data-link="whats" target="_blank" rel="noopener">Convidar para uma oficina</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════ 09 · LEVE PRA CASA ═════ -->
   <section class="secao wrap" id="leve">
     <div class="secao__topo">
-      <span class="sticker sticker--branco">08 — Leve um predinho pra casa</span>
+      <span class="sticker sticker--branco">09 — Leve um predinho pra casa</span>
       <h2>O projeto <em>continua</em> na sua parede</h2>
     </div>
     <div class="ofertas">
-      <div class="card oferta"><h3>Calendário 2026</h3><p>Os doze meses do projeto em folhas A3, com as aquarelas de todos os dias e o nome de cada rua.</p><a class="btn--sm" href="" data-link="loja" target="_blank" rel="noopener">Ver na loja</a></div>
-      <div class="card oferta"><h3>Reprodução de um dia</h3><p>Escolha uma data importante e receba a reprodução do predinho daquele dia. Um presente com dia, rua e cidade.</p><a class="btn--sm btn--sol" href="#seu-dia">Escolher a data</a></div>
-      <div class="card oferta"><h3>Encomende uma pintura</h3><p>A sua casa, o prédio da sua infância ou a esquina do seu bairro, em aquarela, no mesmo traço do projeto.</p><a class="btn--sm btn--branco" href="" data-link="orcar" target="_blank" rel="noopener">Pedir um orçamento</a></div>
+      <div class="card oferta"><h3>Calendário 2026</h3><p>Os doze meses do projeto em folhas A3, com as aquarelas de todos os dias e o nome de cada rua.</p><a class="btn--sm" href="" data-link="calendario" target="_blank" rel="noopener">Comprar o calendário</a></div>
+      <div class="card oferta"><h3>Reprodução de um dia</h3><p>Escolha uma data importante e receba a reprodução do predinho daquele dia. Um presente com dia, rua e cidade. <a href="#seu-dia" style="color:var(--tinta);font-weight:700">Descubra o seu dia ↑</a></p><a class="btn--sm btn--sol" href="" data-link="reproducao" target="_blank" rel="noopener">Comprar a reprodução</a></div>
+      <div class="card oferta"><h3>Encomende uma pintura</h3><p>A sua casa, o prédio da sua infância ou a esquina do seu bairro, em aquarela, no mesmo traço do projeto.</p><a class="btn--sm btn--branco" href="" data-link="orcamento" target="_blank" rel="noopener">Fazer um orçamento</a></div>
     </div>
     <div class="imprensa">
       <p>Imprensa, curadoria, editais e parcerias: vamos conversar.</p>
@@ -304,7 +346,8 @@ const ESFORCO = { horas:null, horasBusca:null, cadernos:null };
 montarMoldura('inicio');
 document.querySelectorAll('a').forEach(a => { if(a.innerHTML.includes('${ARROW}')) a.innerHTML = a.innerHTML.replace('${ARROW}', ARROW); });
 const wa = t => `https://wa.me/${LINKS.whats}?text=${encodeURIComponent(t)}`;
-const LK = { loja:LINKS.loja, orcar:wa('Olá! Gostaria de orçar uma pintura.'), imprensa:wa('Olá! Gostaria de conversar sobre o projeto Predinho do Dia.') };
+const LK = { loja:LINKS.loja, calendario:LINKS.calendario, reproducao:LINKS.reproducao, orcamento:LINKS.orcamento, instagram:LINKS.instagram,
+  whats:wa('Olá, Bruno! Gostaria de conversar sobre uma oficina de desenho.'), imprensa:wa('Olá! Gostaria de conversar sobre o projeto Predinho do Dia.') };
 document.querySelectorAll('[data-link]').forEach(a => a.href = LK[a.dataset.link]);
 preencherNumeros();
 
@@ -406,6 +449,9 @@ function observarPassos(){
   passos.forEach(p => io.observe(p));
 }
 
+/* ── Selinho do primeiro predinho junto do retrato ── */
+{ const sa = document.getElementById('selo-artista'); sa.href = diaHref(P[0]); sa.innerHTML = pic(P[0],200); }
+
 /* ── Dias que não existem ── */
 document.getElementById('imp-lista').innerHTML = P.filter(p => p.impossivel).map(p => `
   <a class="card imp" href="${diaHref(p)}">${pic(p,400)}
@@ -453,11 +499,11 @@ if(!P.some(p=>p.impossivel)) document.getElementById('impossiveis').remove();
   const h = new Date(); sd.value = h.getDate(); sm.value = h.getMonth()+1;
   function mostrar(){
     const p = BY[`${sd.value}-${sm.value}`];
-    if(!p){ res.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--mudo)">Esse dia ainda não tem predinho no mapa. Que tal encomendar uma pintura especial?</div>`; return; }
+    if(!p){ res.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--mudo)">Esse dia ainda não tem predinho no mapa. Que tal <a href="${LINKS.orcamento}" target="_blank" rel="noopener" style="color:var(--tinta);font-weight:700">encomendar uma pintura especial</a>?</div>`; return; }
     res.innerHTML = `<a href="${diaHref(p)}">${pic(p,400)}</a><div>
       <h3>${dataExtenso(p)}</h3><p>${p.rua}<br>${p.cidade} · ${UF_NOME[p.uf]}</p>
       <div class="acoes"><a class="btn--sm btn--branco" href="${diaHref(p)}">Ver o dia</a>
-      <a class="btn--sm" href="${wa(`Olá! Quero uma reprodução do Predinho do Dia de ${dataExtenso(p)} (${p.cidade}/${p.uf}).`)}" target="_blank" rel="noopener">Quero este</a></div></div>`;
+      <a class="btn--sm" href="${LINKS.reproducao}" target="_blank" rel="noopener">Quero este</a></div></div>`;
   }
   sd.onchange = sm.onchange = mostrar; mostrar();
 })();

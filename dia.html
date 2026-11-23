@@ -81,7 +81,6 @@ function atual(){
 function render(){
   const p = atual(), ant = P[p.i-1], prox = P[p.i+1];
   document.title = `${dataExtenso(p)} · ${p.cidade}/${p.uf} · Predinho do Dia`;
-  const waTxt = encodeURIComponent(`Olá! Quero uma reprodução do Predinho do Dia de ${dataExtenso(p)} (${p.rua}, ${p.cidade}/${p.uf}).`);
   document.getElementById('dia').innerHTML = `
     <div class="dia__img">${pic(p,1200)}</div>
     <div class="dia__info">
@@ -99,10 +98,11 @@ function render(){
         <p>${ant ? `A <b>${fmt(p.salto)} km</b> do dia anterior, em ${ant.cidade} (${ant.uf}).` : 'O primeiro predinho do ano.'}</p>
       </div>
       <div class="acoes">
-        <a class="btn--sm" href="https://wa.me/${LINKS.whats}?text=${waTxt}" target="_blank" rel="noopener">Quero uma reprodução deste dia</a>
+        <a class="btn--sm" href="${LINKS.reproducao}" target="_blank" rel="noopener">Quero uma reprodução deste dia</a>
         <button class="btn--sm btn--branco" id="copiar" type="button">Copiar link</button>
         <span class="aviso-copia" id="copiado" hidden>Link copiado ✓</span>
       </div>
+      <p class="aviso-copia" style="margin-top:.8rem">Na loja, é só escolher a data <b>${p.dia}</b>.</p>
     </div>`;
   const setLink = (el, q) => { el.href = q ? '#'+q.key : '#'; el.setAttribute('aria-disabled', q ? 'false' : 'true'); };
   setLink(document.getElementById('ant'), ant); setLink(document.getElementById('prox'), prox);
