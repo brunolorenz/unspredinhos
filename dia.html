@@ -117,8 +117,7 @@ function render(){
     </div>`;
   const setLink = (el, q) => { el.href = q ? '#'+q.key : '#'; el.setAttribute('aria-disabled', q ? 'false' : 'true'); };
   setLink(document.getElementById('ant'), ant); setLink(document.getElementById('prox'), prox);
-  /* link curto (d/29-10) mostra título e aquarela do dia na prévia do WhatsApp/iMessage */
-  const linkCurto = new URL(`d/${p.key}`, location.href.split('#')[0]).href;
+  const linkCurto = location.href;
   document.getElementById('copiar').onclick = async () => {
     const ok = () => { document.getElementById('copiado').hidden = false; };
     if(navigator.share){ try { await navigator.share({title:`${dataExtenso(p)} · ${p.cidade}/${p.uf}`, text:`Predinho do Dia: ${p.rua}, ${p.cidade}/${p.uf}`, url:linkCurto}); return; } catch(e){ if(e.name==='AbortError') return; } }
