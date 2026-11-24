@@ -137,6 +137,7 @@ function mostrarTip(e,p){
 function esconderTip(){ tip.style.display = 'none'; }
 
 /* ── Cabeçalho e rodapé iguais em todas as páginas ── */
+const SACOLA = `<svg class="ic-compra" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M9 10V7a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`;
 const ARROW = `<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function montarMoldura(ativa){
   const nav = document.getElementById('nav');
@@ -149,7 +150,7 @@ function montarMoldura(ativa){
       <a href="numeros.html" class="${ativa==='numeros'?'on':''}">Números</a>
       <a href="artista.html" class="${ativa==='artista'?'on':''}">O artista</a>
     </nav>
-    <a class="nav__cta" href="${LINKS.calendario}" target="_blank" rel="noopener">Calendário 2026</a>
+    <a class="nav__cta" href="${LINKS.calendario}" target="_blank" rel="noopener">${SACOLA}Calendário 2026</a>
   </header>`;
   const rod = document.getElementById('rodape');
   if(rod) rod.outerHTML = `

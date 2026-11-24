@@ -25,6 +25,12 @@ img{max-width:100%}
 .nav__links a:hover{color:var(--azul)}
 .nav__links a.on{border-bottom-color:var(--tinta)}
 .nav__cta{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.9rem;color:#fff;text-decoration:none;background:var(--azul);border:2px solid var(--tinta);border-radius:100px;padding:.5rem 1.2rem;box-shadow:0 3px 0 var(--tinta);transition:all .1s;white-space:nowrap}
+.nav__cta{display:inline-flex;align-items:center;gap:.45rem}
+.ic-compra{width:18px;height:18px;flex:none}
+.btn-compra{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.1rem;line-height:1.15;color:#fff;background:var(--azul);text-decoration:none;padding:.85rem 1.2rem;border:2.5px solid var(--tinta);border-radius:16px;box-shadow:0 5px 0 var(--tinta);transition:all .12s}
+.btn-compra:hover{transform:translateY(2px);box-shadow:0 3px 0 var(--tinta)}
+.btn-compra .ic-compra{width:24px;height:24px}
+.btn-compra small{display:block;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.78rem;opacity:.9}
 .nav__cta:hover{transform:translateY(2px);box-shadow:0 1px 0 var(--tinta)}
 @media (max-width:767px){
   .nav__cta{display:none}

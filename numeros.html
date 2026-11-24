@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Números · Predinho do Dia 2026</title>
 <meta name="description" content="O tamanho do esforço do projeto Predinho do Dia 2026: quilômetros, estados, recordes e curiosidades.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#FFD93B">
+<meta property="og:image" content="https://brunolorenz.github.io/unspredinhos/img/capa.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Predinho do Dia · @unspredinhos">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="O tamanho do esforço · Predinho do Dia 2026">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
@@ -50,13 +59,46 @@
   .duas{display:grid;grid-template-columns:1fr 1fr;gap:2.4rem}
   @media (max-width:760px){ .duas{grid-template-columns:1fr} .barra{grid-template-columns:110px 1fr 36px} }
 
-  .colunas{display:grid;grid-template-columns:repeat(12,1fr);gap:.5rem;align-items:end;height:220px;padding:1rem 1rem .4rem}
   .coluna{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:.3rem}
   .coluna i{display:block;width:100%;background:var(--azul);border:2px solid var(--tinta);border-radius:8px 8px 3px 3px;height:0;transition:height 1s ease}
   .coluna.max i{background:var(--sol)}
   .coluna small{font-size:.72rem;font-weight:700}
   .coluna em{font-style:normal;font-size:.68rem;font-weight:600;color:var(--mudo)}
   @media (max-width:560px){ .coluna em{display:none} }
+
+  /* ── Cobrinha: o caminho do ano ── */
+  .cobra{height:520vh;position:relative}
+  .cobra__fixo{position:sticky;top:calc(var(--nav-h) + 1rem);height:calc(100vh - var(--nav-h) - 2rem);display:grid;grid-template-columns:1.25fr .75fr;gap:1.6rem;align-items:center}
+  .cobra__mapa{padding:.8rem;align-self:center}
+  .cobra__mapa svg{width:100%;height:auto;max-height:calc(100vh - var(--nav-h) - 4rem);display:block;margin:0 auto}
+  .cobra__dia{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:1.05}
+  .cobra__onde{font-weight:600;color:var(--mudo);font-size:1.1rem;margin:.3rem 0 1.2rem}
+  .cobra__placar{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+  .cobra__placar .card{padding:.8rem .9rem;box-shadow:0 4px 0 var(--tinta)}
+  .cobra__placar b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.7rem;line-height:1.05;font-variant-numeric:tabular-nums}
+  .cobra__placar small{font-size:.8rem;font-weight:600;color:var(--mudo)}
+  .cobra__meses{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin:1.2rem 0 .8rem;height:70px;align-items:end}
+  .cobra__meses div{display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:3px}
+  .cobra__meses i{display:block;background:#fff;border:2px solid var(--tinta);border-radius:5px 5px 2px 2px;overflow:hidden;position:relative}
+  .cobra__meses i span{position:absolute;left:0;right:0;bottom:0;background:var(--tinta);height:0}
+  .cobra__meses small{font-size:.62rem;font-weight:700;text-align:center;color:var(--mudo)}
+  .cobra__meses div.on small{color:var(--tinta)}
+  .legenda{display:flex;flex-wrap:wrap;gap:.3rem .9rem;font-size:.78rem;font-weight:600;color:var(--mudo)}
+  .legenda i{display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--tinta);margin-right:.3rem;vertical-align:-1px}
+  @keyframes pulso{0%{r:9}50%{r:14}100%{r:9}}
+  .cabeca-halo{animation:pulso 1.2s ease-in-out infinite}
+  @media (max-width:760px){
+    .cobra{height:600vh}
+    .cobra__fixo{grid-template-columns:1fr;grid-template-rows:auto auto;gap:.6rem;align-content:start}
+    .cobra__mapa svg{max-height:calc(100vh - var(--nav-h) - 13rem)}
+    .cobra__info{order:-1}
+    .cobra__dia{font-size:1.5rem}
+    .cobra__onde{font-size:.95rem;margin:.1rem 0 .5rem}
+    .cobra__placar b{font-size:1.25rem}
+    .cobra__placar .card{padding:.5rem .7rem}
+    .cobra__meses{height:40px;margin:.5rem 0 0}
+    .legenda{display:none}
+  }
 
   .recordes{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
   .recorde{padding:1.1rem 1rem}
@@ -74,7 +116,7 @@
   <p class="lead">Um desenho por dia parece pouco, até você somar um ano inteiro deles.</p>
   <div class="grandes" id="grandes"></div>
 
-  <section class="secao">
+  <section class="secao" id="mesa" hidden>
     <div class="secao__topo"><span class="sticker sticker--branco">Da mesa de desenho</span><h2>O que não aparece <em>no mapa</em></h2></div>
     <div class="esforco" id="esforco"></div>
   </section>
@@ -96,8 +138,22 @@
   </section>
 
   <section class="secao">
-    <div class="secao__topo"><span class="sticker sticker--branco">Mês a mês</span><h2>Quilômetros <em>por mês</em></h2><p class="mudo">A soma dos saltos de um dia para o outro em cada mês. Quanto mais alta a barra, mais o mapa foi cruzado.</p></div>
-    <div class="card colunas" id="colunas"></div>
+    <div class="secao__topo"><span class="sticker sticker--branco">O caminho do ano</span><h2>Uma cobrinha de <em><span data-n="milkm">—</span> mil km</em></h2><p class="mudo">Role devagar. A cada dia, a cobrinha avança até a rua seguinte, na cor da região de chegada, e fica um pouco maior. O que ela deixa para trás vira rastro.</p></div>
+    <div class="cobra" id="cobra">
+      <div class="cobra__fixo">
+        <div class="card cobra__mapa"><svg id="cobra-svg" role="img" aria-label="Mapa do Brasil com o caminho entre os predinhos, crescendo dia após dia"></svg></div>
+        <div class="cobra__info">
+          <div class="cobra__dia" id="cb-dia">1º de janeiro</div>
+          <div class="cobra__onde" id="cb-onde">Parobé · RS</div>
+          <div class="cobra__placar">
+            <div class="card"><b id="cb-km">0</b><small>km percorridos</small></div>
+            <div class="card"><b id="cb-n">1</b><small>de <span data-n="total"></span> dias</small></div>
+          </div>
+          <div class="cobra__meses" id="cb-meses"></div>
+          <div class="legenda" id="cb-leg"></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <section class="secao">
@@ -107,6 +163,8 @@
 </main>
 <div id="rodape"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <script src="js/data.js"></script>
 <script src="js/common.js"></script>
 <script>
@@ -122,6 +180,7 @@ const ESFORCO = [
 ];
 
 montarMoldura('numeros');
+preencherNumeros();
 const link = p => `<a href="${diaHref(p)}">${p.cidade} (${p.uf})</a>`;
 
 document.getElementById('grandes').innerHTML = [
@@ -129,7 +188,9 @@ document.getElementById('grandes').innerHTML = [
   [Math.round(TOTAL.km/1000)+' mil','km de saltos'], [(TOTAL.km/40075).toLocaleString('pt-BR',{maximumFractionDigits:1}),'voltas na Terra'],
 ].map(([v,l]) => `<div class="card"><b>${v}</b><small>${l}</small></div>`).join('');
 
-document.getElementById('esforco').innerHTML = ESFORCO.map(e =>
+/* a seção só aparece quando houver pelo menos um número preenchido; os vazios ficam de fora */
+if(ESFORCO.some(e => e.v!=null)) document.getElementById('mesa').hidden = false;
+document.getElementById('esforco').innerHTML = ESFORCO.filter(e => e.v!=null).map(e =>
   `<div class="card ${e.v==null?'falta':''}"><b>${e.v==null ? '—' : e.v.toLocaleString('pt-BR')+e.sufixo}</b><small>${e.l}${e.v==null?' · a preencher':''}</small></div>`).join('');
 
 /* Conquista dos estados */
@@ -155,12 +216,6 @@ const barras = (id, lista, cor, nome) => {
 barras('b-reg', conta(p=>p.regiao), k=>RC[k], k=>REG_NOME[k]||k);
 barras('b-uf', conta(p=>p.uf), k=>RC[SR[UF_NOME[k]]], k=>UF_NOME[k]);
 
-/* Km por mês */
-const kmMes = Array(12).fill(0); P.forEach(p => kmMes[p.m-1] += p.salto);
-const maxK = Math.max(...kmMes);
-document.getElementById('colunas').innerHTML = kmMes.map((k,i) =>
-  `<div class="coluna ${k===maxK?'max':''}" title="${MESES_T[i]}: ${fmt(k)} km"><em>${Math.round(k/1000)}k</em><i data-h="${k/maxK*100}"></i><small>${MESES_ABR[i]}</small></div>`).join('');
-
 /* Recordes */
 const saltos = P.slice(1).filter(p => p.salto > 0.5);
 const menor = saltos.reduce((a,b) => b.salto < a.salto ? b : a);
@@ -184,13 +239,97 @@ document.getElementById('recordes').innerHTML =
   rec(`${P.length-algarismo} × ${algarismo}`, `ruas com a data por extenso × em algarismos`) +
   rec(tipos.map(([t,n])=>`${n} ${t.toLowerCase()}${n>1?'s':''}`).join(' · '), `ruas, avenidas e travessas`);
 
+
+/* ═════ Cobrinha: o caminho cresce conforme a rolagem ═════ */
+(() => {
+  const kmMes = Array(12).fill(0); P.forEach(p => kmMes[p.m-1] += p.salto);
+  const maxK = Math.max(...kmMes);
+  const meses = document.getElementById('cb-meses');
+  meses.innerHTML = kmMes.map((k,i) => `<div title="${MESES_T[i]}: ${fmt(k)} km"><i style="height:${Math.max(18, k/maxK*100)}%"><span></span></i><small>${MESES_ABR[i][0]}</small></div>`).join('');
+  document.getElementById('cb-leg').innerHTML = Object.entries(RC).map(([r,c]) => `<span><i style="background:${c}"></i>${REG_NOME[r]||r}</span>`).join('');
+  const kmAte = []; let acc = 0; P.forEach((p,i) => { acc += p.salto; kmAte[i] = acc; });
+
+  carregarBrasil().then(features => {
+    const svg = d3.select('#cobra-svg').attr('viewBox','0 0 600 620').attr('preserveAspectRatio','xMidYMid meet');
+    // projeção ajustada ao tamanho do quadro, para o mapa ocupar o espaço todo
+    const proj = d3.geoMercator().fitExtent([[8,8],[592,612]], {type:'FeatureCollection', features});
+    svg.append('g').selectAll('path').data(features).join('path').attr('d', d3.geoPath(proj))
+      .attr('fill','#EFE9D6').attr('stroke','#111').attr('stroke-width',.6).attr('stroke-linejoin','round');
+    const pt = P.map(p => proj([p.lng,p.lat]));
+    const gTrilha = svg.append('g').attr('fill','none').attr('stroke-linecap','round');
+    const gPontos = svg.append('g');
+    // um segmento por salto, na cor da região de chegada
+    const segs = P.slice(1).map((p,k) => {
+      const a = pt[k], b = pt[k+1], len = Math.hypot(b[0]-a[0], b[1]-a[1]) || .01;
+      const el = gTrilha.append('line').attr('x1',a[0]).attr('y1',a[1]).attr('x2',b[0]).attr('y2',b[1])
+        .attr('stroke', RC[p.regiao]||'#888').attr('stroke-width',1.1).attr('opacity',.28)
+        .attr('stroke-dasharray',`${len} ${len}`).attr('stroke-dashoffset',len).node();
+      return {el, len, mostrado:0, est:-1};
+    });
+    const pontos = P.map((p,i) => gPontos.append('circle').attr('cx',pt[i][0]).attr('cy',pt[i][1]).attr('r',3.2)
+      .attr('fill',RC[p.regiao]).attr('stroke','#111').attr('stroke-width',1).attr('opacity',0).node());
+    const halo = svg.append('circle').attr('class','cabeca-halo').attr('r',10).attr('fill','#FFD93B').attr('opacity',.55);
+    const cabeca = svg.append('circle').attr('r',7).attr('fill','#111').attr('stroke','#fff').attr('stroke-width',2.5);
+
+    const sec = document.getElementById('cobra');
+    const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let ultimoDia = -1, pedido = false;
+
+    function desenhar(){
+      pedido = false;
+      const r = sec.getBoundingClientRect(), total = sec.offsetHeight - innerHeight;
+      let f = reduzido ? 1 : Math.min(1, Math.max(0, -r.top / Math.max(total,1)));
+      const pos = f * (P.length - 1);            // posição contínua ao longo dos dias
+      const k = Math.floor(pos), frac = pos - k;
+      const corpo = 6 + Math.floor(k/5);           // a cobra fica maior conforme o ano avança
+      segs.forEach((s,i) => {
+        const alvo = i < k ? 1 : i === k ? frac : 0;
+        if(alvo !== s.mostrado){ s.el.setAttribute('stroke-dashoffset', s.len*(1-alvo)); s.mostrado = alvo; }
+        const noCorpo = i > k - corpo;
+        const est = alvo === 0 ? 0 : noCorpo ? 2 : 1;
+        if(est !== s.est){
+          s.est = est;
+          s.el.setAttribute('stroke-width', est===2 ? 4.2 : 1.1);
+          s.el.setAttribute('opacity', est===2 ? 1 : .28);
+          if(est===2) s.el.parentNode.appendChild(s.el);   // corpo por cima do rastro
+        }
+      });
+      pontos.forEach((c,i) => c.setAttribute('opacity', i <= k ? 1 : 0));
+      // cabeça da cobra, no ponto entre o dia k e o seguinte
+      const a = pt[k], b = pt[Math.min(k+1, P.length-1)];
+      const x = a[0] + (b[0]-a[0])*frac, y = a[1] + (b[1]-a[1])*frac;
+      cabeca.attr('cx',x).attr('cy',y); halo.attr('cx',x).attr('cy',y);
+      const dia = frac > .5 ? Math.min(k+1, P.length-1) : k;
+      if(dia !== ultimoDia){
+        ultimoDia = dia; const p = P[dia];
+        document.getElementById('cb-dia').textContent = dataExtenso(p);
+        document.getElementById('cb-onde').textContent = `${p.cidade} · ${p.uf}`;
+        document.getElementById('cb-n').textContent = dia+1;
+        cabeca.attr('fill', RC[p.regiao]).attr('stroke','#111');
+      }
+      document.getElementById('cb-km').textContent = fmt((kmAte[k]||0) + (P[k+1] ? P[k+1].salto*frac : 0));
+      // barrinhas dos meses enchem junto
+      const feitoMes = Array(12).fill(0);
+      P.forEach((p,i) => { if(i<=k) feitoMes[p.m-1] += p.salto; else if(i===k+1) feitoMes[p.m-1] += p.salto*frac; });
+      meses.querySelectorAll(':scope > div').forEach((d,i) => {
+        d.querySelector('span').style.height = (kmMes[i] ? feitoMes[i]/kmMes[i]*100 : 0) + '%';
+        d.querySelector('span').style.background = '#111';
+        d.classList.toggle('on', P[dia].m === i+1);
+      });
+    }
+    addEventListener('scroll', () => { if(!pedido){ pedido = true; requestAnimationFrame(desenhar); } }, {passive:true});
+    addEventListener('resize', desenhar);
+    desenhar();
+  }).catch(e => console.warn('Mapa não carregou', e));
+})();
+
 /* anima as barras quando aparecem */
 const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){
   e.target.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w+'%');
   e.target.querySelectorAll('[data-h]').forEach(b => b.style.height = b.dataset.h+'%');
   io.unobserve(e.target);
 }}), {threshold:.2});
-['b-reg','b-uf','colunas'].forEach(id => io.observe(document.getElementById(id)));
+['b-reg','b-uf'].forEach(id => io.observe(document.getElementById(id)));
 </script>
 </body>
 </html>

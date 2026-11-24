@@ -8,6 +8,14 @@
 <meta property="og:title" content="Predinho do Dia · um ano desenhando o Brasil">
 <meta property="og:description" content="Um predinho por dia, numa rua com o nome da data. 366 aquarelas pelo Brasil inteiro.">
 <meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#FFD93B">
+<meta property="og:image" content="https://brunolorenz.github.io/unspredinhos/img/capa.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Predinho do Dia · @unspredinhos">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
@@ -115,7 +123,8 @@
   .esforco small{font-size:.85rem;font-weight:600;color:var(--mudo);line-height:1.35;display:block}
   .esforco .falta{border-style:dashed;box-shadow:none;background:transparent}
   .esforco .falta b{color:var(--mudo)}
-  @media (max-width:760px){ .esforco{grid-template-columns:repeat(2,1fr)} }
+  .esforco.tres{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:760px){ .esforco{grid-template-columns:repeat(2,1fr)} .esforco.tres{grid-template-columns:1fr} }
 
   /* ── Parede do ano ── */
   .parede{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem 1.2rem}
@@ -137,7 +146,7 @@
   .seudia__res .pic{border:2px solid var(--tinta);border-radius:10px}
   .seudia__res h3{font-size:1.25rem}
   .seudia__res p{color:var(--mudo);font-size:.92rem;margin:.2rem 0 .8rem}
-  .seudia__res .acoes{display:flex;gap:.5rem;flex-wrap:wrap}
+  .seudia__res .btn-compra{grid-column:1/-1}
   @media (max-width:760px){ .seudia{grid-template-columns:1fr} .seudia__res{grid-template-columns:110px 1fr} }
 
   /* ── O artista ── */
@@ -320,8 +329,8 @@
       <h2>O projeto <em>continua</em> na sua parede</h2>
     </div>
     <div class="ofertas">
-      <div class="card oferta"><h3>Calendário 2026</h3><p>Os doze meses do projeto em folhas A3, com as aquarelas de todos os dias e o nome de cada rua.</p><a class="btn--sm" href="" data-link="calendario" target="_blank" rel="noopener">Comprar o calendário</a></div>
-      <div class="card oferta"><h3>Reprodução de um dia</h3><p>Escolha uma data importante e receba a reprodução do predinho daquele dia. Um presente com dia, rua e cidade. <a href="#seu-dia" style="color:var(--tinta);font-weight:700">Descubra o seu dia ↑</a></p><a class="btn--sm btn--sol" href="" data-link="reproducao" target="_blank" rel="noopener">Comprar a reprodução</a></div>
+      <div class="card oferta"><h3>Calendário 2026</h3><p>Os doze meses do projeto em folhas A3, com as aquarelas de todos os dias e o nome de cada rua.</p><a class="btn--sm" href="" data-link="calendario" target="_blank" rel="noopener">${SACOLA}Comprar o calendário</a></div>
+      <div class="card oferta"><h3>Reprodução de um dia</h3><p>Escolha uma data importante e receba a reprodução do predinho daquele dia. Um presente com dia, rua e cidade. <a href="#seu-dia" style="color:var(--tinta);font-weight:700">Descubra o seu dia ↑</a></p><a class="btn--sm btn--sol" href="" data-link="reproducao" target="_blank" rel="noopener">${SACOLA}Comprar a reprodução</a></div>
       <div class="card oferta"><h3>Encomende uma pintura</h3><p>A sua casa, o prédio da sua infância ou a esquina do seu bairro, em aquarela, no mesmo traço do projeto.</p><a class="btn--sm btn--branco" href="" data-link="orcamento" target="_blank" rel="noopener">Fazer um orçamento</a></div>
     </div>
     <div class="imprensa">
@@ -345,7 +354,7 @@ const NOTAS_MES = {1:'',2:'',3:'',4:'',5:'',6:'',7:'',8:'',9:'',10:'',11:'',12:'
 const ESFORCO = { horas:null, horasBusca:null, cadernos:null };
 
 montarMoldura('inicio');
-document.querySelectorAll('a').forEach(a => { if(a.innerHTML.includes('${ARROW}')) a.innerHTML = a.innerHTML.replace('${ARROW}', ARROW); });
+document.querySelectorAll('a').forEach(a => { if(a.innerHTML.includes('${ARROW}')) a.innerHTML = a.innerHTML.replace('${ARROW}', ARROW); if(a.innerHTML.includes('${SACOLA}')) a.innerHTML = a.innerHTML.replace('${SACOLA}', SACOLA); });
 const wa = t => `https://wa.me/${LINKS.whats}?text=${encodeURIComponent(t)}`;
 const LK = { loja:LINKS.loja, calendario:LINKS.calendario, reproducao:LINKS.reproducao, orcamento:LINKS.orcamento, instagram:LINKS.instagram,
   whats:wa('Olá, Bruno! Gostaria de conversar sobre uma oficina de desenho.'), imprensa:wa('Olá! Gostaria de conversar sobre o projeto Predinho do Dia.') };
@@ -469,7 +478,8 @@ if(!P.some(p=>p.impossivel)) document.getElementById('impossiveis').remove();
     card(P.length, 'dias seguidos desenhando') +
     card(fmt(TOTAL.km)+' km', `de percurso virtual, ou ${(TOTAL.km/40075).toLocaleString('pt-BR',{maximumFractionDigits:1})} voltas na Terra`) +
     card(fmt(TOTAL.maior.d)+' km', `maior salto de um dia para o outro (${TOTAL.maior.de.cidade} → ${TOTAL.maior.para.cidade})`) +
-    (ESFORCO.horas ? card(ESFORCO.horas+' h','pintando, sem contar a busca pelas ruas') : card('— h','horas de pintura (a preencher)', true));
+    (ESFORCO.horas ? card(ESFORCO.horas+' h','pintando, sem contar a busca pelas ruas') : '');
+  if(!ESFORCO.horas) document.getElementById('esforco-cards').classList.add('tres');
 })();
 
 /* ── Parede do ano ── */
@@ -503,8 +513,8 @@ if(!P.some(p=>p.impossivel)) document.getElementById('impossiveis').remove();
     if(!p){ res.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--mudo)">Esse dia ainda não tem predinho no mapa. Que tal <a href="${LINKS.orcamento}" target="_blank" rel="noopener" style="color:var(--tinta);font-weight:700">encomendar uma pintura especial</a>?</div>`; return; }
     res.innerHTML = `<a href="${diaHref(p)}">${pic(p,400)}</a><div>
       <h3>${dataExtenso(p)}</h3><p>${p.rua}<br>${p.cidade} · ${UF_NOME[p.uf]}</p>
-      <div class="acoes"><a class="btn--sm btn--branco" href="${diaHref(p)}">Ver o dia</a>
-      <a class="btn--sm" href="${LINKS.reproducao}" target="_blank" rel="noopener">Quero este</a></div></div>`;
+      <a class="btn--sm btn--branco" href="${diaHref(p)}">Ver o dia</a></div>
+      <a class="btn-compra" href="${LINKS.reproducao}" target="_blank" rel="noopener">${SACOLA}<span>Quero este predinho<small>Na loja, escolha a data ${p.dia}</small></span></a>`;
   }
   sd.onchange = sm.onchange = mostrar; mostrar();
 })();
