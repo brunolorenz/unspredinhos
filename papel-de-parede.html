@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papel de parede · Predinho do Dia</title>
+<meta name="description" content="Transforme o predinho do seu dia em papel de parede para o celular.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#FFD93B">
+<meta property="og:title" content="Papel de parede · Predinho do Dia">
+<meta property="og:image" content="https://brunolorenz.github.io/unspredinhos/img/capa.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<style>
+  .page-hero{padding-top:clamp(2.2rem,5vw,3.5rem)}
+  h1{font-size:clamp(2rem,4.4vw,3.2rem)}
+  .gerador{display:grid;grid-template-columns:1fr minmax(260px,360px);gap:clamp(1.5rem,4vw,3rem);align-items:start;margin-top:2rem}
+  .painel{padding:1.3rem 1.3rem 1.5rem;display:flex;flex-direction:column;gap:1.3rem}
+  .campo > label,.campo > .rot{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:.45rem}
+  .campo small{display:block;font-size:.8rem;color:var(--mudo);margin-top:.35rem}
+  .linha{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+  select,.arquivo{font:inherit;font-weight:700;font-size:.95rem;padding:.55rem .85rem;border:2.5px solid var(--tinta);border-radius:12px;background:#fff;box-shadow:0 3px 0 var(--tinta);cursor:pointer;color:var(--tinta)}
+  .arquivo input{display:none}
+  .ou{font-size:.85rem;font-weight:600;color:var(--mudo)}
+  input[type=range]{width:100%;accent-color:var(--azul)}
+  .valor{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.85rem;color:var(--mudo);float:right}
+  .cores{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+  .amostra{width:44px;height:44px;border-radius:12px;border:2.5px solid var(--tinta);box-shadow:0 3px 0 var(--tinta)}
+  input[type=color]{width:44px;height:44px;border:2.5px solid var(--tinta);border-radius:12px;padding:2px;background:#fff;cursor:pointer;box-shadow:0 3px 0 var(--tinta)}
+  .check{display:flex;gap:.55rem;align-items:center;font-weight:600;font-size:.95rem;cursor:pointer}
+  .check input{width:20px;height:20px;accent-color:var(--azul)}
+  .info-dia{background:var(--tom);border:2px solid var(--tinta);border-radius:12px;padding:.55rem .8rem;font-size:.88rem;font-weight:600}
+  .info-dia b{font-family:'Bricolage Grotesque',sans-serif}
+  .aviso{background:#FFE1D9;border:2px solid var(--tinta);border-radius:12px;padding:.6rem .8rem;font-size:.88rem}
+
+  /* Celular de prévia */
+  .previa{position:sticky;top:calc(var(--nav-h) + 1rem);display:flex;flex-direction:column;align-items:center;gap:1rem}
+  .celular{position:relative;width:100%;max-width:300px;border:3px solid var(--tinta);border-radius:42px;padding:9px;background:var(--tinta);box-shadow:0 8px 0 rgba(17,17,17,.25)}
+  .tela{position:relative;border-radius:33px;overflow:hidden;background:#eee}
+  .tela canvas,.tela img{display:block;width:100%;height:auto}
+  .relogio{position:absolute;left:0;right:0;top:7%;text-align:center;color:#fff;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.25);mix-blend-mode:normal}
+  .relogio small{display:block;font-weight:600;font-size:.8rem;opacity:.95}
+  .relogio b{display:block;font-family:'DM Sans',system-ui,sans-serif;font-weight:700;font-size:3.6rem;line-height:1;letter-spacing:-.02em}
+  .relogio.escuro{color:#111;text-shadow:none}
+  .ilha{position:absolute;top:2.2%;left:50%;transform:translateX(-50%);width:30%;height:3.2%;background:#000;border-radius:99px}
+  .previa .btn{justify-content:center}
+  .dica{font-size:.85rem;color:var(--mudo);text-align:center;max-width:300px}
+  #resultado{display:none}
+  @media (max-width:760px){
+    .gerador{grid-template-columns:1fr}
+    .previa{position:static;order:-1}
+    .celular{max-width:240px}
+    .relogio b{font-size:2.8rem}
+  }
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<main class="page-hero wrap">
+  <span class="sticker">Presente · grátis</span>
+  <h1>O seu dia como <span>papel de parede</span></h1>
+  <p class="lead">Escolha uma data e leve o predinho dela na tela do celular.</p>
+
+  <div class="gerador">
+    <div class="card painel">
+      <div class="campo">
+        <span class="rot">1. Escolha o dia</span>
+        <div class="linha">
+          <select id="sel-dia" aria-label="Dia"></select>
+          <select id="sel-mes" aria-label="Mês"></select>
+        </div>
+        <div class="info-dia" id="info-dia" style="margin-top:.7rem"></div>
+        <div class="aviso" id="aviso" hidden></div>
+      </div>
+
+      <div class="campo">
+        <label for="sel-tela">2. Modelo do celular</label>
+        <select id="sel-tela">
+          <option value="1179x2556">iPhone 14 Pro, 15, 16 (padrão)</option>
+          <option value="1290x2796">iPhone Pro Max / Plus</option>
+          <option value="1170x2532">iPhone 12, 13, 14</option>
+          <option value="1080x2340">iPhone mini / SE grande</option>
+          <option value="1080x2400">Android (a maioria)</option>
+          <option value="1440x3200">Android com tela grande</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="tam">3. Tamanho do predinho <span class="valor" id="tam-v"></span></label>
+        <input type="range" id="tam" min="50" max="100" value="100">
+      </div>
+
+      <div class="campo">
+        <label for="margem">4. Distância do rodapé <span class="valor" id="margem-v"></span></label>
+        <input type="range" id="margem" min="0" max="25" value="0">
+        <small>Com 0%, a aquarela encosta na parte de baixo da tela.</small>
+      </div>
+
+      <div class="campo">
+        <label class="check"><input type="checkbox" id="suave" checked> Suavizar as bordas da imagem</label>
+        <label class="check" style="margin-top:.5rem"><input type="checkbox" id="relogio" checked> Mostrar o relógio na prévia</label>
+      </div>
+    </div>
+
+    <div class="previa">
+      <div class="celular">
+        <div class="tela">
+          <canvas id="tela" aria-label="Prévia do papel de parede"></canvas>
+          <div class="ilha"></div>
+          <div class="relogio" id="relogio-prev"><small id="rel-data"></small><b id="rel-hora">9:41</b></div>
+        </div>
+      </div>
+      <button class="btn" id="salvar" type="button">Salvar papel de parede <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="dica" id="dica">No iPhone, toque em salvar e escolha "Salvar imagem". Depois vá em Ajustes › Imagem de Fundo.</p>
+      <img id="resultado" alt="Papel de parede pronto: toque e segure para salvar">
+    </div>
+  </div>
+</main>
+
+<div id="rodape"></div>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+montarMoldura('');
+const cv = document.getElementById('tela'), ctx = cv.getContext('2d');
+const $ = id => document.getElementById(id);
+const FUNDO = '#FFF8ED';   // cor de fundo fixa de todos os papéis de parede
+let imagem = null, atual = null, origem = 'dia';
+
+/* ── seletor de data ── */
+$('sel-dia').innerHTML = Array.from({length:31},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+$('sel-mes').innerHTML = MESES_T.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+{
+  const k = location.hash.slice(1), h = new Date();
+  const [d,m] = BY[k] ? k.split('-') : [h.getDate(), h.getMonth()+1];
+  $('sel-dia').value = d; $('sel-mes').value = m;
+}
+
+/* ── carregar a imagem ── */
+function carregar(src, usarCors){
+  return new Promise((ok, erro) => {
+    const im = new Image();
+    if(usarCors) im.crossOrigin = 'anonymous';
+    im.onload = () => ok(im); im.onerror = erro; im.src = src;
+  });
+}
+async function imagemDoDia(p){
+  // 1º tenta a aquarela do Drive; se não der, usa o desenho provisório (só para a prévia)
+  if(p.img){
+    try { return {im: await carregar(imgURL(p, 1600), true), real:true}; } catch(e){}
+  }
+  const svg = predinhoSVG(p).replace('preserveAspectRatio="xMidYMax slice"','').replace('<svg ','<svg width="996" height="1280" ');
+  const url = URL.createObjectURL(new Blob([svg], {type:'image/svg+xml'}));
+  return {im: await carregar(url, false), real:false};
+}
+async function escolherDia(){
+  origem = 'dia';
+  const p = BY[`${$('sel-dia').value}-${$('sel-mes').value}`];
+  atual = p;
+  if(!p){ $('info-dia').innerHTML = 'Esse dia não tem predinho. Escolha outra data.'; imagem = null; desenhar(); return; }
+  $('info-dia').innerHTML = `<b>${dataExtenso(p)}</b> · ${p.rua}, ${p.cidade}/${p.uf}`;
+  history.replaceState(null, '', '#'+p.key);
+  const r = await imagemDoDia(p);
+  if(atual !== p) return;
+  imagem = r.im;
+  $('aviso').hidden = r.real;
+  $('aviso').textContent = 'Não consegui carregar a aquarela original aqui, então a prévia mostra um desenho provisório. Fora do site publicado, isso é normal.';
+  desenhar();
+}
+$('sel-dia').onchange = $('sel-mes').onchange = escolherDia;
+/* ── desenho ── */
+function hexRgb(h){ const n = parseInt(h.slice(1),16); return [n>>16&255, n>>8&255, n&255]; }
+function claro(h){ const [r,g,b] = hexRgb(h); return (0.299*r + 0.587*g + 0.114*b) > 150; }
+
+function desenhar(){
+  const [W,H] = $('sel-tela').value.split('x').map(Number);
+  cv.width = W; cv.height = H;
+  const fundo = FUNDO;
+  ctx.fillStyle = fundo; ctx.fillRect(0,0,W,H);
+  const tam = +$('tam').value, mg = +$('margem').value;
+  $('tam-v').textContent = tam+'%'; $('margem-v').textContent = mg+'%';
+  if(imagem){
+    const iw = W * tam/100, ih = iw * imagem.height / imagem.width;
+    const x = (W - iw)/2, y = H - ih - H*mg/100;
+    ctx.drawImage(imagem, x, y, iw, ih);
+    if($('suave').checked){
+      // degradê da cor de fundo sobre as bordas, para a imagem "sumir" no fundo
+      const f = Math.max(iw*.06, 24), [r,g,b] = hexRgb(fundo), cor = a => `rgba(${r},${g},${b},${a})`;
+      const faixa = (x0,y0,x1,y1,rx,ry,rw,rh) => { const gr = ctx.createLinearGradient(x0,y0,x1,y1); gr.addColorStop(0,cor(1)); gr.addColorStop(1,cor(0)); ctx.fillStyle = gr; ctx.fillRect(rx,ry,rw,rh); };
+      faixa(0,y,0,y+f, x,y,iw,f);                                   // topo
+      if(tam < 100){ faixa(x,0,x+f,0, x,y,f,ih); faixa(x+iw,0,x+iw-f,0, x+iw-f,y,f,ih); }   // laterais
+      if(mg > 0) faixa(0,y+ih,0,y+ih-f, x,y+ih-f,iw,f);             // base
+    }
+  }
+  // relógio da prévia (não vai para a imagem final)
+  const rel = $('relogio-prev');
+  rel.style.display = $('relogio').checked ? '' : 'none';
+  rel.classList.toggle('escuro', claro(fundo));
+  const h = new Date();
+  $('rel-hora').textContent = h.getHours() + ':' + pad(h.getMinutes());
+  $('rel-data').textContent = SEMANA[h.getDay()].replace('-feira','') + ', ' + h.getDate() + ' de ' + MESES[h.getMonth()];
+}
+['sel-tela','tam','margem','suave','relogio'].forEach(id => $(id).addEventListener('input', desenhar));
+
+/* ── salvar ── */
+$('salvar').onclick = () => {
+  let nome = 'papel-de-parede-predinho';
+  if(origem==='dia' && atual) nome += '-' + pad(atual.d) + '-' + pad(atual.m);
+  let ok = true;
+  try { cv.toBlob(async blob => {
+    if(!blob){ return falhou(); }
+    const arq = new File([blob], nome + '.png', {type:'image/png'});
+    // no celular, a folha de compartilhamento tem "Salvar imagem" direto nas Fotos
+    if(navigator.canShare && navigator.canShare({files:[arq]})){
+      try { await navigator.share({files:[arq], title:'Papel de parede · Predinho do Dia'}); return; } catch(e){ if(e.name==='AbortError') return; }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = nome + '.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    // plano B: mostra a imagem pronta para tocar e segurar
+    const r = $('resultado'); r.src = url; r.style.display = 'block'; r.style.maxWidth = '300px'; r.style.borderRadius = '20px'; r.style.border = '2.5px solid #111';
+    $('dica').textContent = 'Se o download não começou, toque e segure a imagem abaixo para salvá-la.';
+  }, 'image/png'); } catch(e){ falhou(); }
+  function falhou(){ $('dica').textContent = 'Não foi possível gerar o arquivo com esta imagem. Tente de novo em alguns instantes.'; }
+};
+
+addEventListener('hashchange', () => { const k = location.hash.slice(1); if(BY[k]){ const [d,m] = k.split('-'); $('sel-dia').value = d; $('sel-mes').value = m; escolherDia(); } });
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(escolherDia);
+</script>
+</body>
+</html>

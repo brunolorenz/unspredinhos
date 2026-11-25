@@ -159,6 +159,7 @@ function montarMoldura(ativa){
     <div class="rodape__links">
       <a class="btn--sm btn--sol" href="${LINKS.instagram}" target="_blank" rel="noopener">@unspredinhos</a>
       <a class="btn--sm btn--branco" href="${LINKS.loja}" target="_blank" rel="noopener">Loja</a>
+      <a class="btn--sm btn--branco" href="papel-de-parede.html">Papel de parede</a>
       <a class="btn--sm" href="https://wa.me/${LINKS.whats}" target="_blank" rel="noopener">Fale comigo</a>
     </div>
     <div class="credit">Aquarelas e desenhos: Bruno Lorenz · @unspredinhos · 2026</div>
